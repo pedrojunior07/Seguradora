@@ -14,11 +14,13 @@ return new class extends Migration
        Schema::create('comissao', function (Blueprint $table) {
     $table->id();
 
-    $table->foreignId('corretora_seguro_seguradora_id')
-          ->constrained('corretora_seguro_seguradora');
+    $table->unsignedBigInteger('corretora_seguro_seguradora_id');
+    $table->foreign('corretora_seguro_seguradora_id', 'comissao_corretora_fk')
+          ->references('id')->on('corretora_seguroseguradora');
 
-    $table->foreignId('propriedade_cliente_seguradora_seguro_id')
-          ->constrained('propriedade_cliente_seguradora_seguro');
+    $table->unsignedBigInteger('prop_cliente_seg_seguro_id');
+    $table->foreign('prop_cliente_seg_seguro_id', 'comissao_prop_cliente_fk')
+          ->references('id')->on('prop_cliente_seg_seguro');
 
     $table->decimal('base_calculo', 12, 2);
     $table->decimal('percentagem', 5, 2);

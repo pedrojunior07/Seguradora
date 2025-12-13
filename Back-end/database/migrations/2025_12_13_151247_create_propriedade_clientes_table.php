@@ -11,7 +11,7 @@ return new class extends Migration {
 
             // Dono da propriedade
             $table->foreignId('cliente_id')
-                  ->constrained('clientes')
+                  ->constrained('clientes', 'id_cliente')
                   ->cascadeOnDelete();
 
             // Dados da propriedade

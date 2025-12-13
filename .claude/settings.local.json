@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh:*)",
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan migrate:status:*)",
+      "Bash(php artisan:*)",
+      "Bash(find:*)",
+      "Bash(dir /b \"c:\\Users\\Pedro Manjate\\Documents\\GitHub\\Seguradora\\Back-end\\database\\migrations\")",
+      "Bash(ren:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

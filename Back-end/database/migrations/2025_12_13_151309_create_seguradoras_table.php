@@ -11,19 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('seguros', function (Blueprint $table) {
-    $table->id('id_seguro');
-    $table->foreignId('id_categoria')
-          ->constrained('categorias', 'id_categoria');
-
-    $table->string('nome');
-    $table->text('descricao')->nullable();
-    $table->string('tipo_seguro');
-    $table->date('data_criacao');
-    $table->date('data_atualizacao')->nullable();
-    $table->timestamps();
-});
-
+        Schema::create('seguradoras', function (Blueprint $table) {
+            $table->id('id_seguradora');
+            $table->string('nome');
+            $table->string('nuit')->unique();
+            $table->string('telefone');
+            $table->string('email')->nullable();
+            $table->string('endereco')->nullable();
+            $table->boolean('status')->default(true);
+            $table->timestamps();
+        });
     }
 
     /**

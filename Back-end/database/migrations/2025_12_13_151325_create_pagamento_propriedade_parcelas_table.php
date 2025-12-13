@@ -25,7 +25,7 @@ return new class extends Migration
 
     $table->foreignId('id_metodo_pagamento')
           ->nullable()
-          ->constrained('metodo_pagamento', 'id_metodo');
+          ->constrained('metodo_pagamentos');
 
     $table->timestamps();
 });

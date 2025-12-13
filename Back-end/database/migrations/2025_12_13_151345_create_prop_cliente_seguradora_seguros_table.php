@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('propriedade_cliente_seguradora_seguro', function (Blueprint $table) {
+       Schema::create('prop_cliente_seg_seguro', function (Blueprint $table) {
     $table->id();
 
-    $table->foreignId('propriedade_cliente_id')
-          ->constrained('propriedade_cliente');
+    $table->unsignedBigInteger('propriedade_cliente_id');
+    $table->foreign('propriedade_cliente_id', 'prop_cliente_fk')
+          ->references('id')->on('propriedade_cliente');
 
-    $table->foreignId('seguradora_seguro_id')
-          ->constrained('seguradora_seguro');
+    $table->unsignedBigInteger('seguradora_seguro_id');
+    $table->foreign('seguradora_seguro_id', 'seg_seguro_fk')
+          ->references('id')->on('seguradora_seguro');
 
     $table->string('status');
     $table->date('data_registo');

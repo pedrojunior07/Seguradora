@@ -16,7 +16,7 @@ return new class extends Migration
     $table->string('nome_banco');
     $table->string('numero_conta');
     $table->string('titular');
-    $table->foreignId('seguradora_id')->constrained('seguradoras');
+    $table->foreignId('seguradora_id')->constrained('seguradoras', 'id_seguradora');
     $table->timestamps();
 });
 
