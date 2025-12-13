@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+       Schema::create('detalhes_bancarios', function (Blueprint $table) {
+    $table->id();
+    $table->string('nome_banco');
+    $table->string('numero_conta');
+    $table->string('titular');
+    $table->foreignId('seguradora_id')->constrained('seguradoras');
+    $table->timestamps();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('detalhes_bancarios');
+    }
+};
