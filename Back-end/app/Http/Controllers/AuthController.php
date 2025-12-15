@@ -2,51 +2,81 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    // LOGIN
+    public function __construct(protected AuthService $authService) {}
+
+    public function register(RegisterRequest $request)
+    {
+        try {
+            $resultado = $this->authService->registrar($request->validated());
+
+            return response()->json([
+                'message' => 'Registro realizado com sucesso',
+                'user' => $resultado['user'],
+                'entidade' => $resultado['entidade'],
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao registrar',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email'    => 'required|email',
+        $request->validate([
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        if (! $token = Auth::attempt($credentials)) {
+        try {
+            $resultado = $this->authService->login($request->email, $request->password);
+
+            if (!$resultado) {
+                return response()->json([
+                    'message' => 'Credenciais inválidas',
+                ], 401);
+            }
+
+            return response()->json($resultado, 200);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Credenciais inválidas'
-            ], 401);
+                'message' => $e->getMessage(),
+            ], 403);
         }
-
-        return $this->respondWithToken($token);
     }
 
-    // USUÁRIO AUTENTICADO
-    public function me()
+    public function me(Request $request)
     {
-        return response()->json(Auth::user());
-    }
-
-    // LOGOUT
-    public function logout()
-    {
-        Auth::logout();
+        $user = $request->user()->load($request->user()->perfil);
 
         return response()->json([
-            'message' => 'Logout realizado com sucesso'
+            'user' => $user,
+            'entidade' => $user->getPerfilEntidade(),
         ]);
     }
 
-    // FORMATO DO TOKEN
-    protected function respondWithToken($token)
+    public function logout(Request $request)
+    {
+        auth()->logout();
+
+        return response()->json([
+            'message' => 'Logout realizado com sucesso',
+        ]);
+    }
+
+    public function refresh()
     {
         return response()->json([
-            'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => auth()->factory()->getTTL() * 60
+            'access_token' => auth('api')->refresh(),
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
         ]);
     }
 }

@@ -1,0 +1,473 @@
+{
+  "info": {
+    "name": "Seguradora API Tests",
+    "description": "Collection of API test requests for the Insurance Management System",
+    "version": "1.0.0",
+    "baseUrl": "http://127.0.0.1:8000/api"
+  },
+
+  "auth": {
+    "register_seguradora": {
+      "method": "POST",
+      "url": "/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "name": "Admin Seguradora",
+        "email": "admin@seguradora.com",
+        "password": "password123",
+        "password_confirmation": "password123",
+        "perfil": "seguradora",
+        "nome_empresa": "Seguradora Principal",
+        "nuit": "123456789",
+        "endereco": "Av. Principal, 100"
+      },
+      "expected_response": 201,
+      "description": "Register a new Insurance Company (Seguradora)"
+    },
+
+    "register_corretora": {
+      "method": "POST",
+      "url": "/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "name": "Admin Corretora",
+        "email": "admin@corretora.com",
+        "password": "password123",
+        "password_confirmation": "password123",
+        "perfil": "corretora",
+        "nome_empresa": "Corretora Teste",
+        "nuit": "987654321",
+        "endereco": "Rua Comercial, 50",
+        "licenca": "LIC-2025-001"
+      },
+      "expected_response": 201,
+      "description": "Register a new Broker (Corretora)"
+    },
+
+    "register_cliente": {
+      "method": "POST",
+      "url": "/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "name": "Cliente Pessoa",
+        "email": "cliente@test.com",
+        "password": "password123",
+        "password_confirmation": "password123",
+        "perfil": "cliente",
+        "tipo_cliente": "fisica",
+        "nome_completo": "João da Silva",
+        "nuit": "111222333",
+        "documento": "BI-123456",
+        "endereco": "Rua Residencial, 25",
+        "telefone1": "258123456789",
+        "telefone2": "258987654321"
+      },
+      "expected_response": 201,
+      "description": "Register a new Client (Cliente)"
+    },
+
+    "login": {
+      "method": "POST",
+      "url": "/login",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "email": "admin@seguradora.com",
+        "password": "password123"
+      },
+      "expected_response": 200,
+      "description": "Login and receive JWT token",
+      "note": "Save the 'token' from response for authenticated requests"
+    }
+  },
+
+  "user": {
+    "get_profile": {
+      "method": "GET",
+      "url": "/me",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get current user profile and linked entity",
+      "note": "Replace {JWT_TOKEN} with token from login response"
+    },
+
+    "logout": {
+      "method": "POST",
+      "url": "/logout",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Logout current user"
+    },
+
+    "refresh_token": {
+      "method": "POST",
+      "url": "/refresh",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Refresh JWT token"
+    }
+  },
+
+  "seguradora": {
+    "list_policies_pending": {
+      "method": "GET",
+      "url": "/seguradora/apolices/pendentes",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List pending policies for approval",
+      "profile": "seguradora"
+    },
+
+    "list_policies_active": {
+      "method": "GET",
+      "url": "/seguradora/apolices/ativas",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List active policies"
+    },
+
+    "get_policy": {
+      "method": "GET",
+      "url": "/seguradora/apolices/{apolice_id}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get specific policy details"
+    },
+
+    "approve_policy": {
+      "method": "POST",
+      "url": "/seguradora/apolices/{apolice_id}/aprovar",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "body": {
+        "observacoes": "Policy approved for coverage"
+      },
+      "expected_response": 200,
+      "description": "Approve a pending policy"
+    },
+
+    "reject_policy": {
+      "method": "POST",
+      "url": "/seguradora/apolices/{apolice_id}/rejeitar",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "body": {
+        "motivo": "Documentation incomplete"
+      },
+      "expected_response": 200,
+      "description": "Reject a pending policy"
+    },
+
+    "list_claims_pending": {
+      "method": "GET",
+      "url": "/seguradora/sinistros/pendentes",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List pending claims"
+    },
+
+    "get_claim": {
+      "method": "GET",
+      "url": "/seguradora/sinistros/{sinistro_id}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get specific claim details"
+    },
+
+    "analyze_claim": {
+      "method": "POST",
+      "url": "/seguradora/sinistros/{sinistro_id}/analisar",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "body": {
+        "observacoes": "Claim under analysis"
+      },
+      "expected_response": 200,
+      "description": "Start analyzing a claim"
+    },
+
+    "approve_claim": {
+      "method": "POST",
+      "url": "/seguradora/sinistros/{sinistro_id}/aprovar",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "body": {
+        "valor_aprovado": 5000.00,
+        "franquia": 500.00
+      },
+      "expected_response": 200,
+      "description": "Approve a claim with amount"
+    }
+  },
+
+  "corretora": {
+    "list_proposals": {
+      "method": "GET",
+      "url": "/corretora/propostas",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List all proposals",
+      "profile": "corretora"
+    },
+
+    "create_proposal": {
+      "method": "POST",
+      "url": "/corretora/propostas",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "body": {
+        "cliente_id": 1,
+        "seguro_id": 1,
+        "bem_segurado_id": 1,
+        "bem_segurado_type": "App\\Models\\Veiculo",
+        "valor_imovel": 50000.00
+      },
+      "expected_response": 201,
+      "description": "Create a new proposal"
+    },
+
+    "get_proposal": {
+      "method": "GET",
+      "url": "/corretora/propostas/{proposta_id}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get specific proposal details"
+    },
+
+    "send_proposal": {
+      "method": "POST",
+      "url": "/corretora/propostas/{proposta_id}/enviar",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Send proposal to insurance company"
+    },
+
+    "convert_to_policy": {
+      "method": "POST",
+      "url": "/corretora/propostas/{proposta_id}/converter-apolice",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 201,
+      "description": "Convert approved proposal into policy"
+    }
+  },
+
+  "cliente": {
+    "list_policies": {
+      "method": "GET",
+      "url": "/cliente/apolices",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List all client policies",
+      "profile": "cliente"
+    },
+
+    "list_active_policies": {
+      "method": "GET",
+      "url": "/cliente/apolices/ativas",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List active client policies"
+    },
+
+    "get_policy": {
+      "method": "GET",
+      "url": "/cliente/apolices/{apolice_id}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get specific policy details"
+    },
+
+    "get_policy_payments": {
+      "method": "GET",
+      "url": "/cliente/apolices/{apolice_id}/pagamentos",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get payment schedule for a policy"
+    },
+
+    "list_claims": {
+      "method": "GET",
+      "url": "/cliente/sinistros",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List all client claims"
+    },
+
+    "register_claim": {
+      "method": "POST",
+      "url": "/cliente/sinistros",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "body": {
+        "apolice_id": 1,
+        "data_ocorrencia": "2025-12-14T10:30:00Z",
+        "descricao": "Vehicle accident claim",
+        "localizacao": "Main Street, intersection",
+        "tipo_bem": "veiculo"
+      },
+      "expected_response": 201,
+      "description": "Register a new claim"
+    },
+
+    "get_claim": {
+      "method": "GET",
+      "url": "/cliente/sinistros/{sinistro_id}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get specific claim details"
+    },
+
+    "track_claim": {
+      "method": "GET",
+      "url": "/cliente/sinistros/{sinistro_id}/acompanhamento",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Track claim status and progress"
+    },
+
+    "list_payments": {
+      "method": "GET",
+      "url": "/cliente/pagamentos",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List all payments"
+    },
+
+    "list_pending_payments": {
+      "method": "GET",
+      "url": "/cliente/pagamentos/pendentes",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List pending payments"
+    },
+
+    "list_overdue_payments": {
+      "method": "GET",
+      "url": "/cliente/pagamentos/atrasados",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "List overdue payments"
+    },
+
+    "get_payment": {
+      "method": "GET",
+      "url": "/cliente/pagamentos/{pagamento_id}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "expected_response": 200,
+      "description": "Get specific payment details"
+    },
+
+    "register_payment": {
+      "method": "POST",
+      "url": "/cliente/pagamentos/{pagamento_id}/registrar",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {JWT_TOKEN}"
+      },
+      "body": {
+        "metodo_pagamento_id": 1,
+        "valor_pago": 500.00,
+        "referencia_pagamento": "TRX-2025-001234",
+        "comprovante": null
+      },
+      "expected_response": 200,
+      "description": "Register a payment"
+    }
+  },
+
+  "notes": {
+    "authentication": "All protected endpoints require JWT token in Authorization header as 'Bearer {token}'",
+    "profiles": "Each user profile has specific endpoints: seguradora, corretora, cliente",
+    "errors": "Check response status codes: 201 Created, 200 OK, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found",
+    "database": "Make sure you have run migrations before testing",
+    "server": "Server must be running on http://127.0.0.1:8000"
+  }
+}

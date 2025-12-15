@@ -2,47 +2,110 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'perfil',
+        'perfil_id',
+        'status',
+        'telefone',
+        'ultimo_acesso',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'ultimo_acesso' => 'datetime',
+            'status' => 'boolean',
         ];
+    }
+
+    // JWT Methods
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [
+            'perfil' => $this->perfil,
+            'perfil_id' => $this->perfil_id,
+        ];
+    }
+
+    // Relationships
+    public function seguradora()
+    {
+        return $this->belongsTo(Seguradora::class, 'perfil_id', 'id_seguradora');
+    }
+
+    public function corretora()
+    {
+        return $this->belongsTo(Corretora::class, 'perfil_id', 'id_corretora');
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class, 'perfil_id', 'id_cliente');
+    }
+
+    public function agente()
+    {
+        return $this->belongsTo(Agente::class, 'perfil_id', 'id_agente');
+    }
+
+    // Helpers
+    public function isSeguradora(): bool
+    {
+        return $this->perfil === 'seguradora';
+    }
+
+    public function isCorretora(): bool
+    {
+        return $this->perfil === 'corretora';
+    }
+
+    public function isCliente(): bool
+    {
+        return $this->perfil === 'cliente';
+    }
+
+    public function isAgente(): bool
+    {
+        return $this->perfil === 'agente';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->perfil === 'admin';
+    }
+
+    public function getPerfilEntidade()
+    {
+        return match($this->perfil) {
+            'seguradora' => $this->seguradora,
+            'corretora' => $this->corretora,
+            'cliente' => $this->cliente,
+            'agente' => $this->agente,
+            default => null,
+        };
     }
 }
