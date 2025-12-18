@@ -17,6 +17,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'perfil',
         'perfil_id',
+        'seguradora_id',
         'status',
         'telefone',
         'ultimo_acesso',
@@ -54,7 +55,7 @@ class User extends Authenticatable implements JWTSubject
     // Relationships
     public function seguradora()
     {
-        return $this->belongsTo(Seguradora::class, 'perfil_id', 'id_seguradora');
+        return $this->belongsTo(Seguradora::class, 'seguradora_id', 'id_seguradora');
     }
 
     public function corretora()

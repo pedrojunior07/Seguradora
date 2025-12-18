@@ -14,10 +14,14 @@ class Seguradora extends Model
 
     protected $fillable = [
         'nome',
+        'nome_responsavel',
         'nuit',
         'telefone',
+        'telefone1',
+        'telefone2',
         'email',
         'endereco',
+        'licenca',
         'status',
     ];
 
@@ -28,8 +32,7 @@ class Seguradora extends Model
     // Relacionamentos
     public function users()
     {
-        return $this->hasMany(User::class, 'perfil_id', 'id_seguradora')
-                    ->where('perfil', 'seguradora');
+        return $this->hasMany(User::class, 'seguradora_id', 'id_seguradora');
     }
 
     public function seguros()

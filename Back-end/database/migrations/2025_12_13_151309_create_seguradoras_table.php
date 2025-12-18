@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('seguradoras', function (Blueprint $table) {
             $table->id('id_seguradora');
             $table->string('nome');
+            $table->string('nome_responsavel')->nullable();
             $table->string('nuit')->unique();
             $table->string('telefone');
+            $table->string('telefone1')->nullable();
+            $table->string('telefone2')->nullable();
             $table->string('email')->nullable();
             $table->string('endereco')->nullable();
+            $table->string('licenca')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

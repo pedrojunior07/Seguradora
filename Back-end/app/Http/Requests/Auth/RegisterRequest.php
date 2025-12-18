@@ -24,15 +24,21 @@ class RegisterRequest extends FormRequest
         // Regras específicas por perfil
         if ($this->perfil === 'seguradora') {
             $rules['nome_empresa'] = 'required|string|max:255';
+            $rules['nome_responsavel'] = 'nullable|string|max:255';
             $rules['nuit'] = 'required|string|unique:seguradoras,nuit';
+            $rules['telefone1'] = 'required|string|max:20';
+            $rules['telefone2'] = 'nullable|string|max:20';
             $rules['endereco'] = 'nullable|string|max:255';
+            $rules['licenca'] = 'nullable|string|max:100';
         }
 
         if ($this->perfil === 'corretora') {
             $rules['nome_empresa'] = 'required|string|max:255';
+            $rules['nome_responsavel'] = 'nullable|string|max:255';
             $rules['nuit'] = 'required|string|unique:corretoras,nuit';
+            $rules['telefone1'] = 'required|string|max:20';
+            $rules['telefone2'] = 'nullable|string|max:20';
             $rules['endereco'] = 'nullable|string|max:255';
-            $rules['licenca'] = 'nullable|string|max:100';
         }
 
         if ($this->perfil === 'cliente') {

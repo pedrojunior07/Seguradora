@@ -12,6 +12,9 @@ class Seguro extends Model
     protected $table = 'seguros';
     protected $primaryKey = 'id_seguro';
 
+    const CREATED_AT = 'data_criacao';
+    const UPDATED_AT = 'data_atualizacao';
+
     protected $fillable = [
         'id_categoria',
         'nome',

@@ -20,6 +20,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('metodo_pagamentos', function (Blueprint $table) {
+            $table->dropUnique(['codigo']); // Remove o índice único antes de remover a coluna
             $table->dropColumn(['nome', 'codigo', 'descricao', 'ativo', 'configuracoes']);
         });
     }

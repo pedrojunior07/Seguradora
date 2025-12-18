@@ -18,47 +18,42 @@ import { useAuth } from '@context/AuthContext';
 const Login = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
+
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
         setError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setLoading(true);
+        setError('');
 
         try {
             const data = await login(formData.email, formData.password);
-
-            // Redirect based on user profile
             const profile = data.user.perfil;
-            switch (profile) {
-                case 'seguradora':
-                    navigate('/seguradora/dashboard');
-                    break;
-                case 'corretora':
-                    navigate('/corretora/dashboard');
-                    break;
-                case 'cliente':
-                    navigate('/cliente/dashboard');
-                    break;
-                default:
-                    navigate('/');
-            }
+            console.log("token:   " + data.token)
+
+            if (profile === 'seguradora') navigate('/seguradora/dashboard');
+            else if (profile === 'corretora') navigate('/corretora/dashboard');
+            else if (profile === 'cliente') navigate('/cliente/dashboard');
+            else navigate('/');
         } catch (err) {
-            setError(err.message || 'Falha no login. Verifique suas credenciais.');
+            console.error('Login error:', err);
+
+            // Extract error message from API response
+            if (err.data?.message) {
+                setError(err.data.message);
+            } else if (err.message) {
+                setError(err.message);
+            } else {
+                setError('Email ou senha inválidos. Verifique suas credenciais e tente novamente.');
+            }
         } finally {
             setLoading(false);
         }
@@ -70,30 +65,44 @@ const Login = () => {
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #eef2ff, #f8fafc)',
             }}
         >
             <Container maxWidth="sm">
                 <Card
-                    elevation={24}
                     sx={{
-                        borderRadius: 4,
-                        backdropFilter: 'blur(10px)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        borderRadius: 3,
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                        animation: 'fadeIn 0.6s ease-in-out',
                     }}
                 >
-                    <CardContent sx={{ p: 5 }}>
-                        <Box textAlign="center" mb={4}>
-                            <Typography variant="h3" fontWeight="bold" color="primary" gutterBottom>
-                                Sistema de Seguros
+                    <CardContent sx={{ p: 4 }}>
+                        <Box textAlign="center" mb={3}>
+                            <Box
+                                sx={{
+                                    width: 60,
+                                    height: 60,
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    margin: '0 auto 16px',
+                                    color: 'white'
+                                }}
+                            >
+                                <Lock fontSize="large" />
+                            </Box>
+                            <Typography variant="h4" fontWeight={700} gutterBottom color="#1e3a8a">
+                                Seguro+
                             </Typography>
-                            <Typography variant="h6" color="text.secondary">
-                                Faça login na sua conta
+                            <Typography variant="body1" color="text.secondary">
+                                Bem-vindo ao seu portal de seguros
                             </Typography>
                         </Box>
 
                         {error && (
-                            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                            <Alert severity="error" sx={{ mb: 2 }}>
                                 {error}
                             </Alert>
                         )}
@@ -103,19 +112,23 @@ const Login = () => {
                                 fullWidth
                                 label="Email"
                                 name="email"
-                                type="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                required
                                 margin="normal"
+                                required
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <Email color="primary" />
+                                            <Email fontSize="small" sx={{ color: '#1e40af' }} />
                                         </InputAdornment>
                                     ),
                                 }}
-                                sx={{ mb: 2 }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': { borderColor: '#1e40af' },
+                                        '&.Mui-focused fieldset': { borderColor: '#1e40af' },
+                                    }
+                                }}
                             />
 
                             <TextField
@@ -125,47 +138,53 @@ const Login = () => {
                                 type={showPassword ? 'text' : 'password'}
                                 value={formData.password}
                                 onChange={handleChange}
-                                required
                                 margin="normal"
+                                required
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <Lock color="primary" />
+                                            <Lock fontSize="small" sx={{ color: '#1e40af' }} />
                                         </InputAdornment>
                                     ),
                                     endAdornment: (
                                         <InputAdornment position="end">
                                             <IconButton
                                                 onClick={() => setShowPassword(!showPassword)}
-                                                edge="end"
+                                                size="small"
                                             >
                                                 {showPassword ? <VisibilityOff /> : <Visibility />}
                                             </IconButton>
                                         </InputAdornment>
                                     ),
                                 }}
-                                sx={{ mb: 3 }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': { borderColor: '#1e40af' },
+                                        '&.Mui-focused fieldset': { borderColor: '#1e40af' },
+                                    }
+                                }}
                             />
 
                             <Button
                                 type="submit"
                                 fullWidth
-                                variant="contained"
-                                size="large"
                                 disabled={loading}
                                 sx={{
+                                    mt: 3,
                                     py: 1.5,
-                                    fontSize: '1.1rem',
-                                    fontWeight: 'bold',
                                     borderRadius: 2,
                                     textTransform: 'none',
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    fontSize: '1rem',
+                                    fontWeight: 600,
+                                    backgroundColor: '#1e40af',
+                                    boxShadow: '0 4px 14px 0 rgba(30, 64, 175, 0.39)',
                                     '&:hover': {
-                                        background: 'linear-gradient(135deg, #5568d3 0%, #6a4293 100%)',
+                                        backgroundColor: '#1e3a8a',
+                                        boxShadow: '0 6px 20px rgba(30, 64, 175, 0.23)'
                                     },
                                 }}
                             >
-                                {loading ? 'Entrando...' : 'Entrar'}
+                                {loading ? 'Entrando...' : 'Acessar Conta'}
                             </Button>
                         </form>
 
@@ -174,15 +193,29 @@ const Login = () => {
                                 Não tem uma conta?{' '}
                                 <Link
                                     to="/register"
-                                    style={{ color: '#667eea', fontWeight: 'bold', textDecoration: 'none' }}
+                                    style={{
+                                        color: '#1e40af',
+                                        fontWeight: 500,
+                                        textDecoration: 'none',
+                                    }}
                                 >
-                                    Registre-se
+                                    Criar conta
                                 </Link>
                             </Typography>
                         </Box>
                     </CardContent>
                 </Card>
             </Container>
+
+            {/* animação */}
+            <style>
+                {`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                `}
+            </style>
         </Box>
     );
 };

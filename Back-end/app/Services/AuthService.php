@@ -21,10 +21,14 @@ class AuthService
                 case 'seguradora':
                     $entidade = Seguradora::create([
                         'nome' => $dados['nome_empresa'],
+                        'nome_responsavel' => $dados['nome_responsavel'] ?? null,
                         'nuit' => $dados['nuit'],
-                        'telefone' => $dados['telefone'] ?? '',
+                        'telefone' => $dados['telefone1'],
+                        'telefone1' => $dados['telefone1'],
+                        'telefone2' => $dados['telefone2'] ?? null,
                         'email' => $dados['email'],
                         'endereco' => $dados['endereco'] ?? null,
+                        'licenca' => $dados['licenca'] ?? null,
                         'status' => true,
                     ]);
                     break;
@@ -32,11 +36,13 @@ class AuthService
                 case 'corretora':
                     $entidade = Corretora::create([
                         'nome' => $dados['nome_empresa'],
+                        'nome_responsavel' => $dados['nome_responsavel'] ?? null,
                         'nuit' => $dados['nuit'],
-                        'telefone' => $dados['telefone'] ?? '',
+                        'telefone' => $dados['telefone1'],
+                        'telefone1' => $dados['telefone1'],
+                        'telefone2' => $dados['telefone2'] ?? null,
                         'email' => $dados['email'],
                         'endereco' => $dados['endereco'] ?? null,
-                        'licenca' => $dados['licenca'] ?? null,
                         'status' => true,
                     ]);
                     break;
@@ -61,6 +67,7 @@ class AuthService
                 'password' => Hash::make($dados['password']),
                 'perfil' => $dados['perfil'],
                 'perfil_id' => $entidade->getKey(),
+                'seguradora_id' => $dados['perfil'] === 'seguradora' ? $entidade->getKey() : null,
                 'telefone' => $dados['telefone'] ?? null,
                 'status' => true,
             ]);

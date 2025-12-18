@@ -12,6 +12,9 @@ const authService = {
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
+                if (response.data.entidade) {
+                    localStorage.setItem('entidade', JSON.stringify(response.data.entidade));
+                }
             }
 
             return response.data;
@@ -31,6 +34,29 @@ const authService = {
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
+                // Logic to extract entity data
+                let entidade = response.data.entidade;
+
+                // If not found in root, check inside user object using 'entidade' key or dynamic profile key
+                if (!entidade && response.data.user) {
+                    entidade = response.data.user.entidade;
+
+                    if (!entidade && response.data.user.perfil) {
+                        // The backend returns the relation with the same name as the profile
+                        // e.g. user.seguradora, user.corretora
+                        entidade = response.data.user[response.data.user.perfil];
+                    }
+                }
+
+                if (entidade) {
+                    localStorage.setItem('entidade', JSON.stringify(entidade));
+                }
+
+                // Return response with the extracted entity to ensure Context updates immediately
+                return {
+                    ...response.data,
+                    entidade: entidade
+                };
             }
 
             return response.data;
@@ -48,6 +74,7 @@ const authService = {
         } finally {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            localStorage.removeItem('entidade');
         }
     },
 
@@ -55,6 +82,9 @@ const authService = {
     getProfile: async () => {
         try {
             const response = await api.get('/me');
+            if (response.data.entidade) {
+                localStorage.setItem('entidade', JSON.stringify(response.data.entidade));
+            }
             return response.data;
         } catch (error) {
             throw error;
@@ -82,6 +112,19 @@ const authService = {
         if (userStr) {
             try {
                 return JSON.parse(userStr);
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    },
+
+    // Get current entity from localStorage
+    getCurrentEntity: () => {
+        const entityStr = localStorage.getItem('entidade');
+        if (entityStr) {
+            try {
+                return JSON.parse(entityStr);
             } catch (e) {
                 return null;
             }

@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('corretoras', function (Blueprint $table) {
-    $table->id('id_corretora');
-    $table->string('nome');
-    $table->string('nuit')->unique();
-    $table->string('telefone');
-    $table->string('email')->nullable();
-    $table->string('endereco')->nullable();
-    $table->timestamps();
-});
+        Schema::create('corretoras', function (Blueprint $table) {
+            $table->id('id_corretora');
+            $table->string('nome');
+            $table->string('nome_responsavel')->nullable();
+            $table->string('nuit')->unique();
+            $table->string('telefone');
+            $table->string('telefone1')->nullable();
+            $table->string('telefone2')->nullable();
+            $table->string('email')->nullable();
+            $table->string('endereco')->nullable();
+            $table->timestamps();
+        });
 
     }
 

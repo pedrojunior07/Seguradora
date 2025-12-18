@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-class PagamentoPropParcela extends Model
+class PagamentoPropriedadeParcela extends Model
 {
     protected $table = 'pagamento_prop_parcela';
 

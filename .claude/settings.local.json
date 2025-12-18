@@ -14,7 +14,10 @@
       "Bash(composer install:*)",
       "Bash(curl:*)",
       "Bash(TOKEN=\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzY1NzUyOTIzLCJleHAiOjE3NjU3NTY1MjMsIm5iZiI6MTc2NTc1MjkyMywianRpIjoiQ3E0TENTZ1E4cW5pQVJFTCIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3IiwicGVyZmlsIjoic2VndXJhZG9yYSIsInBlcmZpbF9pZCI6MX0.8PmcZnMgcRykW9YdQ2hkZoKk1LvhQwTEfQEEJ22EgUg\")",
-      "Bash(__NEW_LINE__ curl -s -X GET http://127.0.0.1:8000/api/me )"
+      "Bash(__NEW_LINE__ curl -s -X GET http://127.0.0.1:8000/api/me )",
+      "Bash(timeout 3 bash -c 'until curl -s http://127.0.0.1:8000/api/me > /dev/null 2>&1; do sleep 0.5; done')",
+      "Bash(findstr:*)",
+      "Bash(timeout 5 bash -c 'until curl -s http://127.0.0.1:8000/api/me > /dev/null 2>&1; do sleep 0.5; done')"
     ],
     "deny": [],
     "ask": []

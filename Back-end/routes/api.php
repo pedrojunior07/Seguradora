@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\SeguroController;
 use App\Http\Controllers\Seguradora\ApoliceController as SeguradoraApoliceController;
 use App\Http\Controllers\Seguradora\SinistroController as SeguradoraSinistroController;
 use App\Http\Controllers\Corretora\PropostaController;
@@ -28,8 +29,21 @@ Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 
+    // Categorias
+    Route::apiResource('categorias', \App\Http\Controllers\Api\CategoriaController::class);
+
     // ROTAS SEGURADORA
-    Route::middleware('auth.seguradora')->prefix('seguradora')->group(function () {
+    Route::prefix('seguradora')->group(function () {
+        // Seguros
+        Route::get('seguros', [SeguroController::class, 'index']);
+        Route::post('seguros', [SeguroController::class, 'store']);
+        Route::get('seguros/{id}', [SeguroController::class, 'show']);
+        Route::put('seguros/{id}', [SeguroController::class, 'update']);
+        Route::post('seguros/{id}/ativar', [SeguroController::class, 'ativar']);
+        Route::post('seguros/{id}/desativar', [SeguroController::class, 'desativar']);
+        Route::post('seguros/{id}/precos', [SeguroController::class, 'adicionarPreco']);
+        Route::post('seguros/{id}/coberturas', [SeguroController::class, 'adicionarCobertura']);
+
         // Apólices
         Route::get('apolices/pendentes', [SeguradoraApoliceController::class, 'pendentes']);
         Route::get('apolices/ativas', [SeguradoraApoliceController::class, 'ativas']);
@@ -49,7 +63,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // ROTAS CORRETORA
-    Route::middleware('auth.corretora')->prefix('corretora')->group(function () {
+    Route::prefix('corretora')->group(function () {
         // Propostas
         Route::get('propostas', [PropostaController::class, 'index']);
         Route::post('propostas', [PropostaController::class, 'store']);
@@ -59,7 +73,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // ROTAS CLIENTE
-    Route::middleware('auth.cliente')->prefix('cliente')->group(function () {
+    Route::prefix('cliente')->group(function () {
         // Apólices
         Route::get('apolices', [ClienteApoliceController::class, 'index']);
         Route::get('apolices/ativas', [ClienteApoliceController::class, 'ativas']);

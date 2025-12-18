@@ -6,16 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetalhesBancarios extends Model
 {
+    protected $table = 'detalhes_bancarios';
+
     protected $fillable = [
         'nome_banco',
         'numero_conta',
         'titular',
-        'seguradora_id'
+        'id_seguradora'
     ];
 
+    // Relacionamentos
     public function seguradora()
     {
-        return $this->belongsTo(Seguradora::class);
+        return $this->belongsTo(Seguradora::class, 'id_seguradora', 'id_seguradora');
     }
 }
 

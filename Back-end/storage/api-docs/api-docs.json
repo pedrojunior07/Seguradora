@@ -1,0 +1,363 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Seguros TM",
+        "description": "API para gestão de seguros, clientes, apólices e sinistros",
+        "contact": {
+            "email": "suporte@segurostm.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Servidor de Desenvolvimento"
+        }
+    ],
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Registrar novo usuário",
+                "description": "Registra um novo usuário no sistema. Os campos obrigatórios variam conforme o perfil selecionado.",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "perfil"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Nome do usuário",
+                                        "type": "string",
+                                        "example": "João Silva"
+                                    },
+                                    "email": {
+                                        "description": "Email do usuário (deve ser único)",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "joao@example.com"
+                                    },
+                                    "password": {
+                                        "description": "Senha (mínimo 8 caracteres)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "senha12345"
+                                    },
+                                    "password_confirmation": {
+                                        "description": "Confirmação da senha",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "senha12345"
+                                    },
+                                    "perfil": {
+                                        "description": "Tipo de perfil do usuário",
+                                        "type": "string",
+                                        "enum": [
+                                            "cliente",
+                                            "seguradora",
+                                            "corretora"
+                                        ],
+                                        "example": "cliente"
+                                    },
+                                    "telefone": {
+                                        "description": "Telefone (opcional para seguradora/corretora)",
+                                        "type": "string",
+                                        "example": "+258 84 123 4567"
+                                    },
+                                    "tipo_cliente": {
+                                        "description": "Tipo de cliente (obrigatório se perfil=cliente)",
+                                        "type": "string",
+                                        "enum": [
+                                            "fisica",
+                                            "juridica"
+                                        ],
+                                        "example": "fisica"
+                                    },
+                                    "nome_completo": {
+                                        "description": "Nome completo (obrigatório se perfil=cliente)",
+                                        "type": "string",
+                                        "example": "João Alberto Silva"
+                                    },
+                                    "nuit": {
+                                        "description": "NUIT - número único de identificação tributária (obrigatório para todos os perfis)",
+                                        "type": "string",
+                                        "example": "123456789"
+                                    },
+                                    "documento": {
+                                        "description": "Número do documento (opcional, para cliente)",
+                                        "type": "string",
+                                        "example": "BI123456"
+                                    },
+                                    "endereco": {
+                                        "description": "Endereço (opcional)",
+                                        "type": "string",
+                                        "example": "Av. Julius Nyerere, 123"
+                                    },
+                                    "telefone1": {
+                                        "description": "Telefone principal (obrigatório se perfil=cliente)",
+                                        "type": "string",
+                                        "example": "+258 84 123 4567"
+                                    },
+                                    "telefone2": {
+                                        "description": "Telefone secundário (opcional, para cliente)",
+                                        "type": "string",
+                                        "example": "+258 82 987 6543"
+                                    },
+                                    "nome_empresa": {
+                                        "description": "Nome da empresa (obrigatório se perfil=seguradora ou corretora)",
+                                        "type": "string",
+                                        "example": "Seguros TM Lda"
+                                    },
+                                    "licenca": {
+                                        "description": "Número da licença (opcional, para corretora)",
+                                        "type": "string",
+                                        "example": "LIC2024001"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registro realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Registro realizado com sucesso"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "entidade": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao registrar (validação falhou)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The name field is required. (and 5 more errors)"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Fazer login",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "joao@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "senha123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciais inválidas"
+                    }
+                }
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Obter dados do usuário autenticado",
+                "operationId": "9d9bc556f927575aa492a88c28fe5908",
+                "responses": {
+                    "200": {
+                        "description": "Dados do usuário",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "entidade": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Fazer logout",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Logout realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout realizado com sucesso"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/refresh": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Renovar token de acesso",
+                "operationId": "2c27d311a2876560fcb5a754b556cdc5",
+                "responses": {
+                    "200": {
+                        "description": "Token renovado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Autenticação JWT. Use o token retornado no endpoint de login.",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Autenticação",
+            "description": "Autenticação"
+        }
+    ]
+}
