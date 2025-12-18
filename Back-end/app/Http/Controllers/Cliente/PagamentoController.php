@@ -9,6 +9,30 @@ use Illuminate\Http\Request;
 
 class PagamentoController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/cliente/pagamentos",
+     *     summary="Listar todos os pagamentos do cliente",
+     *     description="Retorna histórico completo de pagamentos do cliente autenticado",
+     *     tags={"Cliente - Pagamentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de pagamentos",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 @OA\Property(property="id_pagamento", type="integer", example=1),
+     *                 @OA\Property(property="numero_pagamento", type="string", example="PAG-2024-001"),
+     *                 @OA\Property(property="valor_parcela", type="number", example=150.00),
+     *                 @OA\Property(property="data_vencimento", type="string", format="date", example="2024-02-15"),
+     *                 @OA\Property(property="status", type="string", example="pendente"),
+     *                 @OA\Property(property="apolice", type="object"),
+     *                 @OA\Property(property="metodo_pagamento", type="object")
+     *             ))
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $pagamentos = Pagamento::where('cliente_id', $request->user()->perfil_id)
@@ -50,6 +74,55 @@ class PagamentoController extends Controller
         return response()->json($pagamento->load(['apolice', 'metodoPagamento']));
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/cliente/pagamentos/{pagamento}/registrar",
+     *     summary="Registrar pagamento",
+     *     description="Registra o pagamento de uma parcela com upload de comprovante",
+     *     tags={"Cliente - Pagamentos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="pagamento",
+     *         in="path",
+     *         description="ID do pagamento",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"metodo_pagamento_id"},
+     *                 @OA\Property(property="metodo_pagamento_id", type="integer", example=1, description="ID do método de pagamento"),
+     *                 @OA\Property(property="referencia_pagamento", type="string", example="REF-123456", description="Referência/código da transação"),
+     *                 @OA\Property(property="comprovante", type="string", format="binary", description="Arquivo do comprovante de pagamento (imagem ou PDF)")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Pagamento registrado com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Pagamento registado com sucesso"),
+     *             @OA\Property(property="pagamento", type="object",
+     *                 @OA\Property(property="id_pagamento", type="integer", example=1),
+     *                 @OA\Property(property="status", type="string", example="pago"),
+     *                 @OA\Property(property="data_pagamento", type="string", format="datetime"),
+     *                 @OA\Property(property="valor_pago", type="number", example=150.00)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Pagamento já processado ou erro ao registrar"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Não autorizado - pagamento não pertence ao cliente"
+     *     )
+     * )
+     */
     public function registrarPagamento(Pagamento $pagamento, StorePagamentoRequest $request)
     {
         if ($pagamento->cliente_id !== $request->user()->perfil_id) {

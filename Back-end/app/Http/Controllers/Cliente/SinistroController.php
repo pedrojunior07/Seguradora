@@ -12,6 +12,30 @@ class SinistroController extends Controller
 {
     public function __construct(protected SinistroService $sinistroService) {}
 
+    /**
+     * @OA\Get(
+     *     path="/api/cliente/sinistros",
+     *     summary="Listar sinistros do cliente",
+     *     description="Retorna todos os sinistros registrados pelo cliente autenticado",
+     *     tags={"Cliente - Sinistros"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de sinistros",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 @OA\Property(property="id_sinistro", type="integer", example=1),
+     *                 @OA\Property(property="numero_sinistro", type="string", example="SIN-2024-001"),
+     *                 @OA\Property(property="status", type="string", example="em_analise"),
+     *                 @OA\Property(property="data_comunicacao", type="string", format="date"),
+     *                 @OA\Property(property="descricao_ocorrido", type="string"),
+     *                 @OA\Property(property="valor_estimado_dano", type="number"),
+     *                 @OA\Property(property="apolice", type="object")
+     *             ))
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $sinistros = Sinistro::where('cliente_id', $request->user()->perfil_id)
@@ -21,6 +45,41 @@ class SinistroController extends Controller
         return response()->json($sinistros);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/cliente/sinistros",
+     *     summary="Registrar novo sinistro",
+     *     description="Registra uma ocorrência de sinistro para uma apólice ativa",
+     *     tags={"Cliente - Sinistros"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"apolice_id","data_ocorrencia","descricao_ocorrido","valor_estimado_dano"},
+     *             @OA\Property(property="apolice_id", type="integer", example=1, description="ID da apólice"),
+     *             @OA\Property(property="data_ocorrencia", type="string", format="date", example="2024-01-15", description="Data em que ocorreu o sinistro"),
+     *             @OA\Property(property="hora_ocorrencia", type="string", format="time", example="14:30:00"),
+     *             @OA\Property(property="local_ocorrencia", type="string", example="Av. Julius Nyerere, Maputo"),
+     *             @OA\Property(property="descricao_ocorrido", type="string", example="Colisão traseira em semáforo"),
+     *             @OA\Property(property="valor_estimado_dano", type="number", example=5000.00),
+     *             @OA\Property(property="houve_vitimas", type="boolean", example=false),
+     *             @OA\Property(property="boletim_ocorrencia", type="string", example="BO-2024-12345")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Sinistro registrado com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Sinistro registado com sucesso"),
+     *             @OA\Property(property="sinistro", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro ao registrar sinistro"
+     *     )
+     * )
+     */
     public function store(StoreSinistroRequest $request)
     {
         try {

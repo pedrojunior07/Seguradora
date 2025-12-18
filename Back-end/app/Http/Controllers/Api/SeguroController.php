@@ -21,7 +21,65 @@ class SeguroController extends Controller
     }
 
     /**
-     * Listar seguros da seguradora autenticada
+     * @OA\Get(
+     *     path="/api/seguradora/seguros",
+     *     summary="Listar seguros da seguradora",
+     *     description="Retorna todos os seguros cadastrados pela seguradora autenticada com opções de filtro",
+     *     tags={"Seguradora - Seguros"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filtrar por status (ativo, inativo)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"ativo", "inativo"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="tipo_seguro",
+     *         in="query",
+     *         description="Filtrar por tipo de seguro (automovel, saude, residencial, vida)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"automovel", "saude", "residencial", "vida"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="id_categoria",
+     *         in="query",
+     *         description="Filtrar por ID da categoria",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Número de registros por página",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de seguros retornada com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="current_page", type="integer", example=1),
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 @OA\Property(property="id_seguro", type="integer", example=1),
+     *                 @OA\Property(property="nome", type="string", example="Seguro Auto Premium"),
+     *                 @OA\Property(property="descricao", type="string", example="Cobertura completa para veículos"),
+     *                 @OA\Property(property="tipo_seguro", type="string", example="automovel"),
+     *                 @OA\Property(property="status", type="string", example="ativo"),
+     *                 @OA\Property(property="id_categoria", type="integer", example=1)
+     *             )),
+     *             @OA\Property(property="total", type="integer", example=50)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Não autenticado"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro ao listar seguros"
+     *     )
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -42,7 +100,48 @@ class SeguroController extends Controller
     }
 
     /**
-     * Criar novo seguro
+     * @OA\Post(
+     *     path="/api/seguradora/seguros",
+     *     summary="Criar novo seguro",
+     *     description="Cadastra um novo produto de seguro para a seguradora autenticada",
+     *     tags={"Seguradora - Seguros"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nome","tipo_seguro","id_categoria"},
+     *             @OA\Property(property="nome", type="string", example="Seguro Auto Premium", description="Nome do seguro"),
+     *             @OA\Property(property="descricao", type="string", example="Cobertura completa para veículos de passeio", description="Descrição detalhada"),
+     *             @OA\Property(property="tipo_seguro", type="string", enum={"automovel","saude","residencial","vida"}, example="automovel", description="Tipo de seguro"),
+     *             @OA\Property(property="id_categoria", type="integer", example=1, description="ID da categoria do seguro"),
+     *             @OA\Property(property="detalhes", type="object", description="Informações adicionais específicas do tipo de seguro")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Seguro criado com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Seguro criado com sucesso"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id_seguro", type="integer", example=1),
+     *                 @OA\Property(property="nome", type="string", example="Seguro Auto Premium"),
+     *                 @OA\Property(property="status", type="string", example="ativo")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro de validação"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Não autenticado"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro ao criar seguro"
+     *     )
+     * )
      */
     public function store(CriarSeguroRequest $request): JsonResponse
     {
@@ -72,7 +171,39 @@ class SeguroController extends Controller
     }
 
     /**
-     * Obter detalhes de um seguro específico
+     * @OA\Get(
+     *     path="/api/seguradora/seguros/{id}",
+     *     summary="Obter detalhes de um seguro",
+     *     description="Retorna informações detalhadas de um seguro específico incluindo preços e coberturas",
+     *     tags={"Seguradora - Seguros"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID do seguro",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Detalhes do seguro",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id_seguro", type="integer", example=1),
+     *                 @OA\Property(property="nome", type="string", example="Seguro Auto Premium"),
+     *                 @OA\Property(property="descricao", type="string"),
+     *                 @OA\Property(property="tipo_seguro", type="string", example="automovel"),
+     *                 @OA\Property(property="status", type="string", example="ativo"),
+     *                 @OA\Property(property="precos", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="coberturas", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Seguro não encontrado"
+     *     )
+     * )
      */
     public function show(int $id): JsonResponse
     {
@@ -151,7 +282,37 @@ class SeguroController extends Controller
     }
 
     /**
-     * Adicionar novo preço ao seguro
+     * @OA\Post(
+     *     path="/api/seguradora/seguros/{id}/precos",
+     *     summary="Adicionar preço ao seguro",
+     *     description="Adiciona uma nova tabela de preços para um seguro",
+     *     tags={"Seguradora - Seguros"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID do seguro",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"valor_base","periodicidade"},
+     *             @OA\Property(property="valor_base", type="number", format="float", example=1500.00, description="Valor base do prêmio"),
+     *             @OA\Property(property="periodicidade", type="string", enum={"mensal","trimestral","semestral","anual"}, example="mensal"),
+     *             @OA\Property(property="descricao", type="string", example="Plano básico mensal")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Preço adicionado com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Preço adicionado com sucesso"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     )
+     * )
      */
     public function adicionarPreco(AdicionarPrecoRequest $request, int $id): JsonResponse
     {

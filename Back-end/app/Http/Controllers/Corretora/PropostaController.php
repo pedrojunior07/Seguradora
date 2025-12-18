@@ -13,6 +13,30 @@ class PropostaController extends Controller
 {
     public function __construct(protected ApoliceService $apoliceService) {}
 
+    /**
+     * @OA\Get(
+     *     path="/api/corretora/propostas",
+     *     summary="Listar propostas da corretora",
+     *     description="Retorna todas as propostas de seguro criadas pela corretora autenticada",
+     *     tags={"Corretora - Propostas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de propostas",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 @OA\Property(property="id_proposta", type="integer", example=1),
+     *                 @OA\Property(property="numero_proposta", type="string", example="PROP-2024-001"),
+     *                 @OA\Property(property="status", type="string", example="rascunho"),
+     *                 @OA\Property(property="premio_calculado", type="number", example=1500.00),
+     *                 @OA\Property(property="validade_proposta", type="string", format="date"),
+     *                 @OA\Property(property="cliente", type="object"),
+     *                 @OA\Property(property="seguradora_seguro", type="object")
+     *             ))
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $propostas = Proposta::where('corretora_id', $request->user()->perfil_id)
@@ -22,6 +46,47 @@ class PropostaController extends Controller
         return response()->json($propostas);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/corretora/propostas",
+     *     summary="Criar nova proposta",
+     *     description="Cria uma nova proposta de seguro com cálculo automático do prêmio",
+     *     tags={"Corretora - Propostas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"cliente_id","seguradora_seguro_id","tipo_proposta","valor_bem","coberturas_selecionadas"},
+     *             @OA\Property(property="cliente_id", type="integer", example=1),
+     *             @OA\Property(property="seguradora_seguro_id", type="integer", example=1, description="ID do produto de seguro da seguradora"),
+     *             @OA\Property(property="tipo_proposta", type="string", enum={"individual","empresarial"}, example="individual"),
+     *             @OA\Property(property="valor_bem", type="number", example=50000.00, description="Valor do bem a segurar"),
+     *             @OA\Property(property="coberturas_selecionadas", type="array", @OA\Items(type="integer"), example={1,2,3}, description="IDs das coberturas selecionadas"),
+     *             @OA\Property(property="bem_id", type="integer", example=1, description="ID do bem segurado"),
+     *             @OA\Property(property="bem_type", type="string", example="App\\Models\\Veiculo"),
+     *             @OA\Property(property="parcelas_sugeridas", type="integer", example=12),
+     *             @OA\Property(property="observacoes", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Proposta criada com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Proposta criada com sucesso"),
+     *             @OA\Property(property="proposta", type="object",
+     *                 @OA\Property(property="id_proposta", type="integer"),
+     *                 @OA\Property(property="numero_proposta", type="string"),
+     *                 @OA\Property(property="premio_calculado", type="number"),
+     *                 @OA\Property(property="status", type="string", example="rascunho")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro ao criar proposta"
+     *     )
+     * )
+     */
     public function store(StorePropostaRequest $request)
     {
         try {

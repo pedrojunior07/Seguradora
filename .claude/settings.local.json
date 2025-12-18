@@ -17,7 +17,11 @@
       "Bash(__NEW_LINE__ curl -s -X GET http://127.0.0.1:8000/api/me )",
       "Bash(timeout 3 bash -c 'until curl -s http://127.0.0.1:8000/api/me > /dev/null 2>&1; do sleep 0.5; done')",
       "Bash(findstr:*)",
-      "Bash(timeout 5 bash -c 'until curl -s http://127.0.0.1:8000/api/me > /dev/null 2>&1; do sleep 0.5; done')"
+      "Bash(timeout 5 bash -c 'until curl -s http://127.0.0.1:8000/api/me > /dev/null 2>&1; do sleep 0.5; done')",
+      "Bash(del configl5-swagger.php)",
+      "Bash(rm:*)",
+      "Bash(composer show:*)",
+      "Bash(\"C:\\\\Users\\\\Pedro Manjate\\\\.config\\\\herd-lite\\\\bin\\\\composer.bat\" require darkaonline/l5-swagger)"
     ],
     "deny": [],
     "ask": []

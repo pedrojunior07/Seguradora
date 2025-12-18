@@ -12,6 +12,31 @@ class ApoliceController extends Controller
 {
     public function __construct(protected ApoliceService $apoliceService) {}
 
+    /**
+     * @OA\Get(
+     *     path="/api/seguradora/apolices/pendentes",
+     *     summary="Listar apólices pendentes de aprovação",
+     *     description="Retorna todas as apólices que aguardam aprovação da seguradora",
+     *     tags={"Seguradora - Apólices"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de apólices pendentes",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 @OA\Property(property="id_apolice", type="integer", example=1),
+     *                 @OA\Property(property="numero_apolice", type="string", example="APO-2024-001"),
+     *                 @OA\Property(property="status", type="string", example="pendente_aprovacao"),
+     *                 @OA\Property(property="premio_total", type="number", example=1500.00),
+     *                 @OA\Property(property="data_inicio", type="string", format="date", example="2024-01-15"),
+     *                 @OA\Property(property="data_fim", type="string", format="date", example="2025-01-15"),
+     *                 @OA\Property(property="cliente", type="object"),
+     *                 @OA\Property(property="bem_segurado", type="object")
+     *             ))
+     *         )
+     *     )
+     * )
+     */
     public function pendentes(Request $request)
     {
         $apolices = Apolice::where('status', 'pendente_aprovacao')
@@ -53,6 +78,44 @@ class ApoliceController extends Controller
         ]));
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/seguradora/apolices/{apolice}/aprovar",
+     *     summary="Aprovar apólice",
+     *     description="Aprova uma apólice pendente, ativando-a no sistema",
+     *     tags={"Seguradora - Apólices"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="apolice",
+     *         in="path",
+     *         description="ID da apólice",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="observacoes", type="string", example="Apólice aprovada conforme análise de risco")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Apólice aprovada com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Apólice aprovada com sucesso"),
+     *             @OA\Property(property="apolice", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro ao aprovar apólice"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Não autorizado - apólice não pertence à seguradora"
+     *     )
+     * )
+     */
     public function aprovar(Apolice $apolice, AprovarApoliceRequest $request)
     {
         // Verificar acesso

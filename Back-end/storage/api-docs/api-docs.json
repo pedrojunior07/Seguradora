@@ -15,6 +15,508 @@
         }
     ],
     "paths": {
+        "/api/categorias": {
+            "get": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Listar todas as categorias",
+                "description": "Retorna a lista de todas as categorias de seguros cadastradas no sistema",
+                "operationId": "684188b8d25abcad5e1c8a786226c02b",
+                "responses": {
+                    "200": {
+                        "description": "Lista de categorias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id_categoria": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "descricao": {
+                                                "type": "string",
+                                                "example": "Automóvel"
+                                            },
+                                            "seguros_count": {
+                                                "description": "Quantidade de seguros nesta categoria",
+                                                "type": "integer",
+                                                "example": 5
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Categorias"
+                ],
+                "summary": "Criar nova categoria",
+                "description": "Cadastra uma nova categoria de seguro no sistema",
+                "operationId": "240f085d72cd493a2f869e93edc2c132",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "descricao"
+                                ],
+                                "properties": {
+                                    "descricao": {
+                                        "description": "Nome da categoria (deve ser único)",
+                                        "type": "string",
+                                        "example": "Seguro de Vida"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Categoria criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Categoria criada com sucesso"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_categoria": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "descricao": {
+                                                    "type": "string",
+                                                    "example": "Seguro de Vida"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação - categoria já existe"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/seguradora/seguros": {
+            "get": {
+                "tags": [
+                    "Seguradora - Seguros"
+                ],
+                "summary": "Listar seguros da seguradora",
+                "description": "Retorna todos os seguros cadastrados pela seguradora autenticada com opções de filtro",
+                "operationId": "d1fd771c38335bd89394376410e0a84a",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por status (ativo, inativo)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ativo",
+                                "inativo"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "tipo_seguro",
+                        "in": "query",
+                        "description": "Filtrar por tipo de seguro (automovel, saude, residencial, vida)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "automovel",
+                                "saude",
+                                "residencial",
+                                "vida"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id_categoria",
+                        "in": "query",
+                        "description": "Filtrar por ID da categoria",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Número de registros por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de seguros retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_seguro": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nome": {
+                                                        "type": "string",
+                                                        "example": "Seguro Auto Premium"
+                                                    },
+                                                    "descricao": {
+                                                        "type": "string",
+                                                        "example": "Cobertura completa para veículos"
+                                                    },
+                                                    "tipo_seguro": {
+                                                        "type": "string",
+                                                        "example": "automovel"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "ativo"
+                                                    },
+                                                    "id_categoria": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 50
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "500": {
+                        "description": "Erro ao listar seguros"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Seguradora - Seguros"
+                ],
+                "summary": "Criar novo seguro",
+                "description": "Cadastra um novo produto de seguro para a seguradora autenticada",
+                "operationId": "a7940fa1bb43a7c6026e532d8f54f54f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nome",
+                                    "tipo_seguro",
+                                    "id_categoria"
+                                ],
+                                "properties": {
+                                    "nome": {
+                                        "description": "Nome do seguro",
+                                        "type": "string",
+                                        "example": "Seguro Auto Premium"
+                                    },
+                                    "descricao": {
+                                        "description": "Descrição detalhada",
+                                        "type": "string",
+                                        "example": "Cobertura completa para veículos de passeio"
+                                    },
+                                    "tipo_seguro": {
+                                        "description": "Tipo de seguro",
+                                        "type": "string",
+                                        "enum": [
+                                            "automovel",
+                                            "saude",
+                                            "residencial",
+                                            "vida"
+                                        ],
+                                        "example": "automovel"
+                                    },
+                                    "id_categoria": {
+                                        "description": "ID da categoria do seguro",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "detalhes": {
+                                        "description": "Informações adicionais específicas do tipo de seguro",
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Seguro criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Seguro criado com sucesso"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_seguro": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nome": {
+                                                    "type": "string",
+                                                    "example": "Seguro Auto Premium"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "ativo"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação"
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    },
+                    "500": {
+                        "description": "Erro ao criar seguro"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/seguradora/seguros/{id}": {
+            "get": {
+                "tags": [
+                    "Seguradora - Seguros"
+                ],
+                "summary": "Obter detalhes de um seguro",
+                "description": "Retorna informações detalhadas de um seguro específico incluindo preços e coberturas",
+                "operationId": "ff98132ac42c8d9da142912f0b62aff1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do seguro",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes do seguro",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id_seguro": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nome": {
+                                                    "type": "string",
+                                                    "example": "Seguro Auto Premium"
+                                                },
+                                                "descricao": {
+                                                    "type": "string"
+                                                },
+                                                "tipo_seguro": {
+                                                    "type": "string",
+                                                    "example": "automovel"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "ativo"
+                                                },
+                                                "precos": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "coberturas": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Seguro não encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/seguradora/seguros/{id}/precos": {
+            "post": {
+                "tags": [
+                    "Seguradora - Seguros"
+                ],
+                "summary": "Adicionar preço ao seguro",
+                "description": "Adiciona uma nova tabela de preços para um seguro",
+                "operationId": "a6b4d08cad4e683f4fa399a53a1fbf10",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do seguro",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "valor_base",
+                                    "periodicidade"
+                                ],
+                                "properties": {
+                                    "valor_base": {
+                                        "description": "Valor base do prêmio",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1500
+                                    },
+                                    "periodicidade": {
+                                        "type": "string",
+                                        "enum": [
+                                            "mensal",
+                                            "trimestral",
+                                            "semestral",
+                                            "anual"
+                                        ],
+                                        "example": "mensal"
+                                    },
+                                    "descricao": {
+                                        "type": "string",
+                                        "example": "Plano básico mensal"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Preço adicionado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Preço adicionado com sucesso"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/register": {
             "post": {
                 "tags": [
@@ -342,6 +844,646 @@
                     }
                 ]
             }
+        },
+        "/api/cliente/pagamentos": {
+            "get": {
+                "tags": [
+                    "Cliente - Pagamentos"
+                ],
+                "summary": "Listar todos os pagamentos do cliente",
+                "description": "Retorna histórico completo de pagamentos do cliente autenticado",
+                "operationId": "ad5b1887062c891c0a0e691f21e32463",
+                "responses": {
+                    "200": {
+                        "description": "Lista de pagamentos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_pagamento": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "numero_pagamento": {
+                                                        "type": "string",
+                                                        "example": "PAG-2024-001"
+                                                    },
+                                                    "valor_parcela": {
+                                                        "type": "number",
+                                                        "example": 150
+                                                    },
+                                                    "data_vencimento": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-02-15"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "pendente"
+                                                    },
+                                                    "apolice": {
+                                                        "type": "object"
+                                                    },
+                                                    "metodo_pagamento": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cliente/pagamentos/{pagamento}/registrar": {
+            "post": {
+                "tags": [
+                    "Cliente - Pagamentos"
+                ],
+                "summary": "Registrar pagamento",
+                "description": "Registra o pagamento de uma parcela com upload de comprovante",
+                "operationId": "d6b8761c3dac0cf88941e5d4114b717a",
+                "parameters": [
+                    {
+                        "name": "pagamento",
+                        "in": "path",
+                        "description": "ID do pagamento",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "metodo_pagamento_id"
+                                ],
+                                "properties": {
+                                    "metodo_pagamento_id": {
+                                        "description": "ID do método de pagamento",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "referencia_pagamento": {
+                                        "description": "Referência/código da transação",
+                                        "type": "string",
+                                        "example": "REF-123456"
+                                    },
+                                    "comprovante": {
+                                        "description": "Arquivo do comprovante de pagamento (imagem ou PDF)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pagamento registrado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pagamento registado com sucesso"
+                                        },
+                                        "pagamento": {
+                                            "properties": {
+                                                "id_pagamento": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "pago"
+                                                },
+                                                "data_pagamento": {
+                                                    "type": "string",
+                                                    "format": "datetime"
+                                                },
+                                                "valor_pago": {
+                                                    "type": "number",
+                                                    "example": 150
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Pagamento já processado ou erro ao registrar"
+                    },
+                    "403": {
+                        "description": "Não autorizado - pagamento não pertence ao cliente"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cliente/sinistros": {
+            "get": {
+                "tags": [
+                    "Cliente - Sinistros"
+                ],
+                "summary": "Listar sinistros do cliente",
+                "description": "Retorna todos os sinistros registrados pelo cliente autenticado",
+                "operationId": "83beb29a87822b0fb424d3164442cbcd",
+                "responses": {
+                    "200": {
+                        "description": "Lista de sinistros",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_sinistro": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "numero_sinistro": {
+                                                        "type": "string",
+                                                        "example": "SIN-2024-001"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "em_analise"
+                                                    },
+                                                    "data_comunicacao": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    },
+                                                    "descricao_ocorrido": {
+                                                        "type": "string"
+                                                    },
+                                                    "valor_estimado_dano": {
+                                                        "type": "number"
+                                                    },
+                                                    "apolice": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Cliente - Sinistros"
+                ],
+                "summary": "Registrar novo sinistro",
+                "description": "Registra uma ocorrência de sinistro para uma apólice ativa",
+                "operationId": "1331a96a2a8d6b9ca71c91bafcadebb7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "apolice_id",
+                                    "data_ocorrencia",
+                                    "descricao_ocorrido",
+                                    "valor_estimado_dano"
+                                ],
+                                "properties": {
+                                    "apolice_id": {
+                                        "description": "ID da apólice",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "data_ocorrencia": {
+                                        "description": "Data em que ocorreu o sinistro",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-15"
+                                    },
+                                    "hora_ocorrencia": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "14:30:00"
+                                    },
+                                    "local_ocorrencia": {
+                                        "type": "string",
+                                        "example": "Av. Julius Nyerere, Maputo"
+                                    },
+                                    "descricao_ocorrido": {
+                                        "type": "string",
+                                        "example": "Colisão traseira em semáforo"
+                                    },
+                                    "valor_estimado_dano": {
+                                        "type": "number",
+                                        "example": 5000
+                                    },
+                                    "houve_vitimas": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "boletim_ocorrencia": {
+                                        "type": "string",
+                                        "example": "BO-2024-12345"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Sinistro registrado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sinistro registado com sucesso"
+                                        },
+                                        "sinistro": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao registrar sinistro"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/corretora/propostas": {
+            "get": {
+                "tags": [
+                    "Corretora - Propostas"
+                ],
+                "summary": "Listar propostas da corretora",
+                "description": "Retorna todas as propostas de seguro criadas pela corretora autenticada",
+                "operationId": "bf8c2ee5b2a39d61ff64c95dd675d5a1",
+                "responses": {
+                    "200": {
+                        "description": "Lista de propostas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_proposta": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "numero_proposta": {
+                                                        "type": "string",
+                                                        "example": "PROP-2024-001"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "rascunho"
+                                                    },
+                                                    "premio_calculado": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "validade_proposta": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    },
+                                                    "cliente": {
+                                                        "type": "object"
+                                                    },
+                                                    "seguradora_seguro": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Corretora - Propostas"
+                ],
+                "summary": "Criar nova proposta",
+                "description": "Cria uma nova proposta de seguro com cálculo automático do prêmio",
+                "operationId": "e30fd98cb58b9372fd7ec4a06bfd1c2c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cliente_id",
+                                    "seguradora_seguro_id",
+                                    "tipo_proposta",
+                                    "valor_bem",
+                                    "coberturas_selecionadas"
+                                ],
+                                "properties": {
+                                    "cliente_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "seguradora_seguro_id": {
+                                        "description": "ID do produto de seguro da seguradora",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "tipo_proposta": {
+                                        "type": "string",
+                                        "enum": [
+                                            "individual",
+                                            "empresarial"
+                                        ],
+                                        "example": "individual"
+                                    },
+                                    "valor_bem": {
+                                        "description": "Valor do bem a segurar",
+                                        "type": "number",
+                                        "example": 50000
+                                    },
+                                    "coberturas_selecionadas": {
+                                        "description": "IDs das coberturas selecionadas",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2,
+                                            3
+                                        ]
+                                    },
+                                    "bem_id": {
+                                        "description": "ID do bem segurado",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "bem_type": {
+                                        "type": "string",
+                                        "example": "App\\\\Models\\\\Veiculo"
+                                    },
+                                    "parcelas_sugeridas": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "observacoes": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Proposta criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proposta criada com sucesso"
+                                        },
+                                        "proposta": {
+                                            "properties": {
+                                                "id_proposta": {
+                                                    "type": "integer"
+                                                },
+                                                "numero_proposta": {
+                                                    "type": "string"
+                                                },
+                                                "premio_calculado": {
+                                                    "type": "number"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "rascunho"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao criar proposta"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/seguradora/apolices/pendentes": {
+            "get": {
+                "tags": [
+                    "Seguradora - Apólices"
+                ],
+                "summary": "Listar apólices pendentes de aprovação",
+                "description": "Retorna todas as apólices que aguardam aprovação da seguradora",
+                "operationId": "dff629ca1ca90ae46c94aa3e8ddbdad6",
+                "responses": {
+                    "200": {
+                        "description": "Lista de apólices pendentes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_apolice": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "numero_apolice": {
+                                                        "type": "string",
+                                                        "example": "APO-2024-001"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "pendente_aprovacao"
+                                                    },
+                                                    "premio_total": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "data_inicio": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-01-15"
+                                                    },
+                                                    "data_fim": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-01-15"
+                                                    },
+                                                    "cliente": {
+                                                        "type": "object"
+                                                    },
+                                                    "bem_segurado": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/seguradora/apolices/{apolice}/aprovar": {
+            "post": {
+                "tags": [
+                    "Seguradora - Apólices"
+                ],
+                "summary": "Aprovar apólice",
+                "description": "Aprova uma apólice pendente, ativando-a no sistema",
+                "operationId": "e3ada821f440ac1f2ceb279c5084de32",
+                "parameters": [
+                    {
+                        "name": "apolice",
+                        "in": "path",
+                        "description": "ID da apólice",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "observacoes": {
+                                        "type": "string",
+                                        "example": "Apólice aprovada conforme análise de risco"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Apólice aprovada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Apólice aprovada com sucesso"
+                                        },
+                                        "apolice": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao aprovar apólice"
+                    },
+                    "403": {
+                        "description": "Não autorizado - apólice não pertence à seguradora"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -356,8 +1498,32 @@
     },
     "tags": [
         {
+            "name": "Categorias",
+            "description": "Categorias"
+        },
+        {
+            "name": "Seguradora - Seguros",
+            "description": "Seguradora - Seguros"
+        },
+        {
             "name": "Autenticação",
             "description": "Autenticação"
+        },
+        {
+            "name": "Cliente - Pagamentos",
+            "description": "Cliente - Pagamentos"
+        },
+        {
+            "name": "Cliente - Sinistros",
+            "description": "Cliente - Sinistros"
+        },
+        {
+            "name": "Corretora - Propostas",
+            "description": "Corretora - Propostas"
+        },
+        {
+            "name": "Seguradora - Apólices",
+            "description": "Seguradora - Apólices"
         }
     ]
 }
