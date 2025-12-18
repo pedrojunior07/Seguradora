@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Preco extends Model
 {
     protected $table = 'precos';
-    protected $primaryKey = 'id_preco';
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'seguradora_seguro_id',

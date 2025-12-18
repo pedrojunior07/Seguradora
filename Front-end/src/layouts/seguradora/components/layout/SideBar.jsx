@@ -17,10 +17,15 @@ import {
 
 const { Sider } = Layout;
 
-const Sidebar = ({ collapsed }) => {
+const Sidebar = ({ collapsed, onMenuClick }) => {
   const navigate = useNavigate();
 
   const handleMenuClick = ({ key }) => {
+    // Callback para fechar drawer no mobile
+    if (onMenuClick) {
+      onMenuClick();
+    }
+
     switch (key) {
       case '1':
         navigate('/seguradora/dashboard');

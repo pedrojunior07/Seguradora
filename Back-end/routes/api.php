@@ -42,6 +42,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('seguros/{id}/ativar', [SeguroController::class, 'ativar']);
         Route::post('seguros/{id}/desativar', [SeguroController::class, 'desativar']);
         Route::post('seguros/{id}/precos', [SeguroController::class, 'adicionarPreco']);
+        Route::post('precos/{preco}/ativar', [SeguroController::class, 'ativarPreco']);
+        Route::post('precos/{preco}/desativar', [SeguroController::class, 'desativarPreco']);
         Route::post('seguros/{id}/coberturas', [SeguroController::class, 'adicionarCobertura']);
 
         // Apólices

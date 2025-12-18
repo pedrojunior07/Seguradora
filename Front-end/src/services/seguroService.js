@@ -141,6 +141,32 @@ const seguroService = {
     }
   },
 
+  ativarPreco: async (id) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/seguradora/precos/${id}/ativar`,
+        {},
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  desativarPreco: async (id) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/seguradora/precos/${id}/desativar`,
+        {},
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
   /**
    * Adicionar cobertura ao seguro
    * @param {number} id - ID do seguro

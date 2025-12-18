@@ -16,7 +16,7 @@ import { useAuth } from '@context/AuthContext';
 
 const { Header: AntHeader } = Layout;
 
-const Header = ({ collapsed, setCollapsed }) => {
+const Header = ({ collapsed, setCollapsed, isMobile }) => {
   const { user, entidade, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -152,7 +152,7 @@ const Header = ({ collapsed, setCollapsed }) => {
     <AntHeader
       style={{
         background: '#fff',
-        padding: '0 24px',
+        padding: isMobile ? '0 12px' : '0 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -229,7 +229,7 @@ const Header = ({ collapsed, setCollapsed }) => {
               style={{
                 fontWeight: 500,
                 fontSize: 14,
-                display: window.innerWidth < 768 ? 'none' : 'block'
+                display: isMobile ? 'none' : 'block'
               }}
             >
               {entidade?.nome || user?.name || 'Usuário'}

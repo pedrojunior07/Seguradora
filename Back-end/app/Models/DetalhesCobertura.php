@@ -12,14 +12,17 @@ class DetalhesCobertura extends Model
 
     protected $fillable = [
         'id_seguro_seguradora',
+        'nome',
         'descricao',
         'valor_maximo',
+        'valor_minimo',
         'franquia'
     ];
 
     protected $casts = [
         'franquia' => 'decimal:2',
         'valor_maximo' => 'decimal:2',
+        'valor_minimo' => 'decimal:2',
     ];
 
     // Relacionamentos

@@ -171,6 +171,48 @@ class SeguroController extends Controller
     }
 
     /**
+     * Ativar um preço existente
+     */
+    public function ativarPreco($preco): JsonResponse
+    {
+        try {
+            $precoId = (int) $preco;
+            $precoObj = $this->seguroService->ativarPreco($precoId);
+
+            return response()->json([
+                'message' => 'Preço ativado com sucesso',
+                'data' => $precoObj
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao ativar preço',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Desativar um preço existente
+     */
+    public function desativarPreco($preco): JsonResponse
+    {
+        try {
+            $precoId = (int) $preco;
+            $precoObj = $this->seguroService->desativarPreco($precoId);
+
+            return response()->json([
+                'message' => 'Preço desativado com sucesso',
+                'data' => $precoObj
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao desativar preço',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Adicionar cobertura ao seguro
      */
     public function adicionarCobertura(AdicionarCoberturaRequest $request, int $id): JsonResponse

@@ -113,6 +113,51 @@ const DetalhesSeguro = () => {
       key: 'data_fim',
       render: (data) => data ? dayjs(data).format('DD/MM/YYYY') : <Tag color="green">Atual</Tag>
     }
+,
+    {
+      title: 'Ações',
+      key: 'acoes',
+      render: (_, record) => {
+        const precoId = record.id_preco ?? record.id ?? record.idPreco;
+        return (
+          <Space>
+            {record.data_fim ? (
+              <Button size="small" onClick={async () => {
+                try {
+                  await seguroService.ativarPreco(precoId);
+                  message.success('Preço ativado');
+                  carregarSeguro();
+                } catch (e) {
+                  message.error('Erro ao ativar preço');
+                }
+              }}>
+                Ativar
+              </Button>
+            ) : (
+              <Button danger size="small" onClick={() => {
+                Modal.confirm({
+                  title: 'Confirmar desativação',
+                  content: 'Deseja desativar este preço? Isso encerrará sua vigência.',
+                  okText: 'Sim',
+                  cancelText: 'Cancelar',
+                  onOk: async () => {
+                    try {
+                      await seguroService.desativarPreco(precoId);
+                      message.success('Preço desativado');
+                      carregarSeguro();
+                    } catch (e) {
+                      message.error('Erro ao desativar preço');
+                    }
+                  }
+                });
+              }}>
+                Desativar
+              </Button>
+            )}
+          </Space>
+        );
+      }
+    }
   ];
 
   const columnsCoberturas = [
@@ -260,7 +305,7 @@ const DetalhesSeguro = () => {
         <Table
           columns={columnsPrecos}
           dataSource={seguro.precos || []}
-          rowKey="id_preco"
+          rowKey={(record) => record.id_preco ?? record.id ?? record.idPreco}
           pagination={false}
           size="small"
         />

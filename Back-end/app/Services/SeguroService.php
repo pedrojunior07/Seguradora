@@ -52,6 +52,7 @@ class SeguroService
                 foreach ($dados['coberturas'] as $cobertura) {
                     DetalhesCobertura::create([
                         'id_seguro_seguradora' => $seguradoraSeguro->id,
+                        'nome' => $cobertura['descricao'],
                         'descricao' => $cobertura['descricao'],
                         'franquia' => $cobertura['franquia'] ?? null,
                         'valor_maximo' => $cobertura['valor_minimo'] ?? null,
@@ -105,28 +106,74 @@ class SeguroService
     public function adicionarPreco(int $id_seguradora_seguro, array $dados): Preco
     {
         // Fechar preços anteriores sem data fim
-        Preco::where('id_seguradora_seguro', $id_seguradora_seguro)
+        Preco::where('seguradora_seguro_id', $id_seguradora_seguro)
             ->whereNull('data_fim')
             ->update(['data_fim' => now()->subDay()]);
 
         return Preco::create([
-            'id_seguradora_seguro' => $id_seguradora_seguro,
+            'seguradora_seguro_id' => $id_seguradora_seguro,
             'valor' => $dados['valor'],
             'premio_percentagem' => $dados['premio_percentagem'] ?? null,
             'premio_valor' => $dados['premio_valor'] ?? null,
-            'usaValor' => $dados['usaValor'] ?? false,
+            'usa_valor' => $dados['usaValor'] ?? false,
             'data_inicio' => $dados['data_inicio'] ?? now(),
             'data_fim' => $dados['data_fim'] ?? null,
         ]);
     }
 
     /**
+     * Ativar um preço existente tornando-o o preço atual
+     */
+    public function ativarPreco(int $id_preco): Preco
+    {
+        return DB::transaction(function () use ($id_preco) {
+            $preco = Preco::findOrFail($id_preco);
+
+            // Fechar preços atuais sem data_fim
+            Preco::where('seguradora_seguro_id', $preco->seguradora_seguro_id)
+                ->whereNull('data_fim')
+                ->update(['data_fim' => now()->subDay()]);
+
+            // Tornar este preço o atual
+            $preco->data_inicio = now();
+            $preco->data_fim = null;
+            $preco->save();
+
+            return $preco->fresh();
+        });
+    }
+
+    /**
+     * Desativar um preço existente (definir data_fim)
+     */
+    public function desativarPreco(int $id_preco): Preco
+    {
+        $preco = Preco::findOrFail($id_preco);
+        $preco->data_fim = now();
+        $preco->save();
+        return $preco->fresh();
+    }
+
+    /**
      * Adicionar cobertura para um seguro
      */
-    public function adicionarCobertura(int $id_seguradora_seguro, array $dados): DetalhesCobertura
+    public function adicionarCobertura(int $id_seguro, array $dados): DetalhesCobertura
     {
+        // Buscar a relação SeguradoraSeguro pelo seguro_id
+        $seguradora_id = auth()->user()->perfil_id;
+        $seguradoraSeguro = \App\Models\SeguradoraSeguro::where('id_seguro', $id_seguro)
+            ->where('id_seguradora', $seguradora_id)
+            ->first();
+        if (!$seguradoraSeguro) {
+            \Log::error('Não encontrou relação SeguradoraSeguro para adicionar cobertura', [
+                'id_seguro' => $id_seguro,
+                'id_seguradora' => $seguradora_id
+            ]);
+            throw new \Exception('Relação entre seguradora e seguro não encontrada. Não foi possível adicionar cobertura.');
+        }
         return DetalhesCobertura::create([
-            'id_seguro_seguradora' => $id_seguradora_seguro,
+            'id_seguro_seguradora' => $seguradoraSeguro->id,
+            'nome' => $dados['descricao'],
             'descricao' => $dados['descricao'],
             'franquia' => $dados['franquia'] ?? null,
             'valor_minimo' => $dados['valor_minimo'] ?? null,

@@ -39,6 +39,24 @@ const CriarSeguro = () => {
         if (values.preco.data_fim) {
           values.preco.data_fim = values.preco.data_fim.format('YYYY-MM-DD');
         }
+        // Garante que só envia o campo correto de prêmio
+        if (values.preco.usaValor) {
+          // Se usa valor fixo, remove percentagem e exige premio_valor
+          delete values.preco.premio_percentagem;
+          if (values.preco.premio_valor === undefined || values.preco.premio_valor === null) {
+            message.error('Informe o Prêmio Valor Fixo!');
+            setLoading(false);
+            return;
+          }
+        } else {
+          // Se usa percentagem, remove valor fixo e exige premio_percentagem
+          delete values.preco.premio_valor;
+          if (values.preco.premio_percentagem === undefined || values.preco.premio_percentagem === null) {
+            message.error('Informe o Prêmio Percentagem!');
+            setLoading(false);
+            return;
+          }
+        }
       }
 
       await seguroService.criarSeguro(values);
