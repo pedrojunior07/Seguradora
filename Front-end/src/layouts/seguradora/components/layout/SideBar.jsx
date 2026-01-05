@@ -1,6 +1,7 @@
 // components/layout/Sidebar.jsx
 import { Layout, Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@context/AuthContext';
 import {
   DashboardOutlined,
   InsuranceOutlined,
@@ -19,6 +20,8 @@ const { Sider } = Layout;
 
 const Sidebar = ({ collapsed, onMenuClick }) => {
   const navigate = useNavigate();
+  const { entidade, user } = useAuth();
+  const isSuperAdmin = user?.role === 'super_admin';
 
   const handleMenuClick = ({ key }) => {
     // Callback para fechar drawer no mobile
@@ -54,11 +57,75 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
       case '6':
         navigate('/seguradora/calendario');
         break;
+      case '7-1':
+        navigate('/seguradora/usuarios');
+        break;
       default:
         break;
     }
   };
 
+  const menuItems = [
+    {
+      key: '1',
+      icon: <DashboardOutlined />,
+      label: 'Dashboard',
+    },
+    {
+      key: 'seguros',
+      icon: <SafetyCertificateOutlined />,
+      label: 'Gestão de Seguros',
+      children: [
+        { key: 'seguros-listar', icon: <UnorderedListOutlined />, label: 'Meus Seguros' },
+        // Apenas Super Admin pode criar e gerenciar categorias
+        ...(isSuperAdmin ? [
+          { key: 'seguros-criar', icon: <PlusCircleOutlined />, label: 'Novo Seguro' },
+          { key: 'seguros-categorias', icon: <AppstoreOutlined />, label: 'Categorias' },
+        ] : []),
+      ],
+    },
+    {
+      key: '2',
+      icon: <InsuranceOutlined />,
+      label: 'Apólices',
+    },
+    {
+      key: '3',
+      icon: <FileTextOutlined />,
+      label: 'Sinistros',
+    },
+    {
+      key: '4',
+      icon: <TeamOutlined />,
+      label: 'Clientes',
+    },
+    // Apenas Super Admin vê Relatórios e Configurações
+    ...(isSuperAdmin ? [
+      {
+        key: '7-1',
+        icon: <TeamOutlined />,
+        label: 'Minha Equipe',
+      },
+      {
+        key: '5',
+        icon: <BarChartOutlined />,
+        label: 'Relatórios',
+      },
+      {
+        key: '7',
+        icon: <SettingOutlined />,
+        label: 'Configurações',
+        children: [
+          { key: '7-2', label: 'Parâmetros' },
+        ],
+      },
+    ] : []),
+    {
+      key: '6',
+      icon: <CalendarOutlined />,
+      label: 'Calendário',
+    },
+  ];
   return (
     <Sider
       trigger={null}
@@ -69,9 +136,9 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
       breakpoint="lg"
       collapsedWidth="80"
     >
-      <div className="h-16 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)' }}>
-        <h1 className={`text-white font-bold ${collapsed ? 'text-xl' : 'text-2xl'}`}>
-          {collapsed ? 'S' : 'SEGURO+'}
+      <div className="h-16 flex flex-col items-center justify-center" style={{ background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)' }}>
+        <h1 className={`text-white font-bold ${collapsed ? 'text-xl' : 'text-lg'}`} style={{ color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0 }}>
+          {collapsed ? (entidade?.nome ? entidade.nome.charAt(0).toUpperCase() : 'S') : (entidade?.nome ? entidade.nome : 'SEGURO+')}
         </h1>
       </div>
 
@@ -81,57 +148,7 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
         defaultSelectedKeys={['1']}
         className="mt-4"
         onClick={handleMenuClick}
-        items={[
-          {
-            key: '1',
-            icon: <DashboardOutlined />,
-            label: 'Dashboard',
-          },
-          {
-            key: 'seguros',
-            icon: <SafetyCertificateOutlined />,
-            label: 'Gestão de Seguros',
-            children: [
-              { key: 'seguros-listar', icon: <UnorderedListOutlined />, label: 'Meus Seguros' },
-              { key: 'seguros-criar', icon: <PlusCircleOutlined />, label: 'Novo Seguro' },
-              { key: 'seguros-categorias', icon: <AppstoreOutlined />, label: 'Categorias' },
-            ],
-          },
-          {
-            key: '2',
-            icon: <InsuranceOutlined />,
-            label: 'Apólices',
-          },
-          {
-            key: '3',
-            icon: <FileTextOutlined />,
-            label: 'Sinistros',
-          },
-          {
-            key: '4',
-            icon: <TeamOutlined />,
-            label: 'Clientes',
-          },
-          {
-            key: '5',
-            icon: <BarChartOutlined />,
-            label: 'Relatórios',
-          },
-          {
-            key: '6',
-            icon: <CalendarOutlined />,
-            label: 'Calendário',
-          },
-          {
-            key: '7',
-            icon: <SettingOutlined />,
-            label: 'Configurações',
-            children: [
-              { key: '7-1', label: 'Usuários' },
-              { key: '7-2', label: 'Parâmetros' },
-            ],
-          },
-        ]}
+        items={menuItems}
       />
     </Sider>
   );

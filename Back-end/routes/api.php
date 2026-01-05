@@ -18,6 +18,10 @@ use App\Http\Controllers\Cliente\PagamentoController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
+// Conteúdo Público (Seguradoras)
+Route::get('public/seguradoras', [\App\Http\Controllers\Api\SeguradoraController::class, 'index']);
+Route::get('public/seguradoras/{id}/seguros', [\App\Http\Controllers\Api\SeguradoraController::class, 'seguros']);
+
 /*
 |--------------------------------------------------------------------------
 | Rotas protegidas (COM JWT)
@@ -32,8 +36,18 @@ Route::middleware('auth:api')->group(function () {
     // Categorias
     Route::apiResource('categorias', \App\Http\Controllers\Api\CategoriaController::class);
 
+    // Gestão de Equipe (Super Admin)
+    Route::get('equipe', [\App\Http\Controllers\Api\UserController::class, 'index']);
+    Route::post('equipe/operadores', [\App\Http\Controllers\Api\UserController::class, 'storeOperador']);
+    Route::put('equipe/{id}', [\App\Http\Controllers\Api\UserController::class, 'update']);
+    Route::delete('equipe/{id}', [\App\Http\Controllers\Api\UserController::class, 'destroy']);
+
     // ROTAS SEGURADORA
     Route::prefix('seguradora')->group(function () {
+        // Dashboard
+        Route::get('dashboard/resumo', [\App\Http\Controllers\DashboardController::class, 'resumo']);
+        Route::get('dashboard/grafico-vendas', [\App\Http\Controllers\DashboardController::class, 'graficoVendas']);
+
         // Seguros
         Route::get('seguros', [SeguroController::class, 'index']);
         Route::post('seguros', [SeguroController::class, 'store']);
@@ -62,6 +76,11 @@ Route::middleware('auth:api')->group(function () {
         Route::post('sinistros/{sinistro}/aprovar', [SeguradoraSinistroController::class, 'aprovar']);
         Route::post('sinistros/{sinistro}/negar', [SeguradoraSinistroController::class, 'negar']);
         Route::get('sinistros/estatisticas', [SeguradoraSinistroController::class, 'estatisticas']);
+        Route::get('sinistros/estatisticas', [SeguradoraSinistroController::class, 'estatisticas']);
+
+        // Gestão de Clientes
+        Route::get('clientes', [\App\Http\Controllers\Seguradora\ClienteController::class, 'index']);
+        Route::post('clientes', [\App\Http\Controllers\Seguradora\ClienteController::class, 'store']);
     });
 
     // ROTAS CORRETORA
@@ -74,8 +93,14 @@ Route::middleware('auth:api')->group(function () {
         Route::post('propostas/{proposta}/converter-apolice', [PropostaController::class, 'converterEmApolice']);
     });
 
+    // CONTRATAÇÃO (Geral ou Cliente)
+    Route::post('contratacao/veiculo', [\App\Http\Controllers\Api\ContratacaoController::class, 'contratar']);
+
     // ROTAS CLIENTE
     Route::prefix('cliente')->group(function () {
+        // Veículos
+        Route::get('veiculos', [\App\Http\Controllers\Api\VeiculoController::class, 'index']);
+
         // Apólices
         Route::get('apolices', [ClienteApoliceController::class, 'index']);
         Route::get('apolices/ativas', [ClienteApoliceController::class, 'ativas']);

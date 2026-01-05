@@ -16,7 +16,6 @@ class Corretora extends Model
         'nome',
         'nome_responsavel',
         'nuit',
-        'telefone',
         'telefone1',
         'telefone2',
         'email',

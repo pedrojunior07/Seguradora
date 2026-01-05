@@ -20,6 +20,9 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
   const { user, entidade, logout } = useAuth();
   const navigate = useNavigate();
 
+  const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api').replace(/\/api\/?$/, '');
+  const getLogoUrl = (logoPath) => (logoPath ? `${apiBase}/storage/${logoPath}` : null);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -106,8 +109,8 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
       label: (
         <div style={{ padding: '8px 0' }}>
           <Space direction="vertical" size={4} style={{ width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Avatar size={48} icon={<UserOutlined />} src={user?.avatar} style={{ background: '#1e40af' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <Avatar size={48} icon={<UserOutlined />} src={entidade?.logo ? getLogoUrl(entidade.logo) : user?.avatar} style={{ background: '#1e40af' }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 15 }}>
                   {entidade?.nome || user?.name || 'Usuário'}
@@ -222,7 +225,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
             <Avatar
               size={36}
               icon={<UserOutlined />}
-              src={user?.avatar}
+              src={entidade?.logo ? getLogoUrl(entidade.logo) : user?.avatar}
               style={{ background: '#1e40af' }}
             />
             <span

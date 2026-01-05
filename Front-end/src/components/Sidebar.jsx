@@ -9,7 +9,9 @@ import {
     Box,
     Typography,
     Divider,
+    Avatar,
 } from '@mui/material';
+import { useAuth } from '@context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const drawerWidth = 260;
@@ -18,17 +20,27 @@ const Sidebar = ({ items, mobileOpen, onDrawerToggle }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const { entidade } = useAuth();
+    const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api').replace(/\/api\/?$/, '');
+    const getLogoUrl = (logoPath) => (logoPath ? `${apiBase}/storage/${logoPath}` : null);
+
     const drawer = (
         <Box>
             <Toolbar
                 sx={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
                 }}
             >
-                <Typography variant="h6" fontWeight="bold">
-                    Menu
-                </Typography>
+                <Avatar src={entidade?.logo ? getLogoUrl(entidade.logo) : undefined} sx={{ bgcolor: 'transparent', width: 40, height: 40 }} />
+                <Box>
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                        {entidade?.nome || 'Menu'}
+                    </Typography>
+                </Box>
             </Toolbar>
             <Divider />
             <List sx={{ pt: 2 }}>

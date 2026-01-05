@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Tag, Space, Input, Select, message, Spin, Card } from 'antd';
 import { PlusOutlined, EyeOutlined, EditOutlined, PoweroffOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import seguroService from '../../../services/seguroService';
 
 const { Search } = Input;
@@ -9,6 +10,8 @@ const { Option } = Select;
 
 const ListaSeguros = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'super_admin';
   const [seguros, setSeguros] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -198,14 +201,16 @@ const ListaSeguros = () => {
       <Card>
         <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600 }}>Gestão de Seguros</h2>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate('/seguradora/seguros/criar')}
-            style={{ background: '#1e40af' }}
-          >
-            Criar Novo Seguro
-          </Button>
+          {isSuperAdmin && (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate('/seguradora/seguros/criar')}
+              style={{ background: '#1e40af' }}
+            >
+              Criar Novo Seguro
+            </Button>
+          )}
         </div>
 
         <div style={{ marginBottom: '16px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>

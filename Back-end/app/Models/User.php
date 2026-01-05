@@ -21,6 +21,7 @@ class User extends Authenticatable implements JWTSubject
         'status',
         'telefone',
         'ultimo_acesso',
+        'role',
     ];
 
     protected $hidden = [
@@ -49,6 +50,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'perfil' => $this->perfil,
             'perfil_id' => $this->perfil_id,
+            'role' => $this->role,
         ];
     }
 
@@ -97,6 +99,16 @@ class User extends Authenticatable implements JWTSubject
     public function isAdmin(): bool
     {
         return $this->perfil === 'admin';
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isOperador(): bool
+    {
+        return $this->role === 'operador';
     }
 
     public function getPerfilEntidade()

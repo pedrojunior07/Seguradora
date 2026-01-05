@@ -73,6 +73,7 @@ const Register = () => {
         telefone1: '',
         telefone2: '',
     });
+    const [logoFile, setLogoFile] = useState(null);
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -129,7 +130,20 @@ const Register = () => {
         setError('');
 
         try {
-            const data = await register(formData, perfil);
+            let payload;
+
+            if (perfil === 'seguradora' && logoFile) {
+                payload = new FormData();
+                Object.entries(formData).forEach(([k, v]) => {
+                    if (v !== undefined && v !== null) payload.append(k, v);
+                });
+                payload.append('perfil', perfil);
+                payload.append('logo', logoFile);
+            } else {
+                payload = { ...formData, perfil };
+            }
+
+            const data = await register(payload, perfil);
             setSuccess(true);
 
             setTimeout(() => {
@@ -445,6 +459,18 @@ const Register = () => {
                                             ),
                                         }}
                                     />
+                                </Grid>
+                            )}
+                            {perfil === 'seguradora' && (
+                                <Grid item xs={12} md={6}>
+                                    <div>
+                                        <InputLabel sx={{ mb: 1 }}>Logo da Seguradora (opcional)</InputLabel>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setLogoFile(e.target.files[0] ?? null)}
+                                        />
+                                    </div>
                                 </Grid>
                             )}
                         </Grid>

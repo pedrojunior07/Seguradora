@@ -17,16 +17,36 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check if user is logged in on mount
-        const currentUser = authService.getCurrentUser();
-        const currentEntity = authService.getCurrentEntity();
-        if (currentUser) {
-            setUser(currentUser);
-        }
-        if (currentEntity) {
-            setEntidade(currentEntity);
-        }
-        setLoading(false);
+        const initAuth = async () => {
+            const token = authService.getToken();
+            if (token) {
+                try {
+                    // Tenta buscar perfil atualizado do servidor
+                    const data = await authService.getProfile();
+                    setUser(data.user);
+                    if (data.entidade) {
+                        setEntidade(data.entidade);
+                    }
+                } catch (error) {
+                    console.error("Erro ao buscar perfil:", error);
+                    // Se falhar (token expirado?), tenta usar o cache local ou faz logout
+                    const cachedUser = authService.getCurrentUser();
+                    if (cachedUser) setUser(cachedUser);
+
+                    const cachedEntity = authService.getCurrentEntity();
+                    if (cachedEntity) setEntidade(cachedEntity);
+
+                    // Opcional: Se for erro 401, fazer logout
+                    if (error.response && error.response.status === 401) {
+                        logout();
+                    }
+                }
+            } else {
+                setLoading(false);
+            }
+            setLoading(false);
+        };
+        initAuth();
     }, []);
 
     const login = async (email, password) => {

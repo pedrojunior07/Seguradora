@@ -4,10 +4,20 @@ const authService = {
     // Register a new user (seguradora, corretora, or cliente)
     register: async (userData, perfil) => {
         try {
-            const response = await api.post('/register', {
-                ...userData,
-                perfil,
-            });
+            let response;
+
+            if (userData instanceof FormData) {
+                response = await api.post('/register', userData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            } else {
+                response = await api.post('/register', {
+                    ...userData,
+                    perfil,
+                });
+            }
 
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);

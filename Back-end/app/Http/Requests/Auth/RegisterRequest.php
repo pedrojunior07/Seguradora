@@ -30,6 +30,7 @@ class RegisterRequest extends FormRequest
             $rules['telefone2'] = 'nullable|string|max:20';
             $rules['endereco'] = 'nullable|string|max:255';
             $rules['licenca'] = 'nullable|string|max:100';
+            $rules['logo'] = 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048';
         }
 
         if ($this->perfil === 'corretora') {

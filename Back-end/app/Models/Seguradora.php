@@ -15,8 +15,8 @@ class Seguradora extends Model
     protected $fillable = [
         'nome',
         'nome_responsavel',
+        'logo',
         'nuit',
-        'telefone',
         'telefone1',
         'telefone2',
         'email',

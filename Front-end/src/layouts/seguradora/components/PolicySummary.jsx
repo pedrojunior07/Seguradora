@@ -20,7 +20,7 @@ color: '#3B82F6',
 bgColor: '#EFF6FF',
 borderColor: '#BFDBFE',
 change: 12,
-value: 'R$ 4.2M'
+  value: 'MZN 4.2M'
 },
 {
 type: 'Residencial',
@@ -30,7 +30,7 @@ color: '#10B981',
 bgColor: '#ECFDF5',
 borderColor: '#A7F3D0',
 change: 8,
-value: 'R$ 2.8M'
+  value: 'MZN 2.8M'
 },
 {
 type: 'Vida',
@@ -40,7 +40,7 @@ color: '#8B5CF6',
 bgColor: '#F5F3FF',
 borderColor: '#DDD6FE',
 change: 15,
-value: 'R$ 3.6M'
+  value: 'MZN 3.6M'
 },
 {
 type: 'Saúde',
@@ -50,7 +50,7 @@ color: '#EF4444',
 bgColor: '#FEF2F2',
 borderColor: '#FECACA',
 change: -3,
-value: 'R$ 1.9M'
+  value: 'MZN 1.9M'
 },
 ];
 
@@ -127,8 +127,8 @@ bodyStyle={{ padding: '16px' }}
 </div>
 </div>
 <div>
-<div className="text-xs text-gray-600">Prêmio Médio</div>
-<div className="text-lg font-bold text-gray-800">R$ 1.250</div>
+                <div className="text-xs text-gray-600">Prêmio Médio</div>
+                <div className="text-lg font-bold text-gray-800">MZN 1.250</div>
 </div>
 </div>
 </div>

@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('nome');
             $table->string('nome_responsavel')->nullable();
             $table->string('nuit')->unique();
-            $table->string('telefone');
-            $table->string('telefone1')->nullable();
+            $table->string('telefone1');
             $table->string('telefone2')->nullable();
             $table->string('email')->nullable();
             $table->string('endereco')->nullable();

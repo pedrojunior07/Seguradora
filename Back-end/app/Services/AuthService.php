@@ -23,12 +23,12 @@ class AuthService
                         'nome' => $dados['nome_empresa'],
                         'nome_responsavel' => $dados['nome_responsavel'] ?? null,
                         'nuit' => $dados['nuit'],
-                        'telefone' => $dados['telefone1'],
                         'telefone1' => $dados['telefone1'],
                         'telefone2' => $dados['telefone2'] ?? null,
                         'email' => $dados['email'],
                         'endereco' => $dados['endereco'] ?? null,
                         'licenca' => $dados['licenca'] ?? null,
+                        'logo' => $dados['logo'] ?? null,
                         'status' => true,
                     ]);
                     break;
@@ -38,7 +38,6 @@ class AuthService
                         'nome' => $dados['nome_empresa'],
                         'nome_responsavel' => $dados['nome_responsavel'] ?? null,
                         'nuit' => $dados['nuit'],
-                        'telefone' => $dados['telefone1'],
                         'telefone1' => $dados['telefone1'],
                         'telefone2' => $dados['telefone2'] ?? null,
                         'email' => $dados['email'],
@@ -68,8 +67,9 @@ class AuthService
                 'perfil' => $dados['perfil'],
                 'perfil_id' => $entidade->getKey(),
                 'seguradora_id' => $dados['perfil'] === 'seguradora' ? $entidade->getKey() : null,
-                'telefone' => $dados['telefone'] ?? null,
+                'telefone' => $dados['telefone1'] ?? null,
                 'status' => true,
+                'role' => 'super_admin',
             ]);
 
             return [

@@ -15,12 +15,19 @@ import ListaSeguros from '@layouts/seguradora/pages/ListaSeguros';
 import CriarSeguro from '@layouts/seguradora/pages/CriarSeguro';
 import DetalhesSeguro from '@layouts/seguradora/pages/DetalhesSeguro';
 import ListaCategorias from '@layouts/seguradora/pages/ListaCategorias';
+import UsuariosPage from '@layouts/seguradora/pages/UsuariosPage';
+import ListaClientes from '@layouts/seguradora/pages/ListaClientes';
+import ListaApolices from '@layouts/seguradora/pages/ListaApolices';
+import AdminRoute from '@components/AdminRoute';
 
 // Corretora
 import CorretoraDashboard from '@layouts/corretora/Dashboard';
 
 // Cliente
-import ClienteDashboard from '@layouts/cliente/Dashboard';
+import ClienteDashboard from '@layouts/cliente/pages/Dashboard';
+import ContratarSeguroPage from '@layouts/cliente/pages/ContratarSeguroPage';
+import ListaSeguradorasPage from '@layouts/cliente/pages/ListaSeguradorasPage';
+import ClienteLayout from '@layouts/cliente/Components/layouts/ClienteLayout'; // Temp path, will fix
 
 const theme = createTheme({
   palette: {
@@ -85,9 +92,24 @@ function App() {
               <Route index element={<Navigate to="/seguradora/dashboard" replace />} />
               <Route path="dashboard" element={<SeguradoraDashboard />} />
               <Route path="seguros" element={<ListaSeguros />} />
-              <Route path="seguros/criar" element={<CriarSeguro />} />
+              <Route path="seguros/criar" element={
+                <AdminRoute>
+                  <CriarSeguro />
+                </AdminRoute>
+              } />
               <Route path="seguros/:id" element={<DetalhesSeguro />} />
-              <Route path="categorias" element={<ListaCategorias />} />
+              <Route path="categorias" element={
+                <AdminRoute>
+                  <ListaCategorias />
+                </AdminRoute>
+              } />
+              <Route path="usuarios" element={
+                <AdminRoute>
+                  <UsuariosPage />
+                </AdminRoute>
+              } />
+              <Route path="clientes" element={<ListaClientes />} />
+              <Route path="apolices" element={<ListaApolices />} />
             </Route>
 
             {/* Corretora Routes */}
@@ -106,6 +128,22 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['cliente']}>
                   <ClienteDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/seguradoras"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <ListaSeguradorasPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/contratar"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <ContratarSeguroPage />
                 </ProtectedRoute>
               }
             />

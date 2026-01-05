@@ -1,0 +1,50 @@
+Exemplos de categorias:
+
+Automóvel
+
+Saúde
+
+Vida
+
+Habitação
+
+Transporte
+
+Responsabilidade Civi
+
+Conceito
+
+O tipo de seguro define a modalidade do produto dentro de uma categoria.
+Ele descreve regras, cobertura e forma de contratação.
+
+Exemplos por categoria
+
+
+Categoria: Automóvel
+
+Contra terceiros
+
+Contra todos os riscos
+
+Danos próprios
+
+Frota
+
+Categoria: Saúde
+
+Individual
+
+Familiar
+
+Empresarial
+
+
+Categoria: Vida
+
+Vida simples
+
+Vida + invalidez
+
+Vida temporário
+
+Tipo de seguro = Modalidade / Produto

@@ -11,11 +11,39 @@ import {
 } from '@ant-design/icons';
 
 const StatsCards = () => {
-  const stats = [
+  const [statsData, setStatsData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    // Importar dinamicamente ou usar axios diretamente se o serviço não estiver pronto
+    // Assumindo uso de axios configurado ou serviço
+    const fetchStats = async () => {
+      try {
+        // Obter token do localStorage ou contexto (geralmente api.js já trata)
+        // Substituir URL pela rota correta
+        const response = await fetch('http://localhost:8000/api/seguradora/dashboard/resumo', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Accept': 'application/json'
+            }
+        });
+        const data = await response.json();
+        setStatsData(data);
+      } catch (error) {
+        console.error("Erro ao buscar estatísticas:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const getStats = () => [
     {
       title: 'Apólices Ativas',
-      value: 1248,
-      change: 12,
+      value: statsData?.apolices_ativas?.value || 0,
+      change: statsData?.apolices_ativas?.change || 0,
       icon: <InsuranceOutlined />,
       color: '#1e40af',
       gradient: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
@@ -24,8 +52,8 @@ const StatsCards = () => {
     },
     {
       title: 'Sinistros Pendentes',
-      value: 43,
-      change: -5,
+      value: statsData?.sinistros_pendentes?.value || 0,
+      change: statsData?.sinistros_pendentes?.change || 0,
       icon: <AlertOutlined />,
       color: '#dc2626',
       gradient: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
@@ -34,8 +62,8 @@ const StatsCards = () => {
     },
     {
       title: 'Novos Contratos',
-      value: 89,
-      change: 24,
+      value: statsData?.novos_contratos?.value || 0,
+      change: statsData?.novos_contratos?.change || 0,
       icon: <FileDoneOutlined />,
       color: '#059669',
       gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
@@ -44,8 +72,8 @@ const StatsCards = () => {
     },
     {
       title: 'Prêmio Mensal',
-      value: 'R$ 2.4M',
-      change: 8,
+      value: statsData?.premio_mensal?.formatted || 'MZN 0.00',
+      change: statsData?.premio_mensal?.change || 0,
       icon: <DollarOutlined />,
       color: '#0891b2',
       gradient: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
@@ -54,11 +82,14 @@ const StatsCards = () => {
     },
   ];
 
+  const stats = getStats();
+
   return (
     <Row gutter={[16, 16]}>
       {stats.map((stat, index) => (
         <Col xs={12} sm={12} lg={6} key={index}>
           <Card
+            loading={loading}
             style={{
               height: '100%',
               borderRadius: 16,
@@ -70,12 +101,16 @@ const StatsCards = () => {
             }}
             bodyStyle={{ padding: '20px' }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
+              if(!loading) {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+              if(!loading) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+              }
             }}
           >
             {/* Top bar colorida */}

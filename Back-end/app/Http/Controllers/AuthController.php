@@ -59,7 +59,13 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         try {
-            $resultado = $this->authService->registrar($request->validated());
+            $validated = $request->validated();
+
+            if ($request->hasFile('logo')) {
+                $validated['logo'] = $request->file('logo')->store('seguradoras/logos', 'public');
+            }
+
+            $resultado = $this->authService->registrar($validated);
 
             // Generate JWT token for the newly registered user
             $token = auth('api')->login($resultado['user']);
@@ -73,8 +79,13 @@ class AuthController extends Controller
                 'expires_in' => auth('api')->factory()->getTTL() * 60,
             ], 201);
         } catch (\Exception $e) {
+            \Log::error('Registro falhou', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return response()->json([
-                'message' => 'Erro ao registrar',
+                'message' => 'Erro ao registrar: ' . $e->getMessage(),
                 'error' => $e->getMessage(),
             ], 400);
         }
