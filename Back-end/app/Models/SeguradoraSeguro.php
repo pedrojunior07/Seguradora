@@ -56,10 +56,10 @@ class SeguradoraSeguro extends Model
     public function precoAtual()
     {
         return $this->hasOne(Preco::class, 'seguradora_seguro_id', 'id')
-                    ->where('data_inicio', '<=', now())
+                    ->whereDate('data_inicio', '<=', now())
                     ->where(function ($query) {
                         $query->whereNull('data_fim')
-                              ->orWhere('data_fim', '>=', now());
+                              ->orWhereDate('data_fim', '>=', now());
                     })
                     ->latest('data_inicio');
     }

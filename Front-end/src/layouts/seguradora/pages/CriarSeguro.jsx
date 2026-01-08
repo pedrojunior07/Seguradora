@@ -44,9 +44,7 @@ const CriarSeguro = () => {
     try {
       // Formatar datas se existirem
       if (values.preco) {
-        if (values.preco.data_inicio) {
-          values.preco.data_inicio = values.preco.data_inicio.format('YYYY-MM-DD');
-        }
+
         if (values.preco.data_fim) {
           values.preco.data_fim = values.preco.data_fim.format('YYYY-MM-DD');
         }
@@ -256,12 +254,7 @@ const CriarSeguro = () => {
               />
             </Form.Item>
 
-            <Form.Item
-              label="Data Início"
-              name={['preco', 'data_inicio']}
-            >
-              <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
-            </Form.Item>
+
 
             <Form.Item
               label="Data Fim"

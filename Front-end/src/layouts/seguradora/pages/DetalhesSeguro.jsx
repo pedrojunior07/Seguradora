@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Descriptions, Tag, Button, Space, message, Spin, Table, Modal, Form, InputNumber, Input, DatePicker, Switch, Divider } from 'antd';
+import { Card, Descriptions, Tag, Button, Space, message, Spin, Table, Modal, Form, InputNumber, Input, DatePicker, Switch, Divider, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, PlusOutlined, DollarOutlined, SafetyOutlined, PoweroffOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import seguroService from '../../../services/seguroService';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
+const { Text } = Typography;
 
 const DetalhesSeguro = () => {
   const navigate = useNavigate();
@@ -122,14 +123,23 @@ const DetalhesSeguro = () => {
       title: 'Data Fim',
       dataIndex: 'data_fim',
       key: 'data_fim',
-      render: (data) => data ? dayjs(data).format('DD/MM/YYYY') : <Tag color="green">Atual</Tag>
-    }
-    ,
+      render: (data, record) => {
+        if (data) return dayjs(data).format('DD/MM/YYYY');
+        const isFuture = dayjs(record.data_inicio).isAfter(dayjs(), 'day');
+        return isFuture ? '-' : <Tag color="green">Vigente</Tag>;
+      }
+    },
     {
       title: 'Ações',
       key: 'acoes',
       render: (_, record) => {
         const precoId = record.id_preco ?? record.id ?? record.idPreco;
+        const isFuture = dayjs(record.data_inicio).isAfter(dayjs(), 'day');
+
+        if (isFuture) {
+          return <Tag color="orange">AGENDADO</Tag>;
+        }
+
         return (
           <Space>
             {record.data_fim ? (
@@ -280,6 +290,7 @@ const DetalhesSeguro = () => {
               : '-'
             }
           </Descriptions.Item>
+          <Descriptions.Item label=" "></Descriptions.Item>
           <Descriptions.Item label="Descrição" span={2}>
             {seguro.seguro?.descricao || 'Sem descrição'}
           </Descriptions.Item>
@@ -419,13 +430,7 @@ const DetalhesSeguro = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            label="Data Início"
-            name="data_inicio"
-            rules={[{ required: true, message: 'Campo obrigatório' }]}
-          >
-            <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
-          </Form.Item>
+
 
           <Form.Item
             label="Data Fim"

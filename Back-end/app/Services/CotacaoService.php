@@ -18,21 +18,57 @@ class CotacaoService
     {
         $seguradoraSeguro = SeguradoraSeguro::with(['precoAtual', 'seguro.tipo'])->findOrFail($id_seguradora_seguro);
         
-        $preco = $seguradoraSeguro->precoAtual;
-
-        if (!$preco) {
-            throw new \Exception('Não existe um preço ativo para este seguro no momento.');
+        // Validar status do seguro
+        if (!$seguradoraSeguro->status) {
+            throw new \Exception('Este seguro está inativo no momento.');
         }
 
-        $premioFinal = 0;
+        // Buscar preço ativo manualmente para garantir consistência
+        $preco = \App\Models\Preco::where('seguradora_seguro_id', $seguradoraSeguro->id)
+            ->whereDate('data_inicio', '<=', now())
+            ->where(function ($query) {
+                $query->whereNull('data_fim')
+                      ->orWhereDate('data_fim', '>=', now());
+            })
+            ->orderBy('data_inicio', 'desc')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$preco) {
+            // Fallback: Tenta preço iniciado <= hoje
+            $preco = \App\Models\Preco::where('seguradora_seguro_id', $seguradoraSeguro->id)
+                ->whereDate('data_inicio', '<=', now())
+                ->orderBy('data_inicio', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+                
+            // ULTIMATE FALLBACK: Se ainda assim falhar, pega QUALQUER preço (o último criado)
+            // Isso cobre casos onde a data pode estar futura (agendado) mas o usuário quer simular igual,
+            // ou problemas de fuso horário/formatação no banco.
+            if (!$preco) {
+                $preco = \App\Models\Preco::where('seguradora_seguro_id', $seguradoraSeguro->id)
+                    ->orderBy('id', 'desc')
+                    ->first();
+            }
+        }
+
+        if (!$preco) {
+            $count = \App\Models\Preco::where('seguradora_seguro_id', $seguradoraSeguro->id)->count();
+            \Log::warning("Cotação falhou: Sem preço ativo ou histórico. Seguro ID: {$id_seguradora_seguro}. Total Preços no DB: {$count}");
+            throw new \Exception("Erro Crítico: Não foi encontrado nenhum preço para este seguro (ID: {$seguradoraSeguro->id}, Qtd: {$count}). Contate o suporte.");
+        }
+
+        $premioBase = 0;
 
         if ($preco->usa_valor) {
             // Valor Fixo
-            $premioFinal = $preco->premio_valor;
+            $premioBase = $preco->premio_valor;
         } else {
             // Percentagem
-            $premioFinal = $valor_bem * ($preco->premio_percentagem / 100);
+            $premioBase = $valor_bem * ($preco->premio_percentagem / 100);
         }
+
+        $premioFinal = $premioBase;
 
         // Aplicar prêmio mínimo
         if ($seguradoraSeguro->premio_minimo > 0) {
@@ -43,10 +79,11 @@ class CotacaoService
             'id_seguradora_seguro' => $id_seguradora_seguro,
             'id_preco' => $preco->id,
             'valor_bem' => $valor_bem,
+            'premio_base' => round($premioBase, 2),
             'premio_final' => round($premioFinal, 2),
             'regra_aplicada' => $preco->usa_valor ? 'valor_fixo' : 'percentagem',
             'taxa_aplicada' => $preco->usa_valor ? $preco->premio_valor : $preco->premio_percentagem,
-            'premio_minimo_aplicado' => $premioFinal == $seguradoraSeguro->premio_minimo && $seguradoraSeguro->premio_minimo > 0,
+            'premio_minimo_aplicado' => $premioFinal == $seguradoraSeguro->premio_minimo && $premioFinal > $premioBase,
             'detalhes_cobertura' => $seguradoraSeguro->coberturas ?? []
         ];
     }

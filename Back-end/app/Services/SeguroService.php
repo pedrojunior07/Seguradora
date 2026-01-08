@@ -126,7 +126,7 @@ class SeguroService
 
         return Preco::create([
             'seguradora_seguro_id' => $id_seguradora_seguro,
-            'valor' => $dados['valor'],
+            'valor' => $dados['valor'] ?? 0,
             'premio_percentagem' => $dados['premio_percentagem'] ?? null,
             'premio_valor' => $dados['premio_valor'] ?? null,
             'usa_valor' => $dados['usaValor'] ?? false,

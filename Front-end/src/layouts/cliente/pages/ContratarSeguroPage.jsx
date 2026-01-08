@@ -143,6 +143,7 @@ const ContratarSeguroPage = () => {
 
   const handleSimular = async () => {
     setSimulating(true);
+    setCotacao(null); // Reset anterior state
     try {
       const id_ss = selectedSeguro.id_seguradora_seguro || selectedSeguro.id;
       const res = await clienteService.simularCotacao({
@@ -152,6 +153,8 @@ const ContratarSeguroPage = () => {
       setCotacao(res);
     } catch (error) {
       console.error(error);
+      const errorMsg = error.response?.data?.message || 'Erro ao calcular cotação. Verifique os dados ou tente outro seguradora.';
+      message.error(errorMsg);
     } finally {
       setSimulating(false);
     }
