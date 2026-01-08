@@ -18,9 +18,10 @@ use App\Http\Controllers\Cliente\PagamentoController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
-// Conteúdo Público (Seguradoras)
+// Conteúdo Público (Seguradoras e Seguros)
 Route::get('public/seguradoras', [\App\Http\Controllers\Api\SeguradoraController::class, 'index']);
 Route::get('public/seguradoras/{id}/seguros', [\App\Http\Controllers\Api\SeguradoraController::class, 'seguros']);
+Route::get('public/seguros', [\App\Http\Controllers\Api\SeguradoraController::class, 'todosSeguros']);
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +35,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('refresh', [AuthController::class, 'refresh']);
 
     // Categorias
+    // Categorias e Tipos
     Route::apiResource('categorias', \App\Http\Controllers\Api\CategoriaController::class);
+    Route::apiResource('tipos-seguro', \App\Http\Controllers\Api\TipoSeguroController::class);
 
     // Gestão de Equipe (Super Admin)
     Route::get('equipe', [\App\Http\Controllers\Api\UserController::class, 'index']);
@@ -67,6 +70,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('apolices/{apolice}/aprovar', [SeguradoraApoliceController::class, 'aprovar']);
         Route::post('apolices/{apolice}/rejeitar', [SeguradoraApoliceController::class, 'rejeitar']);
         Route::get('apolices/estatisticas', [SeguradoraApoliceController::class, 'estadisticas']);
+        Route::get('/contratacoes-diretas', [SeguradoraApoliceController::class, 'contratacoesDiretas']);
+        Route::post('/contratacoes-diretas/{id}/decidir', [SeguradoraApoliceController::class, 'decidirProposta']);
 
         // Sinistros
         Route::get('sinistros/pendentes', [SeguradoraSinistroController::class, 'pendentes']);
@@ -93,34 +98,39 @@ Route::middleware('auth:api')->group(function () {
         Route::post('propostas/{proposta}/converter-apolice', [PropostaController::class, 'converterEmApolice']);
     });
 
-    // CONTRATAÇÃO (Geral ou Cliente)
-    Route::post('contratacao/veiculo', [\App\Http\Controllers\Api\ContratacaoController::class, 'contratar']);
+    // CONTRATAÇÃO
+    Route::prefix('contratacao')->group(function () {
+        Route::post('simular', [\App\Http\Controllers\Api\ContratacaoController::class, 'simular']);
+        Route::post('contratar', [\App\Http\Controllers\Api\ContratacaoController::class, 'contratar']);
+    });
 
     // ROTAS CLIENTE
     Route::prefix('cliente')->group(function () {
-        // Veículos
+        // Bens
         Route::get('veiculos', [\App\Http\Controllers\Api\VeiculoController::class, 'index']);
+        Route::post('veiculos', [\App\Http\Controllers\Api\VeiculoController::class, 'store']);
+        Route::get('propriedades', [\App\Http\Controllers\Api\PropriedadeController::class, 'index']);
 
         // Apólices
         Route::get('apolices', [ClienteApoliceController::class, 'index']);
         Route::get('apolices/ativas', [ClienteApoliceController::class, 'ativas']);
+        Route::get('apolices/estatisticas', [ClienteApoliceController::class, 'estatisticas']);
         Route::get('apolices/{apolice}', [ClienteApoliceController::class, 'show']);
         Route::get('apolices/{apolice}/pagamentos', [ClienteApoliceController::class, 'pagamentos']);
-        Route::get('apolices/estatisticas', [ClienteApoliceController::class, 'estatisticas']);
 
         // Sinistros
         Route::get('sinistros', [ClienteSinistroController::class, 'index']);
+        Route::get('sinistros/estatisticas', [ClienteSinistroController::class, 'estatisticas']);
         Route::post('sinistros', [ClienteSinistroController::class, 'store']);
         Route::get('sinistros/{sinistro}', [ClienteSinistroController::class, 'show']);
         Route::get('sinistros/{sinistro}/acompanhamento', [ClienteSinistroController::class, 'acompanhamento']);
-        Route::get('sinistros/estatisticas', [ClienteSinistroController::class, 'estatisticas']);
 
         // Pagamentos
         Route::get('pagamentos', [PagamentoController::class, 'index']);
         Route::get('pagamentos/pendentes', [PagamentoController::class, 'pendentes']);
         Route::get('pagamentos/atrasados', [PagamentoController::class, 'atrasados']);
+        Route::get('pagamentos/estatisticas', [PagamentoController::class, 'estatisticas']);
         Route::get('pagamentos/{pagamento}', [PagamentoController::class, 'show']);
         Route::post('pagamentos/{pagamento}/registrar', [PagamentoController::class, 'registrarPagamento']);
-        Route::get('pagamentos/estatisticas', [PagamentoController::class, 'estatisticas']);
     });
 });

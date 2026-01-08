@@ -27,6 +27,7 @@ import CorretoraDashboard from '@layouts/corretora/Dashboard';
 import ClienteDashboard from '@layouts/cliente/pages/Dashboard';
 import ContratarSeguroPage from '@layouts/cliente/pages/ContratarSeguroPage';
 import ListaSeguradorasPage from '@layouts/cliente/pages/ListaSeguradorasPage';
+import MinhasApolices from '@layouts/cliente/pages/MinhasApolices';
 import ClienteLayout from '@layouts/cliente/Components/layouts/ClienteLayout'; // Temp path, will fix
 
 const theme = createTheme({
@@ -98,11 +99,8 @@ function App() {
                 </AdminRoute>
               } />
               <Route path="seguros/:id" element={<DetalhesSeguro />} />
-              <Route path="categorias" element={
-                <AdminRoute>
-                  <ListaCategorias />
-                </AdminRoute>
-              } />
+
+              <Route path="categorias" element={<ListaCategorias />} />
               <Route path="usuarios" element={
                 <AdminRoute>
                   <UsuariosPage />
@@ -144,6 +142,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['cliente']}>
                   <ContratarSeguroPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/apolices"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <MinhasApolices />
                 </ProtectedRoute>
               }
             />

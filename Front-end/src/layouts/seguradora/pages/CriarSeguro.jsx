@@ -13,6 +13,7 @@ const CriarSeguro = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [categorias, setCategorias] = useState([]);
+  const [tiposDisponiveis, setTiposDisponiveis] = useState([]);
   const [usaValor, setUsaValor] = useState(false);
 
   useEffect(() => {
@@ -25,6 +26,16 @@ const CriarSeguro = () => {
       setCategorias(response || []);
     } catch (error) {
       message.error('Erro ao carregar categorias');
+    }
+  };
+
+  const handleCategoriaChange = (idCategoria) => {
+    form.setFieldValue('id_tipo_seguro', null);
+    const categoria = categorias.find(c => c.id_categoria === idCategoria);
+    if (categoria && categoria.tipos) {
+      setTiposDisponiveis(categoria.tipos);
+    } else {
+      setTiposDisponiveis([]);
     }
   };
 
@@ -90,6 +101,7 @@ const CriarSeguro = () => {
           onFinish={onFinish}
           initialValues={{
             status: true,
+            auto_aprovacao: false,
             preco: {
               usaValor: false
             }
@@ -100,19 +112,14 @@ const CriarSeguro = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
             <Form.Item
-              label="Nome do Seguro"
-              name="nome"
-              rules={[{ required: true, message: 'Campo obrigatório' }]}
-            >
-              <Input placeholder="Ex: Seguro Auto Premium" />
-            </Form.Item>
-
-            <Form.Item
               label="Categoria"
               name="id_categoria"
               rules={[{ required: true, message: 'Campo obrigatório' }]}
             >
-              <Select placeholder="Selecione uma categoria">
+              <Select
+                placeholder="Selecione uma categoria"
+                onChange={handleCategoriaChange}
+              >
                 {categorias.map(cat => (
                   <Option key={cat.id_categoria} value={cat.id_categoria}>
                     {cat.descricao}
@@ -120,7 +127,29 @@ const CriarSeguro = () => {
                 ))}
               </Select>
             </Form.Item>
+
+            <Form.Item
+              label="Tipo de Seguro"
+              name="id_tipo_seguro"
+              rules={[{ required: true, message: 'Campo obrigatório' }]}
+            >
+              <Select placeholder="Selecione o tipo" disabled={!tiposDisponiveis.length}>
+                {tiposDisponiveis.map(tipo => (
+                  <Option key={tipo.id} value={tipo.id}>
+                    {tipo.descricao}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </div>
+
+          <Form.Item
+            label="Nome do Seguro"
+            name="nome"
+            rules={[{ required: true, message: 'Campo obrigatório' }]}
+          >
+            <Input placeholder="Ex: Seguro Auto Premium" />
+          </Form.Item>
 
           <Form.Item
             label="Descrição"
@@ -129,19 +158,7 @@ const CriarSeguro = () => {
             <TextArea rows={3} placeholder="Descreva o seguro..." />
           </Form.Item>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-            <Form.Item
-              label="Tipo de Seguro"
-              name="tipo_seguro"
-              rules={[{ required: true, message: 'Campo obrigatório' }]}
-            >
-              <Select placeholder="Selecione o tipo">
-                <Option value="veiculo">Veículo</Option>
-                <Option value="propriedade">Propriedade</Option>
-                <Option value="vida">Vida</Option>
-                <Option value="saude">Saúde</Option>
-              </Select>
-            </Form.Item>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
 
             <Form.Item
               label="Prêmio Mínimo (MZN)"
@@ -173,32 +190,29 @@ const CriarSeguro = () => {
             </Form.Item>
           </div>
 
-          <Form.Item
-            label="Status"
-            name="status"
-            valuePropName="checked"
-          >
-            <Switch checkedChildren="Ativo" unCheckedChildren="Inativo" />
-          </Form.Item>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+            <Form.Item
+              label="Status"
+              name="status"
+              valuePropName="checked"
+            >
+              <Switch checkedChildren="Ativo" unCheckedChildren="Inativo" />
+            </Form.Item>
+
+            <Form.Item
+              label="Auto-Aprovação"
+              name="auto_aprovacao"
+              valuePropName="checked"
+              tooltip="Se ativado, as propostas dos clientes serão aprovadas automaticamente sem análise prévia."
+            >
+              <Switch checkedChildren="Ligado" unCheckedChildren="Desligado" />
+            </Form.Item>
+          </div>
 
           {/* Preço Inicial */}
           <Divider orientation="left">Preço Inicial (Opcional)</Divider>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-            <Form.Item
-              label="Valor Base (MZN)"
-              name={['preco', 'valor']}
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                min={0}
-                step={100}
-                placeholder="0.00"
-                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                parser={value => value.replace(/\$\s?|(,*)/g, '')}
-              />
-            </Form.Item>
-
             <Form.Item
               label="Usar Valor Fixo?"
               name={['preco', 'usaValor']}

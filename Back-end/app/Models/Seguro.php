@@ -17,9 +17,9 @@ class Seguro extends Model
 
     protected $fillable = [
         'id_categoria',
+        'id_tipo_seguro',
         'nome',
         'descricao',
-        'tipo_seguro',
         'data_criacao',
         'data_atualizacao',
     ];
@@ -35,6 +35,11 @@ class Seguro extends Model
         return $this->belongsTo(Categoria::class, 'id_categoria', 'id_categoria');
     }
 
+    public function tipo()
+    {
+        return $this->belongsTo(TipoSeguro::class, 'id_tipo_seguro', 'id');
+    }
+
     public function seguradoras()
     {
         return $this->belongsToMany(Seguradora::class, 'seguradora_seguro', 'id_seguro', 'id_seguradora')
@@ -48,15 +53,15 @@ class Seguro extends Model
     }
 
     // Scopes
-    public function scopeVeiculo($query)
-    {
-        return $query->where('tipo_seguro', 'veiculo');
-    }
+    // public function scopeVeiculo($query)
+    // {
+    //     return $query->where('tipo_seguro', 'veiculo');
+    // }
 
-    public function scopePropriedade($query)
-    {
-        return $query->where('tipo_seguro', 'propriedade');
-    }
+    // public function scopePropriedade($query)
+    // {
+    //     return $query->where('tipo_seguro', 'propriedade');
+    // }
 
     public function scopeDaCategoria($query, $categoriaId)
     {

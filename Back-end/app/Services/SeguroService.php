@@ -22,7 +22,7 @@ class SeguroService
                 'id_categoria' => $dados['id_categoria'],
                 'nome' => $dados['nome'],
                 'descricao' => $dados['descricao'] ?? null,
-                'tipo_seguro' => $dados['tipo_seguro'],
+                'id_tipo_seguro' => $dados['id_tipo_seguro'],
             ]);
 
             // 2. Criar associação seguradora_seguro
@@ -32,13 +32,14 @@ class SeguroService
                 'premio_minimo' => $dados['premio_minimo'],
                 'valor_minimo_dano' => $dados['valor_minimo_dano'] ?? null,
                 'status' => $dados['status'] ?? true,
+                'auto_aprovacao' => $dados['auto_aprovacao'] ?? false,
             ]);
 
             // 3. Criar preço inicial (se fornecido)
             if (isset($dados['preco'])) {
                 Preco::create([
                     'seguradora_seguro_id' => $seguradoraSeguro->id,
-                    'valor' => $dados['preco']['valor'],
+                    'valor' => $dados['preco']['valor'] ?? null,
                     'premio_percentagem' => $dados['preco']['premio_percentagem'] ?? null,
                     'premio_valor' => $dados['preco']['premio_valor'] ?? null,
                     'usa_valor' => $dados['preco']['usaValor'] ?? false,
@@ -61,27 +62,39 @@ class SeguroService
             }
 
             return [
-                'seguro' => $seguro->load('categoria'),
+                'seguro' => $seguro->load(['categoria', 'tipo']),
                 'seguradoraSeguro' => $seguradoraSeguro->load(['precoAtual', 'coberturas']),
             ];
         });
     }
 
     /**
-     * Atualizar um seguro existente
+     * Atualizar um seguro existente e suas configurações de seguradora
      */
-    public function atualizarSeguro(int $id_seguro, array $dados): Seguro
+    public function atualizarSeguro(int $id_seguradora_seguro, array $dados): SeguradoraSeguro
     {
-        $seguro = Seguro::findOrFail($id_seguro);
+        return DB::transaction(function () use ($id_seguradora_seguro, $dados) {
+            $seguradoraSeguro = SeguradoraSeguro::findOrFail($id_seguradora_seguro);
+            $seguro = $seguradoraSeguro->seguro;
 
-        $seguro->update([
-            'id_categoria' => $dados['id_categoria'] ?? $seguro->id_categoria,
-            'nome' => $dados['nome'] ?? $seguro->nome,
-            'descricao' => $dados['descricao'] ?? $seguro->descricao,
-            'tipo_seguro' => $dados['tipo_seguro'] ?? $seguro->tipo_seguro,
-        ]);
+            // Atualizar modelo base (Seguro)
+            $seguro->update([
+                'id_categoria' => $dados['id_categoria'] ?? $seguro->id_categoria,
+                'nome' => $dados['nome'] ?? $seguro->nome,
+                'descricao' => $dados['descricao'] ?? $seguro->descricao,
+                'id_tipo_seguro' => $dados['id_tipo_seguro'] ?? $seguro->id_tipo_seguro,
+            ]);
 
-        return $seguro->fresh('categoria');
+            // Atualizar modelo de relação (SeguradoraSeguro)
+            $seguradoraSeguro->update([
+                'premio_minimo' => $dados['premio_minimo'] ?? $seguradoraSeguro->premio_minimo,
+                'valor_minimo_dano' => $dados['valor_minimo_dano'] ?? $seguradoraSeguro->valor_minimo_dano,
+                'status' => $dados['status'] ?? $seguradoraSeguro->status,
+                'auto_aprovacao' => $dados['auto_aprovacao'] ?? $seguradoraSeguro->auto_aprovacao,
+            ]);
+
+            return $seguradoraSeguro->load(['seguro.categoria', 'seguro.tipo']);
+        });
     }
 
     /**
@@ -95,6 +108,7 @@ class SeguroService
             'premio_minimo' => $dados['premio_minimo'] ?? $seguradoraSeguro->premio_minimo,
             'valor_minimo_dano' => $dados['valor_minimo_dano'] ?? $seguradoraSeguro->valor_minimo_dano,
             'status' => $dados['status'] ?? $seguradoraSeguro->status,
+            'auto_aprovacao' => $dados['auto_aprovacao'] ?? $seguradoraSeguro->auto_aprovacao,
         ]);
 
         return $seguradoraSeguro->fresh(['seguro', 'seguradora']);
@@ -185,7 +199,7 @@ class SeguroService
      */
     public function listarSegurosSeguradora(int $id_seguradora, array $filtros = [])
     {
-        $query = SeguradoraSeguro::with(['seguro.categoria', 'precoAtual', 'coberturas'])
+        $query = SeguradoraSeguro::with(['seguro.categoria', 'seguro.tipo', 'precoAtual', 'coberturas'])
             ->where('id_seguradora', $id_seguradora);
 
         if (isset($filtros['status'])) {
@@ -193,8 +207,14 @@ class SeguroService
         }
 
         if (isset($filtros['tipo_seguro'])) {
-            $query->whereHas('seguro', function ($q) use ($filtros) {
-                $q->where('tipo_seguro', $filtros['tipo_seguro']);
+            $query->whereHas('seguro.tipo', function ($q) use ($filtros) {
+                 // Assumindo que o filtro 'tipo_seguro' venha como ID ou String. Se for string, tentamos descricao
+                 // Se vier ID, melhor
+                 if (is_numeric($filtros['tipo_seguro'])) {
+                     $q->where('id', $filtros['tipo_seguro']);
+                 } else {
+                     $q->where('descricao', 'like', '%' . $filtros['tipo_seguro'] . '%');
+                 }
             });
         }
 
@@ -214,6 +234,7 @@ class SeguroService
     {
         return SeguradoraSeguro::with([
             'seguro.categoria',
+            'seguro.tipo',
             'seguradora',
             'precoAtual',
             'precos' => function ($query) {
@@ -250,6 +271,6 @@ class SeguroService
      */
     public function listarCategorias()
     {
-        return Categoria::withCount('seguros')->get();
+        return Categoria::with('tipos')->withCount('seguros')->get();
     }
 }

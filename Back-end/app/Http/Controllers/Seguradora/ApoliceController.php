@@ -160,6 +160,74 @@ class ApoliceController extends Controller
         ]);
     }
 
+    public function contratacoesDiretas(Request $request)
+    {
+        $seguradoraId = $request->user()->perfil_id;
+
+        $veiculos = \App\Models\ClienteSeguroVeiculo::whereHas('seguradoraSeguro', function ($q) use ($seguradoraId) {
+                $q->where('id_seguradora', $seguradoraId);
+            })
+            ->with(['veiculo.cliente', 'seguradoraSeguro.seguro', 'preco'])
+            ->get()
+            ->map(function($item) {
+                $item->tipo_bem = 'veiculo';
+                $item->identificacao_bem = $item->veiculo->matricula . " (" . $item->veiculo->marca . " " . $item->veiculo->modelo . ")";
+                $item->cliente_nome = $item->veiculo->cliente->nome;
+                return $item;
+            });
+
+        $propriedades = \App\Models\ClienteSeguroPropriedade::whereHas('seguradoraSeguro', function ($q) use ($seguradoraId) {
+                $q->where('id_seguradora', $seguradoraId);
+            })
+            ->with(['propriedade.cliente', 'seguradoraSeguro.seguro', 'preco'])
+            ->get()
+            ->map(function($item) {
+                $item->tipo_bem = 'propriedade';
+                $item->identificacao_bem = $item->propriedade->descricao . " (" . $item->propriedade->tipo_propriedade . ")";
+                $item->cliente_nome = $item->propriedade->cliente->nome;
+                return $item;
+            });
+
+        $consolidado = $veiculos->concat($propriedades)->sortByDesc('created_at')->values();
+
+        return response()->json(['data' => $consolidado]);
+    }
+
+    public function decidirProposta(Request $request, $id)
+    {
+        $request->validate([
+            'decisao' => 'required|in:aprovar,rejeitar',
+            'tipo_bem' => 'required|in:veiculo,propriedade',
+        ]);
+
+        $seguradoraId = $request->user()->perfil_id;
+        $registro = null;
+
+        if ($request->tipo_bem === 'veiculo') {
+            $registro = \App\Models\ClienteSeguroVeiculo::findOrFail($id);
+        } else {
+            $registro = \App\Models\ClienteSeguroPropriedade::findOrFail($id);
+        }
+
+        // Verificar acesso
+        if ($registro->seguradoraSeguro->id_seguradora !== $seguradoraId) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
+
+        if ($request->decisao === 'aprovar') {
+            $registro->status = 'ativo';
+        } else {
+            $registro->status = 'rejeitado';
+        }
+
+        $registro->save();
+
+        return response()->json([
+            'message' => 'Proposta ' . ($request->decisao === 'aprovar' ? 'aprovada' : 'rejeitada') . ' com sucesso!',
+            'data' => $registro
+        ]);
+    }
+
     public function estadisticas(Request $request)
     {
         $seguradoraId = $request->user()->perfil_id;

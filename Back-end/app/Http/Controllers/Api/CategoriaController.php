@@ -32,7 +32,7 @@ class CategoriaController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categorias = Categoria::withCount('seguros')->get();
+        $categorias = Categoria::with('tipos')->withCount('seguros')->get();
         return response()->json($categorias);
     }
 
@@ -69,8 +69,13 @@ class CategoriaController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        if (!$request->user()->isSuperAdmin()) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
+
         $validated = $request->validate([
-            'descricao' => 'required|string|max:255|unique:categorias,descricao'
+            'descricao' => 'required|string|max:255|unique:categorias,descricao',
+            'status' => 'boolean'
         ]);
 
         $categoria = Categoria::create($validated);
@@ -83,10 +88,15 @@ class CategoriaController extends Controller
 
     public function update(Request $request, $id): JsonResponse
     {
+        if (!$request->user()->isSuperAdmin()) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
+
         $categoria = Categoria::findOrFail($id);
         
         $validated = $request->validate([
-            'descricao' => 'required|string|max:255|unique:categorias,descricao,' . $id . ',id_categoria'
+            'descricao' => 'string|max:255|unique:categorias,descricao,' . $id . ',id_categoria',
+            'status' => 'boolean'
         ]);
 
         $categoria->update($validated);
@@ -97,8 +107,11 @@ class CategoriaController extends Controller
         ]);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(Request $request, $id): JsonResponse
     {
+        if (!$request->user()->isSuperAdmin()) {
+            return response()->json(['message' => 'Não autorizado'], 403);
+        }
         $categoria = Categoria::findOrFail($id);
 
         if ($categoria->seguros()->exists()) {

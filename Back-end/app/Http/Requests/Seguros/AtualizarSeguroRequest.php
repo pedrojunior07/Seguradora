@@ -21,6 +21,7 @@ class AtualizarSeguroRequest extends FormRequest
             'premio_minimo' => 'sometimes|numeric|min:0',
             'valor_minimo_dano' => 'nullable|numeric|min:0',
             'status' => 'sometimes|boolean',
+            'auto_aprovacao' => 'sometimes|boolean',
         ];
     }
 }

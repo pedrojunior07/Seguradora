@@ -122,18 +122,12 @@ const ListaSeguros = () => {
     },
     {
       title: 'Tipo',
-      dataIndex: ['seguro', 'tipo_seguro'],
-      key: 'tipo_seguro',
-      width: 120,
-      render: (tipo) => {
-        const cores = {
-          veiculo: 'blue',
-          propriedade: 'green',
-          vida: 'purple',
-          saude: 'red'
-        };
-        return <Tag color={cores[tipo] || 'default'}>{tipo?.toUpperCase()}</Tag>;
-      }
+      dataIndex: ['seguro', 'tipo'],
+      key: 'tipo',
+      width: 150,
+      render: (tipo) => (
+        <Tag color="cyan">{tipo?.descricao?.toUpperCase() || 'N/A'}</Tag>
+      )
     },
     {
       title: 'Prêmio Mínimo',
@@ -224,17 +218,12 @@ const ListaSeguros = () => {
             <Option value={0}>Inativo</Option>
           </Select>
 
-          <Select
-            placeholder="Filtrar por tipo"
+          <Input
+            placeholder="Buscar por tipo..."
             style={{ width: 200 }}
             allowClear
-            onChange={(value) => setFiltros(prev => ({ ...prev, tipo_seguro: value }))}
-          >
-            <Option value="veiculo">Veículo</Option>
-            <Option value="propriedade">Propriedade</Option>
-            <Option value="vida">Vida</Option>
-            <Option value="saude">Saúde</Option>
-          </Select>
+            onChange={(e) => setFiltros(prev => ({ ...prev, tipo_seguro: e.target.value }))}
+          />
 
           <Select
             placeholder="Filtrar por categoria"

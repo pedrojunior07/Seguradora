@@ -11,9 +11,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -22,6 +24,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -35,8 +38,153 @@
 
 .card {
   padding: 2em;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+
 
 .read-the-docs {
   color: #888;
+}
+
+/* --- Premium Insurance Flow Styles --- */
+
+/* Page Background & Layout */
+.insurance-page-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 100%);
+  min-height: 100vh;
+}
+
+.insurance-main-card {
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* Typography */
+.gradient-title {
+  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px;
+}
+
+/* Interactive Cards (Assets) */
+.asset-card {
+  border-radius: 20px !important;
+  border: 2px solid transparent !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+  background: white;
+  height: 100%;
+}
+
+.asset-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(24, 144, 255, 0.15) !important;
+  border-color: #91d5ff !important;
+}
+
+.asset-card.selected {
+  border-color: #1890ff !important;
+  background: #f0f9ff !important;
+  box-shadow: 0 16px 48px rgba(24, 144, 255, 0.2) !important;
+  transform: translateY(-8px);
+}
+
+/* Pricing/Insurance Cards */
+.insurance-plan-card {
+  border-radius: 20px !important;
+  border: 1px solid #f0f0f0 !important;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  height: 100%;
+}
+
+.insurance-plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+  border-color: #40a9ff !important;
+}
+
+.insurance-plan-card.selected {
+  border: 2px solid #1890ff !important;
+  background: linear-gradient(to bottom, #f0f9ff, #ffffff) !important;
+  box-shadow: 0 20px 50px rgba(24, 144, 255, 0.2) !important;
+}
+
+.insurance-plan-card .rec-badge {
+  position: absolute;
+  top: 15px;
+  right: -30px;
+  background: linear-gradient(135deg, #ffec3d 0%, #ffa940 100%);
+  color: #fff;
+  padding: 5px 30px;
+  transform: rotate(45deg);
+  font-size: 10px;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(255, 169, 64, 0.4);
+  z-index: 10;
+}
+
+/* Summary Receipt */
+.receipt-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.receipt-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: repeating-linear-gradient(45deg, #1890ff, #1890ff 10px, #fff 10px, #fff 20px, #ff4d4f 20px, #ff4d4f 30px, #fff 30px, #fff 40px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Steps Overrides */
+.ant-steps-item-icon {
+  width: 40px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+  border: none !important;
+  background: #f0f2f5;
+}
+
+.ant-steps-item-process .ant-steps-item-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%) !important;
+}
+
+.ant-steps-item-wait .ant-steps-item-icon>.ant-steps-icon {
+  color: #bfbfbf !important;
 }

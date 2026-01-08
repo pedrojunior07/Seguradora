@@ -1,15 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Button, Modal, Form, Input, message, Space, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import {
+    Card, Table, Button, Modal, Form, Input,
+    message, Space, Popconfirm, Tag, Tooltip, Switch
+} from 'antd';
+import {
+    PlusOutlined, EditOutlined, DeleteOutlined,
+    FolderOpenOutlined, AppstoreOutlined, SettingOutlined
+} from '@ant-design/icons';
 import seguroService from '../../../services/seguroService';
+import { useAuth } from '../../../context/AuthContext';
 
 const ListaCategorias = () => {
+    const { user } = useAuth();
+    const isSuperAdmin = user?.role === 'super_admin';
+
     const [categorias, setCategorias] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Modal Categoria
     const [modalVisible, setModalVisible] = useState(false);
     const [modalTitle, setModalTitle] = useState('Nova Categoria');
     const [editingId, setEditingId] = useState(null);
     const [form] = Form.useForm();
+
+    // Modal Tipo Seguro
+    const [modalTipoVisible, setModalTipoVisible] = useState(false);
+    const [modalTipoTitle, setModalTipoTitle] = useState('Novo Tipo de Seguro');
+    const [editingTipoId, setEditingTipoId] = useState(null);
+    const [currentCategoriaId, setCurrentCategoriaId] = useState(null);
+    const [formTipo] = Form.useForm();
 
     useEffect(() => {
         carregarCategorias();
@@ -19,6 +38,7 @@ const ListaCategorias = () => {
         setLoading(true);
         try {
             const data = await seguroService.listarCategorias();
+            // Backend retorna array de categorias
             setCategorias(data);
         } catch (error) {
             message.error('Erro ao carregar categorias');
@@ -28,21 +48,26 @@ const ListaCategorias = () => {
         }
     };
 
-    const handleAdicionar = () => {
+    // --- Categoria Handlers ---
+    const handleAdicionarCategoria = () => {
         setEditingId(null);
         setModalTitle('Nova Categoria');
         form.resetFields();
+        form.setFieldsValue({ status: true });
         setModalVisible(true);
     };
 
-    const handleEditar = (categoria) => {
+    const handleEditarCategoria = (categoria) => {
         setEditingId(categoria.id_categoria);
         setModalTitle('Editar Categoria');
-        form.setFieldsValue({ descricao: categoria.descricao });
+        form.setFieldsValue({
+            descricao: categoria.descricao,
+            status: categoria.status
+        });
         setModalVisible(true);
     };
 
-    const handleExcluir = async (id) => {
+    const handleExcluirCategoria = async (id) => {
         try {
             await seguroService.excluirCategoria(id);
             message.success('Categoria excluída com sucesso');
@@ -52,7 +77,7 @@ const ListaCategorias = () => {
         }
     };
 
-    const handleSalvar = async (values) => {
+    const handleSalvarCategoria = async (values) => {
         try {
             if (editingId) {
                 await seguroService.atualizarCategoria(editingId, values);
@@ -62,59 +87,193 @@ const ListaCategorias = () => {
                 message.success('Categoria criada com sucesso');
             }
             setModalVisible(false);
-            form.resetFields();
             carregarCategorias();
         } catch (error) {
             message.error(error.message || 'Erro ao salvar categoria');
         }
     };
 
+    // --- Tipo Seguro Handlers ---
+    const handleAdicionarTipo = (idCategoria) => {
+        setEditingTipoId(null);
+        setCurrentCategoriaId(idCategoria);
+        setModalTipoTitle('Novo Tipo de Seguro');
+        formTipo.resetFields();
+        formTipo.setFieldsValue({ status: true });
+        setModalTipoVisible(true);
+    };
+
+    const handleEditarTipo = (tipo) => {
+        setEditingTipoId(tipo.id);
+        setCurrentCategoriaId(tipo.id_categoria);
+        setModalTipoTitle('Editar Tipo de Seguro');
+        formTipo.setFieldsValue({
+            descricao: tipo.descricao,
+            status: tipo.status
+        });
+        setModalTipoVisible(true);
+    };
+
+    const handleExcluirTipo = async (id) => {
+        try {
+            await seguroService.excluirTipo(id);
+            message.success('Tipo de seguro excluído');
+            carregarCategorias();
+        } catch (error) {
+            message.error(error.message || 'Erro ao excluir tipo');
+        }
+    };
+
+    const handleSalvarTipo = async (values) => {
+        try {
+            const payload = { ...values, id_categoria: currentCategoriaId };
+
+            if (editingTipoId) {
+                await seguroService.atualizarTipo(editingTipoId, payload);
+                message.success('Tipo atualizado com sucesso');
+            } else {
+                await seguroService.criarTipo(payload);
+                message.success('Tipo criado com sucesso');
+            }
+            setModalTipoVisible(false);
+            carregarCategorias();
+        } catch (error) {
+            message.error(error.message || 'Erro ao salvar tipo');
+        }
+    };
+
+    // --- Colunas ---
     const columns = [
         {
-            title: 'ID',
-            dataIndex: 'id_categoria',
-            key: 'id_categoria',
-            width: 80,
-        },
-        {
-            title: 'Descrição',
+            title: 'Categoria',
             dataIndex: 'descricao',
             key: 'descricao',
+            render: (text) => <span className="font-semibold text-lg">{text}</span>
         },
         {
-            title: 'Seguros Ativos',
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            width: 100,
+            render: (status) => (
+                <Tag color={status ? 'green' : 'red'}>
+                    {status ? 'ATIVO' : 'INATIVO'}
+                </Tag>
+            )
+        },
+        {
+            title: 'Seguros',
             dataIndex: 'seguros_count',
             key: 'seguros_count',
-            render: (count) => count || 0,
+            width: 100,
+            render: (count) => <Tag color="blue">{count} Seguros</Tag>,
         },
-        {
+        ...(isSuperAdmin ? [{
             title: 'Ações',
             key: 'acoes',
-            width: 150,
+            width: 120,
             render: (_, record) => (
                 <Space>
-                    <Button
-                        icon={<EditOutlined />}
-                        onClick={() => handleEditar(record)}
-                        size="small"
-                    />
+                    <Tooltip title="Editar">
+                        <Button
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditarCategoria(record)}
+                            size="small"
+                        />
+                    </Tooltip>
                     <Popconfirm
-                        title="Tem certeza que deseja excluir?"
-                        description="Esta ação não poderá ser desfeita e falhará se houver seguros associados."
-                        onConfirm={() => handleExcluir(record.id_categoria)}
+                        title="Excluir categoria?"
+                        description="Isso excluirá também os tipos associados."
+                        onConfirm={() => handleExcluirCategoria(record.id_categoria)}
                         okText="Sim"
                         cancelText="Não"
                     >
-                        <Button
-                            icon={<DeleteOutlined />}
-                            danger
-                            size="small"
-                        />
+                        <Tooltip title="Excluir">
+                            <Button
+                                icon={<DeleteOutlined />}
+                                danger
+                                size="small"
+                            />
+                        </Tooltip>
                     </Popconfirm>
                 </Space>
             ),
-        },
+        }] : []),
     ];
+
+    // --- Sub Tabela (Tipos) ---
+    const expandedRowRender = (categoria) => {
+        const tiposColumns = [
+            {
+                title: 'Tipo de Seguro',
+                dataIndex: 'descricao',
+                key: 'descricao'
+            },
+            {
+                title: 'Status',
+                dataIndex: 'status',
+                key: 'status',
+                width: 100,
+                render: (status) => (
+                    <Tag color={status ? 'green' : 'red'}>
+                        {status ? 'ATIVO' : 'INATIVO'}
+                    </Tag>
+                )
+            },
+            ...(isSuperAdmin ? [{
+                title: 'Ações',
+                key: 'acoes',
+                width: 120,
+                render: (_, record) => (
+                    <Space>
+                        <Button
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditarTipo(record)}
+                            size="small"
+                        />
+                        <Popconfirm
+                            title="Excluir tipo?"
+                            onConfirm={() => handleExcluirTipo(record.id)}
+                            okText="Sim"
+                            cancelText="Não"
+                        >
+                            <Button
+                                icon={<DeleteOutlined />}
+                                danger
+                                size="small"
+                            />
+                        </Popconfirm>
+                    </Space>
+                )
+            }] : [])
+        ];
+
+        return (
+            <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                    <h4 className="m-0 font-bold text-gray-600">Tipos de Seguro ({categoria.descricao})</h4>
+                    {isSuperAdmin && (
+                        <Button
+                            type="dashed"
+                            size="small"
+                            icon={<PlusOutlined />}
+                            onClick={() => handleAdicionarTipo(categoria.id_categoria)}
+                        >
+                            Adicionar Tipo
+                        </Button>
+                    )}
+                </div>
+                <Table
+                    columns={tiposColumns}
+                    dataSource={categoria.tipos}
+                    pagination={false}
+                    rowKey="id"
+                    size="small"
+                    locale={{ emptyText: 'Nenhum tipo cadastrado' }}
+                />
+            </div>
+        );
+    };
 
     return (
         <div style={{ padding: '24px' }}>
@@ -122,16 +281,21 @@ const ListaCategorias = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FolderOpenOutlined style={{ fontSize: '24px', color: '#1e40af' }} />
-                        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 600 }}>Gestão de Categorias</h1>
+                        <div>
+                            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 600 }}>Gestão de Categorias e Tipos</h1>
+                            <p className="text-gray-400 m-0">Administre as classificações de seguros</p>
+                        </div>
                     </div>
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={handleAdicionar}
-                        style={{ background: '#1e40af' }}
-                    >
-                        Nova Categoria
-                    </Button>
+                    {isSuperAdmin && (
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={handleAdicionarCategoria}
+                            style={{ background: '#1e40af' }}
+                        >
+                            Nova Categoria
+                        </Button>
+                    )}
                 </div>
 
                 <Table
@@ -140,38 +304,52 @@ const ListaCategorias = () => {
                     rowKey="id_categoria"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    expandable={{
+                        expandedRowRender,
+                        rowExpandable: (record) => true,
+                    }}
                 />
             </Card>
 
+            {/* Modal Categoria */}
             <Modal
                 title={modalTitle}
                 open={modalVisible}
                 onCancel={() => setModalVisible(false)}
                 footer={null}
             >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handleSalvar}
-                >
-                    <Form.Item
-                        name="descricao"
-                        label="Nome da Categoria"
-                        rules={[{ required: true, message: 'Por favor insira o nome da categoria' }]}
-                    >
-                        <Input placeholder="Ex: Veículos, Vida, Residencial" />
+                <Form form={form} layout="vertical" onFinish={handleSalvarCategoria}>
+                    <Form.Item name="descricao" label="Nome da Categoria" rules={[{ required: true }]}>
+                        <Input />
                     </Form.Item>
+                    <Form.Item name="status" label="Status" valuePropName="checked">
+                        <Switch checkedChildren="Ativo" unCheckedChildren="Inativo" />
+                    </Form.Item>
+                    <div className="flex justify-end gap-2">
+                        <Button onClick={() => setModalVisible(false)}>Cancelar</Button>
+                        <Button type="primary" htmlType="submit">Salvar</Button>
+                    </div>
+                </Form>
+            </Modal>
 
-                    <Form.Item style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 0 }}>
-                        <Space>
-                            <Button onClick={() => setModalVisible(false)}>
-                                Cancelar
-                            </Button>
-                            <Button type="primary" htmlType="submit" style={{ background: '#1e40af' }}>
-                                Salvar
-                            </Button>
-                        </Space>
+            {/* Modal Tipo Seguro */}
+            <Modal
+                title={modalTipoTitle}
+                open={modalTipoVisible}
+                onCancel={() => setModalTipoVisible(false)}
+                footer={null}
+            >
+                <Form form={formTipo} layout="vertical" onFinish={handleSalvarTipo}>
+                    <Form.Item name="descricao" label="Descrição do Tipo" rules={[{ required: true }]}>
+                        <Input />
                     </Form.Item>
+                    <Form.Item name="status" label="Status" valuePropName="checked">
+                        <Switch checkedChildren="Ativo" unCheckedChildren="Inativo" />
+                    </Form.Item>
+                    <div className="flex justify-end gap-2">
+                        <Button onClick={() => setModalTipoVisible(false)}>Cancelar</Button>
+                        <Button type="primary" htmlType="submit">Salvar</Button>
+                    </div>
                 </Form>
             </Modal>
         </div>

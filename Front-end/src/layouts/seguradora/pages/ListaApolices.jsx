@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import api from '../../../services/api';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const ListaApolices = () => {
     const [apolices, setApolices] = useState([]);
@@ -23,41 +23,69 @@ const ListaApolices = () => {
     const fetchApolices = async () => {
         setLoading(true);
         try {
-            const endpoint = activeTab === 'pendentes'
-                ? '/seguradora/apolices/pendentes'
-                : '/seguradora/apolices/ativas';
+            let endpoint = '';
+            if (activeTab === 'pendentes') endpoint = '/seguradora/apolices/pendentes';
+            else if (activeTab === 'ativas') endpoint = '/seguradora/apolices/ativas';
+            else if (activeTab === 'diretas') endpoint = '/seguradora/contratacoes-diretas';
 
             const response = await api.get(endpoint);
             setApolices(response.data.data || []);
         } catch (error) {
-            console.error('Erro ao buscar apólices:', error);
-            message.error('Falha ao carregar lista de apólices');
+            console.error('Erro ao buscar dados:', error);
+            message.error('Falha ao carregar lista');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleDecidir = async (id, tipo_bem, decisao) => {
+        try {
+            await api.post(`/seguradora/contratacoes-diretas/${id}/decidir`, {
+                tipo_bem,
+                decisao
+            });
+            message.success(`Proposta ${decisao === 'aprovar' ? 'aprovada' : 'rejeitada'} com sucesso!`);
+            fetchApolices();
+        } catch (error) {
+            console.error('Erro ao decidir:', error);
+            message.error(error.response?.data?.message || 'Erro ao processar decisão');
+        }
+    };
+
     const columns = [
         {
-            title: 'Nº Apólice',
-            dataIndex: 'numero_apolice',
-            key: 'numero_apolice',
+            title: activeTab === 'diretas' ? 'Cód. Contratação' : 'Nº Apólice',
+            dataIndex: activeTab === 'diretas' ? 'id' : 'numero_apolice',
+            key: 'identificador',
             render: (text) => <span className="font-mono font-bold text-blue-600">{text || 'N/A'}</span>,
         },
         {
             title: 'Seguro',
-            dataIndex: ['seguradora_seguro', 'seguro', 'nome'],
+            render: (_, record) => record.seguradora_seguro?.seguro?.nome || 'N/A',
             key: 'seguro',
         },
         {
             title: 'Cliente',
-            dataIndex: ['cliente', 'nome'],
+            dataIndex: activeTab === 'diretas' ? 'cliente_nome' : ['cliente', 'nome'],
             key: 'cliente',
         },
         {
+            title: activeTab === 'diretas' ? 'Bem Segurado' : 'Bem',
+            dataIndex: activeTab === 'diretas' ? 'identificacao_bem' : 'bem_segurado_id', // Ajustar se necessário
+            key: 'bem',
+            render: (val, record) => activeTab === 'diretas' ? (
+                <Space direction="vertical" size={0}>
+                    <Text strong size="small">{val}</Text>
+                    <Tag size="small" color={record.tipo_bem === 'veiculo' ? 'blue' : 'orange'}>
+                        {record.tipo_bem?.toUpperCase()}
+                    </Tag>
+                </Space>
+            ) : val
+        },
+        {
             title: 'Prêmio',
-            dataIndex: 'premio_total',
-            key: 'premio_total',
+            dataIndex: activeTab === 'diretas' ? 'premio_final' : 'premio_total',
+            key: 'premio',
             render: (val) => val ? `${parseFloat(val).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}` : '-',
         },
         {
@@ -67,29 +95,53 @@ const ListaApolices = () => {
             render: (status) => {
                 let color = 'default';
                 let icon = null;
-                if (status === 'ativa') { color = 'success'; icon = <CheckCircleOutlined />; }
-                else if (status === 'pendente_aprovacao') { color = 'warning'; icon = <ClockCircleOutlined />; }
-                else if (status === 'cancelada') { color = 'error'; icon = <CloseCircleOutlined />; }
+                if (status === 'ativa' || status === 'ativo') { color = 'success'; icon = <CheckCircleOutlined />; }
+                else if (status === 'pendente_aprovacao' || status === 'pendente' || status === 'proposta' || status === 'em_analise') { color = 'warning'; icon = <ClockCircleOutlined />; }
+                else if (status === 'cancelada' || status === 'cancelado' || status === 'rejeitado') { color = 'error'; icon = <CloseCircleOutlined />; }
 
                 return <Tag icon={icon} color={color}>{status?.toUpperCase().replace('_', ' ')}</Tag>;
             }
         },
         {
-            title: 'Vigência',
-            key: 'vigencia',
+            title: 'Data',
+            key: 'data',
             render: (_, record) => (
                 <span className="text-xs text-gray-500">
-                    {record.data_inicio} até {record.data_fim}
+                    {record.created_at ? new Date(record.created_at).toLocaleDateString() : '-'}
                 </span>
             ),
         },
         {
             title: 'Ações',
             key: 'acoes',
-            render: (_, record) => (
-                <Button type="link" size="small">Ver Detalhes</Button>
-            ),
-        },
+            render: (_, record) => {
+                if (activeTab === 'diretas' && (record.status === 'em_analise' || record.status === 'proposta')) {
+                    return (
+                        <Space>
+                            <Button
+                                size="small"
+                                type="primary"
+                                ghost
+                                icon={<CheckCircleOutlined />}
+                                onClick={() => handleDecidir(record.id, record.tipo_bem, 'aprovar')}
+                            >
+                                Aprovar
+                            </Button>
+                            <Button
+                                size="small"
+                                danger
+                                ghost
+                                icon={<CloseCircleOutlined />}
+                                onClick={() => handleDecidir(record.id, record.tipo_bem, 'rejeitar')}
+                            >
+                                Rejeitar
+                            </Button>
+                        </Space>
+                    );
+                }
+                return null;
+            }
+        }
     ];
 
     return (
@@ -122,6 +174,7 @@ const ListaApolices = () => {
                 tabList={[
                     { key: 'pendentes', tab: 'Pendentes de Aprovação' },
                     { key: 'ativas', tab: 'Apólices Ativas' },
+                    { key: 'diretas', tab: 'Contratações Diretas (Cliente)' },
                 ]}
                 activeTabKey={activeTab}
                 onTabChange={key => setActiveTab(key)}
@@ -129,7 +182,7 @@ const ListaApolices = () => {
                 <Table
                     columns={columns}
                     dataSource={apolices}
-                    rowKey="id_apolice"
+                    rowKey={(record) => record.id_apolice || record.id}
                     loading={loading}
                     pagination={{ pageSize: 10 }}
                 />

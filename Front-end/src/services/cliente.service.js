@@ -7,11 +7,19 @@ const clienteService = {
         return response.data;
     },
 
+    addVeiculo: async (dados) => {
+        const response = await api.post('/cliente/veiculos', dados);
+        return response.data;
+    },
+
+    getMinhasPropriedades: async () => {
+        const response = await api.get('/cliente/propriedades');
+        return response.data;
+    },
+
     // Insurance Products
     getSegurosDisponiveis: async () => {
-        // Assume rota pública ou de seguradora que lista produtos disponíveis
-        // Ajustar endpoint conforme backend (usando o SeguradoraSeguros ou Seguros com Precos)
-        const response = await api.get('/seguradora/seguros?status=ativo');
+        const response = await api.get('/public/seguros');
         return response.data;
     },
 
@@ -27,9 +35,19 @@ const clienteService = {
     },
 
     // Contracting
+    simularCotacao: async (dados) => {
+        // dados: { id_seguradora_seguro, valor_bem }
+        const response = await api.post('/contratacao/simular', dados);
+        return response.data;
+    },
+
     contratarSeguro: async (dados) => {
-        // dados: { veiculo_id, seguro_id, seguradora_id, preco_id, corretora_id? }
-        const response = await api.post('/contratacao/veiculo', dados);
+        // dados: FormData para upload de arquivos
+        const response = await api.post('/contratacao/contratar', dados, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     },
 

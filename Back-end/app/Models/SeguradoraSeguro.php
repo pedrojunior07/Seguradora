@@ -17,12 +17,14 @@ class SeguradoraSeguro extends Model
         'premio_minimo',
         'valor_minimo_dano',
         'status',
+        'auto_aprovacao',
     ];
 
     protected $casts = [
         'premio_minimo' => 'decimal:2',
         'valor_minimo_dano' => 'decimal:2',
         'status' => 'boolean',
+        'auto_aprovacao' => 'boolean',
     ];
 
     // Relacionamentos

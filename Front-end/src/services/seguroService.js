@@ -254,6 +254,46 @@ const seguroService = {
     } catch (error) {
       throw error.response?.data || error.message;
     }
+  },
+
+  // --- Tipos de Seguro ---
+
+  criarTipo: async (dados) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/tipos-seguro`,
+        dados,
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  atualizarTipo: async (id, dados) => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/tipos-seguro/${id}`,
+        dados,
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  excluirTipo: async (id) => {
+    try {
+      const response = await axios.delete(
+        `${API_URL}/tipos-seguro/${id}`,
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
   }
 };
 

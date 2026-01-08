@@ -22,6 +22,17 @@ const DetalhesSeguro = () => {
     carregarSeguro();
   }, [id]);
 
+  const handleToggleAutoAprovacao = async (checked) => {
+    try {
+      await seguroService.atualizarSeguro(id, { auto_aprovacao: checked });
+      message.success(`Auto-aprovação ${checked ? 'ativada' : 'desativada'}`);
+      carregarSeguro();
+    } catch (error) {
+      console.error(error);
+      message.error('Erro ao atualizar configuração');
+    }
+  };
+
   const carregarSeguro = async () => {
     setLoading(true);
     try {
@@ -89,7 +100,7 @@ const DetalhesSeguro = () => {
       title: 'Valor Base',
       dataIndex: 'valor',
       key: 'valor',
-      render: (valor) => `${parseFloat(valor).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}`
+      render: (valor) => valor ? `${parseFloat(valor).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}` : '-'
     },
     {
       title: 'Prêmio',
@@ -113,7 +124,7 @@ const DetalhesSeguro = () => {
       key: 'data_fim',
       render: (data) => data ? dayjs(data).format('DD/MM/YYYY') : <Tag color="green">Atual</Tag>
     }
-,
+    ,
     {
       title: 'Ações',
       key: 'acoes',
@@ -241,11 +252,24 @@ const DetalhesSeguro = () => {
               {seguro.status ? 'ATIVO' : 'INATIVO'}
             </Tag>
           </Descriptions.Item>
+          <Descriptions.Item label="Auto-Aprovação">
+            <Space>
+              <Switch
+                checked={seguro.auto_aprovacao}
+                onChange={handleToggleAutoAprovacao}
+                checkedChildren="ON"
+                unCheckedChildren="OFF"
+              />
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                {seguro.auto_aprovacao ? 'Ativação Instantânea' : 'Requer Análise'}
+              </Text>
+            </Space>
+          </Descriptions.Item>
           <Descriptions.Item label="Categoria">
-            {seguro.seguro?.categoria?.nome}
+            {seguro.seguro?.categoria?.descricao}
           </Descriptions.Item>
           <Descriptions.Item label="Tipo">
-            <Tag color="blue">{seguro.seguro?.tipo_seguro?.toUpperCase()}</Tag>
+            <Tag color="cyan">{seguro.seguro?.tipo?.descricao?.toUpperCase() || 'N/A'}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="Prêmio Mínimo">
             {parseFloat(seguro.premio_minimo).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
@@ -266,9 +290,11 @@ const DetalhesSeguro = () => {
           <>
             <Divider orientation="left">Preço Atual</Divider>
             <Descriptions bordered column={2}>
-              <Descriptions.Item label="Valor Base">
-                {parseFloat(seguro.preco_atual.valor).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
-              </Descriptions.Item>
+              {seguro.preco_atual.valor && (
+                <Descriptions.Item label="Valor Base">
+                  {parseFloat(seguro.preco_atual.valor).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="Prêmio">
                 {seguro.preco_atual.usaValor
                   ? `${parseFloat(seguro.preco_atual.premio_valor).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })} (Fixo)`
@@ -351,20 +377,6 @@ const DetalhesSeguro = () => {
           onFinish={handleAdicionarPreco}
           initialValues={{ usaValor: false }}
         >
-          <Form.Item
-            label="Valor Base (MZN)"
-            name="valor"
-            rules={[{ required: true, message: 'Campo obrigatório' }]}
-          >
-            <InputNumber
-              style={{ width: '100%' }}
-              min={0}
-              step={100}
-              placeholder="0.00"
-              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              parser={value => value.replace(/\$\s?|(,*)/g, '')}
-            />
-          </Form.Item>
 
           <Form.Item
             label="Usar Valor Fixo?"

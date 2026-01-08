@@ -42,7 +42,7 @@ const ClienteLayout = ({ children }) => {
         {
             key: '/cliente/apolices',
             icon: <FileProtectOutlined />,
-            label: <Link to="/cliente/apolices">Minhas Apólices</Link>,
+            label: <Link to="/cliente/apolices">Meus Seguros</Link>,
         },
     ];
 
@@ -80,7 +80,23 @@ const ClienteLayout = ({ children }) => {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Sider trigger={null} collapsible collapsed={collapsed} theme="light" width={260}>
+            <Sider
+                trigger={null}
+                collapsible
+                collapsed={collapsed}
+                theme="light"
+                width={260}
+                style={{
+                    overflow: 'auto',
+                    height: '100vh',
+                    position: 'fixed',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    zIndex: 1000,
+                    boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)'
+                }}
+            >
                 <div style={{ height: 64, margin: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography.Title level={4} style={{ margin: 0, color: '#1890ff' }}>
                         {collapsed ? 'TM' : 'SegurosTM'}
@@ -95,8 +111,8 @@ const ClienteLayout = ({ children }) => {
                 // onClick={handleMenuClick} // Navigation handled by Link
                 />
             </Sider>
-            <Layout className="site-layout">
-                <Header style={{ padding: '0 24px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Layout className="site-layout" style={{ marginLeft: collapsed ? 80 : 260, transition: 'all 0.2s' }}>
+                <Header style={{ padding: '0 24px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 999, width: '100%', boxShadow: '0 1px 4px rgba(0,21,41,.08)' }}>
                     {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
                         className: 'trigger',
                         onClick: () => setCollapsed(!collapsed),

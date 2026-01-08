@@ -29,6 +29,7 @@ import {
     Chip,
     alpha,
     useTheme,
+    Badge,
 } from '@mui/material';
 import {
     Visibility,
@@ -36,7 +37,7 @@ import {
     Person,
     Business,
     Shield,
-    Badge,
+    Badge as BadgeIcon,
     Email,
     Lock,
     Phone,
@@ -147,9 +148,9 @@ const Register = () => {
             setSuccess(true);
 
             setTimeout(() => {
-                if (perfil === 'seguradora') navigate('/seguradora/dashboard');
-                else if (perfil === 'corretora') navigate('/corretora/dashboard');
-                else navigate('/cliente/dashboard');
+                if (perfil === 'seguradora') navigate('/seguradora/dashboard', { replace: true });
+                else if (perfil === 'corretora') navigate('/corretora/dashboard', { replace: true });
+                else navigate('/cliente/dashboard', { replace: true });
             }, 2000);
         } catch (err) {
             console.error('Registration error:', err);
@@ -388,7 +389,7 @@ const Register = () => {
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <Badge color="action" />
+                                                <BadgeIcon color="action" />
                                             </InputAdornment>
                                         ),
                                     }}
@@ -525,7 +526,7 @@ const Register = () => {
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <Badge color="action" />
+                                                <BadgeIcon color="action" />
                                             </InputAdornment>
                                         ),
                                     }}
@@ -739,7 +740,7 @@ const Register = () => {
                                                 animation: 'pulse 2s infinite',
                                             }}
                                         >
-                                            <Badge sx={{ fontSize: 40 }} />
+                                            <BadgeIcon sx={{ fontSize: 40 }} />
                                         </Avatar>
                                         <Typography variant="h4" fontWeight={700} gutterBottom>
                                             Comece Agora
