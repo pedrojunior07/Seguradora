@@ -22,7 +22,6 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-interaction --no-scripts
 
-# Porta que o Railway usa
-EXPOSE 8080
+# 🚀 IMPORTANTE: usar a porta dinâmica do Railway
+CMD php artisan serve --host=0.0.0.0 --port=${PORT}
 
-CMD php artisan serve --host=0.0.0.0 --port=8080
