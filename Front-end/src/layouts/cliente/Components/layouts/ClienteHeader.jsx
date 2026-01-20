@@ -8,8 +8,10 @@ import {
     CloseCircleOutlined,
     LogoutOutlined,
     SettingOutlined,
+  
     MenuUnfoldOutlined,
-    MenuFoldOutlined
+    MenuFoldOutlined,
+    DownloadOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
@@ -27,6 +29,27 @@ const ClienteHeader = ({ collapsed, setCollapsed, isMobile }) => {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+    useEffect(() => {
+        const handler = (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            setDeferredPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+    }, []);
+
+    const handleInstallClick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            setDeferredPrompt(null);
+        }
+    };
 
     const handleLogout = () => {
         logout();
@@ -80,7 +103,7 @@ const ClienteHeader = ({ collapsed, setCollapsed, isMobile }) => {
     };
 
     const notificationContent = (
-        <div style={{ width: isMobile ? '85vw' : 320, maxHeight: 400, overflowY: 'auto' }}>
+        <div style={{ width: isMobile ? '90vw' : 350, maxHeight: '70vh', overflowY: 'auto' }}>
             <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Notificações</h3>
                 <Space>
@@ -190,6 +213,18 @@ const ClienteHeader = ({ collapsed, setCollapsed, isMobile }) => {
             />
 
             <Space size={24}>
+                {deferredPrompt && (
+                    <Button
+                        type="primary"
+                        icon={<DownloadOutlined />}
+                        onClick={handleInstallClick}
+                        size={isMobile ? "small" : "middle"}
+                        style={{ borderRadius: '20px' }}
+                    >
+                        {isMobile ? "Instalar App" : "Instalar Aplicativo"}
+                    </Button>
+                )}
+
                 <Popover content={notificationContent} trigger="click" placement="bottomRight">
                     <Badge count={unreadCount} offset={[-2, 10]}>
                         <Button type="text" icon={<BellOutlined style={{ fontSize: 20 }} />} />

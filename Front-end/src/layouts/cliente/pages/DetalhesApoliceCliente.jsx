@@ -105,13 +105,23 @@ const DetalhesApoliceCliente = () => {
                     ref={componentRef}
                     style={{
                         background: 'white',
-                        padding: isMobile ? '20px' : '40px',
-                        borderRadius: '8px',
-                        boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                        fontSize: isMobile ? '12px' : 'inherit'
+                        padding: isMobile ? '24px' : '48px',
+                        borderRadius: '2px', // Mais quadrado como papel
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                        border: '1px solid #d9d9d9', // Borda de documento
+                        fontSize: isMobile ? '12px' : '14px',
+                        maxWidth: '850px',
+                        margin: '0 auto',
+                        position: 'relative',
+                        color: '#000' // Garantir contraste na impressão
                     }}
                     className="print-container"
                 >
+                    {/* Marca D'água ou Borda Decorativa (opcional) */}
+                    <div style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
+                        background: 'linear-gradient(90deg, #1890ff 0%, #001529 100%)'
+                    }} />
                     {/* Cabeçalho do Documento */}
                     <div style={{
                         display: 'flex',
@@ -243,18 +253,29 @@ const DetalhesApoliceCliente = () => {
                     </div>
                 </div>
 
-                {!isMobile && (
-                    <div style={{ marginTop: '24px', textAlign: 'right' }}>
-                        <Button
-                            type="primary"
-                            size="large"
-                            icon={<PrinterOutlined />}
-                            onClick={handlePrint}
-                        >
-                            Imprimir Apólice
-                        </Button>
-                    </div>
-                )}
+                <div style={{
+                    marginTop: '24px',
+                    textAlign: 'right',
+                    position: isMobile ? 'fixed' : 'static',
+                    bottom: isMobile ? '24px' : 'auto',
+                    right: isMobile ? '24px' : 'auto',
+                    zIndex: 1000
+                }}>
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<PrinterOutlined />}
+                        onClick={handlePrint}
+                        style={isMobile ? {
+                            borderRadius: '50px',
+                            height: '56px',
+                            padding: '0 24px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                        } : {}}
+                    >
+                        {isMobile ? 'Imprimir' : 'Imprimir Apólice'}
+                    </Button>
+                </div>
             </div>
         </ClienteLayout>
     );

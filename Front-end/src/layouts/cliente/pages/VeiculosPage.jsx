@@ -108,6 +108,7 @@ const VeiculosPage = () => {
                     rowKey="id_veiculo"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    scroll={{ x: 'max-content' }}
                 />
             </Card>
 
@@ -117,6 +118,8 @@ const VeiculosPage = () => {
                 onCancel={() => setModalVisible(false)}
                 footer={null}
                 width={800}
+                style={{ maxWidth: '95vw', top: 10, paddingBottom: 0 }}
+                styles={{ body: { padding: '20px 0', maxHeight: 'calc(100vh - 150px)', overflowY: 'auto' } }}
 
             >
                 <FormularioVeiculo
