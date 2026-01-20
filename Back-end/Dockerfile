@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.3-cli
 
 # Dependências do sistema
 RUN apt-get update && apt-get install -y \
@@ -22,4 +22,7 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-interaction --no-scripts
 
-CMD php-fpm
+# Porta que o Railway usa
+EXPOSE 8080
+
+CMD php artisan serve --host=0.0.0.0 --port=8080
