@@ -20,8 +20,17 @@ WORKDIR /app
 
 COPY . .
 
+# Instalar dependências PHP
 RUN composer install --optimize-autoloader --no-interaction --no-scripts
 
-# 🚀 IMPORTANTE: usar a porta dinâmica do Railway
-CMD php artisan serve --host=0.0.0.0 --port=${PORT}
+# Cache Laravel
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
+# Permissões
+RUN chown -R www-data:www-data /app \
+    && chmod -R 775 /app/storage /app/bootstrap/cache
+
+# Rodar Laravel na porta dinâmica do Railway
+CMD php artisan serve --host=0.0.0.0 --port=${PORT}
