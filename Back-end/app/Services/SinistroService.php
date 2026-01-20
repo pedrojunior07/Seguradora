@@ -6,6 +6,10 @@ use App\Models\Apolice;
 use App\Models\Sinistro;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use App\Notifications\AppNotification;
+use App\Models\AuditLog;
+use Illuminate\Support\Facades\Notification;
 
 class SinistroService
 {
@@ -41,7 +45,47 @@ class SinistroService
                 'data_bo' => $dados['data_bo'] ?? null,
                 'status' => 'aberto',
                 'observacoes' => $dados['observacoes'] ?? null,
+                'item_segurado_id' => $apolice->bem_segurado_id,
+                'item_segurado_type' => $apolice->bem_segurado_type,
             ]);
+
+            // Processar múltiplos arquivos e salvar no campo documentos (JSON)
+            if (isset($dados['arquivos']) && is_array($dados['arquivos'])) {
+                $docs = [];
+                foreach ($dados['arquivos'] as $arquivo) {
+                    $path = $arquivo->store('sinistros/' . $sinistro->id_sinistro, 'public');
+                    
+                    $docs[] = [
+                        'caminho' => $path,
+                        'tipo' => str_contains($arquivo->getMimeType(), 'image') ? 'imagem' : 'documento',
+                        'nome_original' => $arquivo->getClientOriginalName(),
+                        'tamanho' => $arquivo->getSize(),
+                        'data_upload' => now()->toDateTimeString(),
+                    ];
+                }
+                $sinistro->documentos = $docs;
+                $sinistro->save();
+            }
+
+            // Notificar a seguradora
+            try {
+                $seguradora = $apolice->seguradoraSeguro->seguradora;
+                $usuariosSeguradora = $seguradora->users;
+                
+                if ($usuariosSeguradora->isNotEmpty()) {
+                    Notification::send($usuariosSeguradora, new AppNotification([
+                        'titulo' => 'Novo Sinistro Reportado',
+                        'mensagem' => "Um novo sinistro ({$sinistro->numero_sinistro}) foi reportado pelo cliente {$apolice->cliente->nome}.",
+                        'tipo' => 'warning',
+                        'url_acao' => "/seguradora/sinistros/{$sinistro->id_sinistro}",
+                        'id_objeto' => $sinistro->id_sinistro,
+                        'tipo_objeto' => 'sinistro'
+                    ]));
+                }
+            } catch (\Exception $e) {
+                // Silenciosamente falhar se houver erro na notificação para não bloquear o registro
+                \Log::error("Erro ao enviar notificação de sinistro: " . $e->getMessage());
+            }
 
             return $sinistro;
         });
@@ -49,13 +93,15 @@ class SinistroService
 
     public function iniciarAnalise(Sinistro $sinistro, User $analista): Sinistro
     {
+        $oldState = $sinistro->toArray();
         $sinistro->iniciarAnalise($analista);
+        AuditLog::log('analisar', $sinistro, "Análise de sinistro iniciada pelo analista {$analista->name}", $oldState, $sinistro->fresh()->toArray());
         return $sinistro->fresh();
     }
 
-    public function aprovarSinistro(Sinistro $sinistro, float $valorAprovado, ?float $franquia = null): Sinistro
+    public function aprovarSinistro(Sinistro $sinistro, float $valorAprovado, ?float $franquia = null, ?User $analista = null): Sinistro
     {
-        return DB::transaction(function () use ($sinistro, $valorAprovado, $franquia) {
+        return DB::transaction(function () use ($sinistro, $valorAprovado, $franquia, $analista) {
             $apolice = $sinistro->apolice;
 
             // Usar franquia da apólice se não informada
@@ -66,7 +112,10 @@ class SinistroService
                 throw new \Exception('Valor aprovado excede o valor segurado');
             }
 
-            $sinistro->aprovar($valorAprovado, $franquiaFinal);
+            $oldState = $sinistro->toArray();
+            $sinistro->aprovar($valorAprovado, $franquiaFinal, $analista);
+
+            AuditLog::log('aprovar', $sinistro, "Sinistro aprovado com valor de " . number_format($valorAprovado, 2) . " pelo analista " . ($analista ? $analista->name : 'N/A'), $oldState, $sinistro->fresh()->toArray());
 
             // Atualizar status da apólice
             $apolice->status = 'sinistrada';
@@ -76,9 +125,11 @@ class SinistroService
         });
     }
 
-    public function negarSinistro(Sinistro $sinistro, string $motivo): Sinistro
+    public function negarSinistro(Sinistro $sinistro, string $motivo, ?User $analista = null): Sinistro
     {
-        $sinistro->negar($motivo);
+        $oldState = $sinistro->toArray();
+        $sinistro->negar($motivo, $analista);
+        AuditLog::log('negar', $sinistro, "Sinistro negado pelo analista " . ($analista ? $analista->name : 'N/A') . ". Motivo: {$motivo}", $oldState, $sinistro->fresh()->toArray());
         return $sinistro->fresh();
     }
 
@@ -107,8 +158,14 @@ class SinistroService
 
     public function listarSinistrosPorStatus(string $status, ?int $seguradoraId = null): \Illuminate\Database\Eloquent\Collection
     {
-        $query = Sinistro::where('status', $status)
-            ->with(['apolice.cliente', 'apolice.seguradoraSeguro.seguradora']);
+        $query = Sinistro::query()
+            ->with(['apolice.cliente', 'apolice.seguradoraSeguro.seguradora', 'apolice.seguradoraSeguro.seguro.categoria', 'apolice.seguradoraSeguro.seguro.tipo', 'latestAuditLog.user']);
+
+        if ($status === 'finalizado') {
+            $query->whereIn('status', ['aprovado', 'negado', 'pago']);
+        } else {
+            $query->where('status', $status);
+        }
 
         if ($seguradoraId) {
             $query->whereHas('apolice.seguradoraSeguro', function ($q) use ($seguradoraId) {

@@ -15,7 +15,7 @@ class StoreSinistroRequest extends FormRequest
     {
         return [
             'apolice_id' => 'required|exists:apolices,id_apolice',
-            'data_ocorrencia' => 'required|date|before_or_equal:now',
+            'data_ocorrencia' => 'required|date',
             'local_ocorrencia' => 'required|string|max:255',
             'descricao_ocorrencia' => 'required|string|min:20',
             'tipo_sinistro' => 'required|string|max:100',
@@ -29,6 +29,8 @@ class StoreSinistroRequest extends FormRequest
             'numero_bo' => 'nullable|string|max:50',
             'data_bo' => 'nullable|date|before_or_equal:today',
             'observacoes' => 'nullable|string',
+            'arquivos' => 'nullable|array',
+            'arquivos.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240', // 10MB max
         ];
     }
 

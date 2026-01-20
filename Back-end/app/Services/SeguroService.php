@@ -7,6 +7,7 @@ use App\Models\Seguro;
 use App\Models\SeguradoraSeguro;
 use App\Models\Preco;
 use App\Models\DetalhesCobertura;
+use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 
 class SeguroService
@@ -33,15 +34,19 @@ class SeguroService
                 'valor_minimo_dano' => $dados['valor_minimo_dano'] ?? null,
                 'status' => $dados['status'] ?? true,
                 'auto_aprovacao' => $dados['auto_aprovacao'] ?? false,
+                'modificado_por' => auth()->id(),
+                'data_modificacao' => now(),
             ]);
+
+            AuditLog::log('criar', $seguradoraSeguro, "Configuração de seguro criada para a seguradora #{$id_seguradora}", null, $seguradoraSeguro->toArray());
 
             // 3. Criar preço inicial (se fornecido)
             if (isset($dados['preco'])) {
                 Preco::create([
                     'seguradora_seguro_id' => $seguradoraSeguro->id,
                     'valor' => $dados['preco']['valor'] ?? null,
-                    'premio_percentagem' => $dados['preco']['premio_percentagem'] ?? null,
-                    'premio_valor' => $dados['preco']['premio_valor'] ?? null,
+                    'premio_percentagem' => $dados['preco']['premio_percentagem'] ?? 0,
+                    'premio_valor' => $dados['preco']['premio_valor'] ?? 0,
                     'usa_valor' => $dados['preco']['usaValor'] ?? false,
                     'data_inicio' => $dados['preco']['data_inicio'] ?? now(),
                     'data_fim' => $dados['preco']['data_fim'] ?? null,
@@ -91,6 +96,8 @@ class SeguroService
                 'valor_minimo_dano' => $dados['valor_minimo_dano'] ?? $seguradoraSeguro->valor_minimo_dano,
                 'status' => $dados['status'] ?? $seguradoraSeguro->status,
                 'auto_aprovacao' => $dados['auto_aprovacao'] ?? $seguradoraSeguro->auto_aprovacao,
+                'modificado_por' => auth()->id(),
+                'data_modificacao' => now(),
             ]);
 
             return $seguradoraSeguro->load(['seguro.categoria', 'seguro.tipo']);
@@ -109,6 +116,8 @@ class SeguroService
             'valor_minimo_dano' => $dados['valor_minimo_dano'] ?? $seguradoraSeguro->valor_minimo_dano,
             'status' => $dados['status'] ?? $seguradoraSeguro->status,
             'auto_aprovacao' => $dados['auto_aprovacao'] ?? $seguradoraSeguro->auto_aprovacao,
+            'modificado_por' => auth()->id(),
+            'data_modificacao' => now(),
         ]);
 
         return $seguradoraSeguro->fresh(['seguro', 'seguradora']);
@@ -126,9 +135,9 @@ class SeguroService
 
         return Preco::create([
             'seguradora_seguro_id' => $id_seguradora_seguro,
-            'valor' => $dados['valor'],
-            'premio_percentagem' => $dados['premio_percentagem'] ?? null,
-            'premio_valor' => $dados['premio_valor'] ?? null,
+            'valor' => $dados['valor'] ?? 0,
+            'premio_percentagem' => $dados['premio_percentagem'] ?? 0,
+            'premio_valor' => $dados['premio_valor'] ?? 0,
             'usa_valor' => $dados['usaValor'] ?? false,
             'data_inicio' => $dados['data_inicio'] ?? now(),
             'data_fim' => $dados['data_fim'] ?? null,
@@ -199,7 +208,7 @@ class SeguroService
      */
     public function listarSegurosSeguradora(int $id_seguradora, array $filtros = [])
     {
-        $query = SeguradoraSeguro::with(['seguro.categoria', 'seguro.tipo', 'precoAtual', 'coberturas'])
+        $query = SeguradoraSeguro::with(['seguro.categoria', 'seguro.tipo', 'precoAtual', 'coberturas', 'latestAuditLog.user'])
             ->where('id_seguradora', $id_seguradora);
 
         if (isset($filtros['status'])) {
@@ -250,7 +259,14 @@ class SeguroService
     public function desativarSeguro(int $id_seguradora_seguro): SeguradoraSeguro
     {
         $seguradoraSeguro = SeguradoraSeguro::findOrFail($id_seguradora_seguro);
-        $seguradoraSeguro->update(['status' => false]);
+        $oldState = $seguradoraSeguro->toArray();
+        $seguradoraSeguro->update([
+            'status' => false,
+            'modificado_por' => auth()->id(),
+            'data_modificacao' => now(),
+        ]);
+
+        AuditLog::log('desativar', $seguradoraSeguro, "Seguro desativado pela seguradora", $oldState, $seguradoraSeguro->fresh()->toArray());
 
         return $seguradoraSeguro;
     }
@@ -261,7 +277,14 @@ class SeguroService
     public function ativarSeguro(int $id_seguradora_seguro): SeguradoraSeguro
     {
         $seguradoraSeguro = SeguradoraSeguro::findOrFail($id_seguradora_seguro);
-        $seguradoraSeguro->update(['status' => true]);
+        $oldState = $seguradoraSeguro->toArray();
+        $seguradoraSeguro->update([
+            'status' => true,
+            'modificado_por' => auth()->id(),
+            'data_modificacao' => now(),
+        ]);
+
+        AuditLog::log('ativar', $seguradoraSeguro, "Seguro ativado pela seguradora", $oldState, $seguradoraSeguro->fresh()->toArray());
 
         return $seguradoraSeguro;
     }

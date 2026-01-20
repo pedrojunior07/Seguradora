@@ -317,6 +317,7 @@ class SeguroController extends Controller
     public function adicionarPreco(AdicionarPrecoRequest $request, int $id): JsonResponse
     {
         try {
+            \Log::info("Adicionar Preço - ID Seguro: {$id}", ['dados' => $request->all()]);
             $preco = $this->seguroService->adicionarPreco($id, $request->validated());
 
             return response()->json([

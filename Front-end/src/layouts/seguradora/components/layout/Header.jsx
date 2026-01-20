@@ -1,5 +1,5 @@
 // components/layout/Header.jsx
-import { Layout, Button, Avatar, Dropdown, Badge, Popover, Space, Divider } from 'antd';
+import { Layout, Button, Avatar, Dropdown, Badge, Popover, Space, Divider, Spin, Empty } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -9,16 +9,25 @@ import {
   SettingOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  FileAddOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
+import { useState, useEffect } from 'react';
+import api from '@services/api';
+import notificationService from '@services/notification.service';
+import moment from 'moment';
+import 'moment/locale/pt';
 
 const { Header: AntHeader } = Layout;
 
 const Header = ({ collapsed, setCollapsed, isMobile }) => {
   const { user, entidade, logout } = useAuth();
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api').replace(/\/api\/?$/, '');
   const getLogoUrl = (logoPath) => (logoPath ? `${apiBase}/storage/${logoPath}` : null);
@@ -28,62 +37,116 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
     navigate('/login');
   };
 
-  // Sample notifications - replace with real data later
-  const notifications = [
-    {
-      id: 1,
-      type: 'success',
-      title: 'Nova Apólice Criada',
-      message: 'Apólice #12345 foi criada com sucesso',
-      time: 'Há 5 minutos',
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />
-    },
-    {
-      id: 2,
-      type: 'warning',
-      title: 'Renovação Pendente',
-      message: '3 apólices precisam de renovação',
-      time: 'Há 1 hora',
-      icon: <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-    },
-    {
-      id: 3,
-      type: 'info',
-      title: 'Atualização do Sistema',
-      message: 'Nova funcionalidade disponível',
-      time: 'Há 2 horas',
-      icon: <InfoCircleOutlined style={{ color: '#1890ff' }} />
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      const data = await notificationService.getNotifications({ unread: true });
+      setNotifications(data.data || []);
+
+      const countData = await notificationService.getUnreadCount();
+      setUnreadCount(countData.count);
+    } catch (error) {
+      console.error('Erro ao procurar notificações:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const handleNotificationClick = async (notif) => {
+    try {
+      if (!notif.read_at) {
+        await notificationService.markAsRead(notif.id);
+        fetchNotifications();
+      }
+      if (notif.data?.url_acao) {
+        navigate(notif.data.url_acao);
+      }
+    } catch (error) {
+      console.error('Erro ao processar notificação:', error);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      fetchNotifications();
+    } catch (error) {
+      console.error('Erro ao marcar todas como lidas:', error);
+    }
+  };
+
+  const getTimeAgo = (date) => {
+    return moment(date).fromNow();
+  };
 
   const notificationContent = (
-    <div style={{ width: 320, maxHeight: 400, overflowY: 'auto' }}>
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }}>
+    <div style={{ width: isMobile ? '85vw' : 350, maxHeight: 450, overflowY: 'auto' }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Notificações</h3>
+        <Space>
+          {unreadCount > 0 && (
+            <Button type="link" size="small" onClick={handleMarkAllRead} style={{ padding: 0 }}>
+              Ler todas
+            </Button>
+          )}
+          <Button type="link" size="small" onClick={fetchNotifications} disabled={loading} style={{ padding: 0 }}>
+            Atualizar
+          </Button>
+        </Space>
       </div>
-      {notifications.map((notif, index) => (
-        <div key={notif.id}>
-          <div
-            style={{
-              padding: '12px 16px',
-              cursor: 'pointer',
-              transition: 'background 0.2s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            <Space align="start" size={12}>
-              <div style={{ fontSize: 20, marginTop: 2 }}>{notif.icon}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, marginBottom: 4 }}>{notif.title}</div>
-                <div style={{ fontSize: 13, color: '#666', marginBottom: 4 }}>{notif.message}</div>
-                <div style={{ fontSize: 12, color: '#999' }}>{notif.time}</div>
-              </div>
-            </Space>
-          </div>
-          {index < notifications.length - 1 && <Divider style={{ margin: 0 }} />}
+
+      {loading && notifications.length === 0 ? (
+        <div style={{ padding: '24px', textAlign: 'center' }}>
+          <Spin size="small" />
         </div>
-      ))}
+      ) : notifications.length === 0 ? (
+        <div style={{ padding: '24px', textAlign: 'center' }}>
+          <Empty description="Sem notificações não lidas" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </div>
+      ) : (
+        notifications.map((notif, index) => (
+          <div key={notif.id}>
+            <div
+              style={{
+                padding: '12px 16px',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                background: notif.read_at ? 'transparent' : '#f0f7ff',
+                borderLeft: notif.read_at ? 'none' : '4px solid #1e40af'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+              onMouseLeave={(e) => e.currentTarget.style.background = notif.read_at ? 'transparent' : '#f0f7ff'}
+              onClick={() => handleNotificationClick(notif)}
+            >
+              <Space align="start" size={12}>
+                <div style={{ fontSize: 20, marginTop: 2 }}>
+                  {notif.data?.tipo === 'success' ? <CheckCircleOutlined style={{ color: '#10b981' }} /> :
+                    notif.data?.tipo === 'error' ? <ExclamationCircleOutlined style={{ color: '#ef4444' }} /> :
+                      notif.data?.tipo === 'warning' ? <InfoCircleOutlined style={{ color: '#f59e0b' }} /> :
+                        <FileAddOutlined style={{ color: '#1e40af' }} />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, marginBottom: 2, fontSize: 14 }}>{notif.data?.titulo}</div>
+                  <div style={{ fontSize: 13, color: '#4b5563', marginBottom: 4, lineHeight: 1.4 }}>
+                    {notif.data?.mensagem}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{getTimeAgo(notif.created_at)}</div>
+                </div>
+              </Space>
+            </div>
+            {index < notifications.length - 1 && <Divider style={{ margin: 0 }} />}
+          </div>
+        ))
+      )}
+
       <div
         style={{
           padding: '12px 16px',
@@ -91,10 +154,15 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
           borderTop: '1px solid #f0f0f0',
           cursor: 'pointer',
           color: '#1e40af',
-          fontWeight: 500
+          fontWeight: 600,
+          fontSize: 14,
+          position: 'sticky',
+          bottom: 0,
+          background: '#fff'
         }}
         onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+        onClick={() => navigate('/seguradora/notificacoes')}
       >
         Ver todas as notificações
       </div>
@@ -109,7 +177,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
       label: (
         <div style={{ padding: '8px 0' }}>
           <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <Avatar size={48} icon={<UserOutlined />} src={entidade?.logo ? getLogoUrl(entidade.logo) : user?.avatar} style={{ background: '#1e40af' }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 15 }}>
@@ -186,7 +254,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
           placement="bottomRight"
           overlayStyle={{ paddingTop: 8 }}
         >
-          <Badge count={notifications.length} offset={[-5, 5]}>
+          <Badge count={unreadCount} offset={[-5, 5]}>
             <Button
               type="text"
               icon={<BellOutlined />}

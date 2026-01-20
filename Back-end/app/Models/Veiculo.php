@@ -22,7 +22,46 @@ class Veiculo extends Model
         'chassi',
         'valor_estimado',
         'tipo_veiculo',
+        'quilometragem_registrada',
+        'tipo_uso',
+        'estado_pneus', 'estado_vidros', 'estado_cadeiras', 'estado_bagageira', 'estado_eletronicos', 'estado_acessorios',
     ];
+
+    protected $appends = [
+        'foto_frente',
+        'foto_traseira',
+        'foto_lado_esquerdo',
+        'foto_lado_direito',
+        'foto_pneus',
+        'foto_vidros',
+        'foto_cadeiras',
+        'foto_bagageira',
+        'foto_eletronicos',
+        'foto_acessorios'
+    ];
+
+    public function fotos()
+    {
+        return $this->hasMany(FotoVeiculo::class, 'id_veiculo', 'id_veiculo');
+    }
+
+    // Accessors
+    public function getFotoFrenteAttribute() { return $this->getFotoPath('frente'); }
+    public function getFotoTraseiraAttribute() { return $this->getFotoPath('traseira'); }
+    public function getFotoLadoEsquerdoAttribute() { return $this->getFotoPath('lado_esquerdo'); }
+    public function getFotoLadoDireitoAttribute() { return $this->getFotoPath('lado_direito'); }
+    public function getFotoPneusAttribute() { return $this->getFotoPath('pneus'); }
+    public function getFotoVidrosAttribute() { return $this->getFotoPath('vidros'); }
+    public function getFotoCadeirasAttribute() { return $this->getFotoPath('cadeiras'); }
+    public function getFotoBagageiraAttribute() { return $this->getFotoPath('bagageira'); }
+    public function getFotoEletronicosAttribute() { return $this->getFotoPath('eletronicos'); }
+    public function getFotoAcessoriosAttribute() { return $this->getFotoPath('acessorios'); }
+
+    private function getFotoPath($tipo)
+    {
+        $foto = $this->fotos->where('tipo', $tipo)->first();
+        return $foto ? $foto->caminho : null;
+    }
 
     protected $casts = [
         'valor_estimado' => 'decimal:2',

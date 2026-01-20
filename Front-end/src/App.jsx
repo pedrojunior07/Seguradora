@@ -18,6 +18,11 @@ import ListaCategorias from '@layouts/seguradora/pages/ListaCategorias';
 import UsuariosPage from '@layouts/seguradora/pages/UsuariosPage';
 import ListaClientes from '@layouts/seguradora/pages/ListaClientes';
 import ListaApolices from '@layouts/seguradora/pages/ListaApolices';
+import ListaPropostasPage from '@layouts/seguradora/pages/ListaPropostasPage';
+import DetalhesPropostaPage from '@layouts/seguradora/pages/DetalhesPropostaPage';
+import SinistrosSeguradoraPage from '@layouts/seguradora/pages/SinistrosPage';
+import DetalhesSinistroPage from '@layouts/seguradora/pages/DetalhesSinistroPage';
+import AuditoriaPage from '@layouts/seguradora/pages/AuditoriaPage';
 import AdminRoute from '@components/AdminRoute';
 
 // Corretora
@@ -25,10 +30,16 @@ import CorretoraDashboard from '@layouts/corretora/Dashboard';
 
 // Cliente
 import ClienteDashboard from '@layouts/cliente/pages/Dashboard';
+import VeiculosPage from '@layouts/cliente/pages/VeiculosPage';
 import ContratarSeguroPage from '@layouts/cliente/pages/ContratarSeguroPage';
 import ListaSeguradorasPage from '@layouts/cliente/pages/ListaSeguradorasPage';
+import MinhasPropostasPage from '@layouts/cliente/pages/MinhasPropostasPage';
 import MinhasApolices from '@layouts/cliente/pages/MinhasApolices';
+import DetalhesApoliceCliente from '@layouts/cliente/pages/DetalhesApoliceCliente';
+import PagamentosPage from '@layouts/cliente/pages/PagamentosPage';
+import SinistrosClientePage from '@layouts/cliente/pages/SinistrosPage';
 import ClienteLayout from '@layouts/cliente/Components/layouts/ClienteLayout'; // Temp path, will fix
+import NotificacoesPage from '@layouts/shared/pages/NotificacoesPage';
 
 const theme = createTheme({
   palette: {
@@ -108,6 +119,16 @@ function App() {
               } />
               <Route path="clientes" element={<ListaClientes />} />
               <Route path="apolices" element={<ListaApolices />} />
+              <Route path="propostas" element={<ListaPropostasPage />} />
+              <Route path="propostas/:id" element={<DetalhesPropostaPage />} />
+              <Route path="sinistros" element={<SinistrosSeguradoraPage />} />
+              <Route path="sinistros/:id" element={<DetalhesSinistroPage />} />
+              <Route path="notificacoes" element={<NotificacoesPage />} />
+              <Route path="auditoria" element={
+                <AdminRoute>
+                  <AuditoriaPage />
+                </AdminRoute>
+              } />
             </Route>
 
             {/* Corretora Routes */}
@@ -138,6 +159,14 @@ function App() {
               }
             />
             <Route
+              path="/cliente/veiculos"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <VeiculosPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/cliente/contratar"
               element={
                 <ProtectedRoute allowedRoles={['cliente']}>
@@ -146,10 +175,51 @@ function App() {
               }
             />
             <Route
+              path="/cliente/minhas-propostas"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <MinhasPropostasPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/cliente/apolices"
               element={
                 <ProtectedRoute allowedRoles={['cliente']}>
                   <MinhasApolices />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/pagamentos"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <PagamentosPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/sinistros"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <SinistrosClientePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cliente/apolices/:id"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <DetalhesApoliceCliente />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/cliente/notificacoes"
+              element={
+                <ProtectedRoute allowedRoles={['cliente']}>
+                  <NotificacoesPage />
                 </ProtectedRoute>
               }
             />

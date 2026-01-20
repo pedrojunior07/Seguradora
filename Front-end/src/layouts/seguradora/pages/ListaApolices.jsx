@@ -8,6 +8,7 @@ import {
     CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined
 } from '@ant-design/icons';
 import api from '../../../services/api';
+import moment from 'moment';
 
 const { Title, Text } = Typography;
 
@@ -110,6 +111,28 @@ const ListaApolices = () => {
                     {record.created_at ? new Date(record.created_at).toLocaleDateString() : '-'}
                 </span>
             ),
+        },
+        {
+            title: 'Auditoria / Última Ação',
+            key: 'audit',
+            render: (_, record) => {
+                const audit = record.latest_audit_log;
+                if (!audit) return <Text type="secondary" style={{ fontSize: '11px' }}>Sem logs</Text>;
+
+                return (
+                    <Space direction="vertical" size={0}>
+                        <Space size={4}>
+                            <Text strong style={{ fontSize: '11px' }}>{audit.user?.name || 'Sistema'}</Text>
+                            <Tag color="blue" style={{ fontSize: '9px', padding: '0 4px', lineHeight: '14px' }}>
+                                {audit.action.toUpperCase()}
+                            </Tag>
+                        </Space>
+                        <Text type="secondary" style={{ fontSize: '10px' }}>
+                            {moment(audit.created_at).format('DD/MM/YYYY HH:mm')}
+                        </Text>
+                    </Space>
+                );
+            }
         },
         {
             title: 'Ações',

@@ -15,7 +15,7 @@ class AdicionarCoberturaRequest extends FormRequest
     {
         return [
             'descricao' => 'required|string',
-            'franquia' => 'nullable|numeric|min:0',
+            'franquia' => 'nullable|numeric|min:0|max:100',
             'valor_minimo' => 'nullable|numeric|min:0',
         ];
     }

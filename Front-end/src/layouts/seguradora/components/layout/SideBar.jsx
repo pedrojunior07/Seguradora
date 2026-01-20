@@ -13,7 +13,9 @@ import {
   SafetyCertificateOutlined,
   PlusCircleOutlined,
   UnorderedListOutlined,
-  AppstoreOutlined
+  AppstoreOutlined,
+  SolutionOutlined,
+  HistoryOutlined
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -45,6 +47,9 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
       case '2':
         navigate('/seguradora/apolices');
         break;
+      case 'propostas':
+        navigate('/seguradora/propostas');
+        break;
       case '3':
         navigate('/seguradora/sinistros');
         break;
@@ -59,6 +64,9 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
         break;
       case '7-1':
         navigate('/seguradora/usuarios');
+        break;
+      case 'auditoria':
+        navigate('/seguradora/auditoria');
         break;
       default:
         break;
@@ -90,6 +98,11 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
       label: 'Apólices',
     },
     {
+      key: 'propostas',
+      icon: <SolutionOutlined />,
+      label: 'Propostas',
+    },
+    {
       key: '3',
       icon: <FileTextOutlined />,
       label: 'Sinistros',
@@ -110,6 +123,11 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
         key: '5',
         icon: <BarChartOutlined />,
         label: 'Relatórios',
+      },
+      {
+        key: 'auditoria',
+        icon: <HistoryOutlined />,
+        label: 'Auditoria de Ações',
       },
       {
         key: '7',

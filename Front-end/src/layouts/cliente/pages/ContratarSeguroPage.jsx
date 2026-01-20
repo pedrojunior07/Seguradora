@@ -8,53 +8,41 @@ import {
   Col,
   Typography,
   Spin,
-  Alert,
-  Result,
-  Avatar,
+  Input,
+  Form,
   InputNumber,
-  List,
+  Select,
+  Badge,
+  Avatar,
+  Rate,
+  Tooltip,
+  Empty,
+  Result,
+  Progress,
   Tag,
   Divider,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  Empty,
-  Badge,
-  Tooltip,
-  Radio,
-  Select,
-  Rate,
-  Progress,
-  Upload
+  Modal
 } from 'antd';
 import {
   CarOutlined,
   HomeOutlined,
-  SafetyCertificateOutlined,
   CheckCircleOutlined,
   DollarOutlined,
-  InfoCircleOutlined,
-  ArrowRightOutlined,
-  PlusOutlined,
   SearchOutlined,
-  UploadOutlined,
   ContainerOutlined,
   BankOutlined,
   CheckCircleFilled,
   SafetyCertificateFilled,
-  StarOutlined,
   EyeOutlined,
   HeartOutlined,
   FileTextOutlined,
-  PercentageOutlined,
-  ToolOutlined,
-  CarryOutOutlined,
-  InboxOutlined,
+  PlusOutlined,
+  ArrowRightOutlined,
   CreditCardOutlined,
-  MobileOutlined,
-  CalendarOutlined,
-  LockOutlined
+  LockOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  SyncOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ClienteLayout from '../Components/layouts/ClienteLayout';
@@ -71,8 +59,8 @@ const ContratarSeguroPage = () => {
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [formVeiculo] = Form.useForm();
+
+
 
   // Dados do Cliente
   const [veiculos, setVeiculos] = useState([]);
@@ -92,19 +80,15 @@ const ContratarSeguroPage = () => {
   const [showCompare, setShowCompare] = useState(false);
   const [comparedSeguros, setComparedSeguros] = useState([]);
   const [favoriteSeguros, setFavoriteSeguros] = useState(new Set());
+
+  // Preview State
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
   const [sortOrder, setSortOrder] = useState('premium');
 
   // Estado da Avaliação
-  const [avaliacao, setAvaliacao] = useState({
-    quilometragem_atual: '',
-    tipo_uso: 'pessoal',
-    pneus: { estado: 'bom', foto: null },
-    vidros: { estado: 'bom', foto: null },
-    cadeiras: { estado: 'bom', foto: null },
-    bagageira: { estado: 'bom', foto: null },
-    eletronicos: { estado: 'bom', foto: null },
-    acessorios: { estado: 'bom', foto: null },
-  });
+
 
   // Buscar dados iniciais
   useEffect(() => {
@@ -136,7 +120,7 @@ const ContratarSeguroPage = () => {
 
   // Simular cotação
   useEffect(() => {
-    if (current === 4 && selectedSeguro && valorBem > 0) {
+    if (current === 3 && selectedSeguro && valorBem > 0) {
       handleSimular();
     }
   }, [current, valorBem, selectedSeguro]);
@@ -157,54 +141,26 @@ const ContratarSeguroPage = () => {
     }
   };
 
-  const handleCreateVeiculo = async (values) => {
-    try {
-      setLoading(true);
-      const res = await clienteService.addVeiculo(values);
-      message.success('Veículo cadastrado com sucesso!');
-      setVeiculos([...veiculos, res.data]);
-      setSelectedAsset(res.data);
-      setValorBem(res.data.valor_estimado);
-      setIsModalVisible(false);
-      formVeiculo.resetFields();
-    } catch (error) {
-      console.error(error);
-      message.error('Erro ao cadastrar veículo.');
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const handleContratar = async () => {
     setLoading(true);
     try {
-      const formData = new FormData();
       const idSeguradoraSeguro = selectedSeguro.id_seguradora_seguro || selectedSeguro.id;
 
-      formData.append('id_seguradora_seguro', idSeguradoraSeguro);
-      formData.append('valor_bem', valorBem);
-      formData.append('id_bem', assetType === 'veiculo' ? selectedAsset.id_veiculo : selectedAsset.id);
-      formData.append('tipo_bem', assetType);
+      const payload = {
+        id_seguradora_seguro: idSeguradoraSeguro,
+        valor_bem: valorBem,
+        id_bem: assetType === 'veiculo' ? selectedAsset.id_veiculo : selectedAsset.id_propriedade,
+        tipo_bem: assetType
+      };
 
-      if (assetType === 'veiculo') {
-        formData.append('quilometragem_atual', avaliacao.quilometragem_atual);
-        formData.append('tipo_uso', avaliacao.tipo_uso);
-
-        const componentes = ['pneus', 'vidros', 'cadeiras', 'bagageira', 'eletronicos', 'acessorios'];
-        componentes.forEach(comp => {
-          formData.append(`estado_${comp}`, avaliacao[comp].estado);
-          if (avaliacao[comp].foto) {
-            formData.append(`foto_${comp}`, avaliacao[comp].foto);
-          }
-        });
-      }
-
-      const res = await clienteService.contratarSeguro(formData);
+      const res = await clienteService.enviarProposta(payload);
       setSuccessInfo(res);
       setFinished(true);
     } catch (error) {
       console.error(error);
-      message.error('Erro ao realizar contratação.');
+      message.error('Erro ao enviar proposta.');
     } finally {
       setLoading(false);
     }
@@ -213,13 +169,7 @@ const ContratarSeguroPage = () => {
   const next = () => setCurrent(current + 1);
   const prev = () => setCurrent(current - 1);
 
-  const updateAvaliacao = (field, subfield, value) => {
-    if (subfield) {
-      setAvaliacao(prev => ({ ...prev, [field]: { ...prev[field], [subfield]: value } }));
-    } else {
-      setAvaliacao(prev => ({ ...prev, [field]: value }));
-    }
-  };
+
 
   const toggleCompare = (seguro) => {
     if (comparedSeguros.find(s => s.id === seguro.id)) {
@@ -273,17 +223,17 @@ const ContratarSeguroPage = () => {
       <ClienteLayout>
         <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
           <Result
-            status="success"
+            status="info"
             title={
               <span style={{
                 fontSize: '28px',
                 fontWeight: 600,
                 color: '#262626'
               }}>
-                Seguro Contratado com Sucesso!
+                Proposta Enviada com Sucesso!
               </span>
             }
-            subTitle="Sua proteção está ativa a partir de agora. Detalhes do contrato foram enviados para seu email."
+            subTitle="Sua proposta foi enviada para análise da seguradora. Você será notificado assim que houver uma atualização."
             extra={[
               <Button
                 type="primary"
@@ -302,9 +252,9 @@ const ContratarSeguroPage = () => {
                 Ir para Dashboard
               </Button>,
               <Button
-                key="policies"
+                key="proposals"
                 size="large"
-                onClick={() => navigate('/cliente/apolices')}
+                onClick={() => navigate('/cliente/minhas-propostas')}
                 style={{
                   height: '48px',
                   padding: '0 32px',
@@ -316,7 +266,7 @@ const ContratarSeguroPage = () => {
                 }}
                 icon={<FileTextOutlined />}
               >
-                Ver Apólices
+                Minhas Propostas
               </Button>
             ]}
           >
@@ -329,15 +279,15 @@ const ContratarSeguroPage = () => {
               }}
             >
               <Title level={4} style={{ color: '#262626', marginBottom: '24px' }}>
-                <SafetyCertificateFilled style={{ color: '#1890ff', marginRight: '8px' }} />
-                Resumo da Contratação
+                <FileTextOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
+                Resumo da Proposta
               </Title>
 
               <Row gutter={[32, 24]}>
                 <Col xs={24} md={12}>
                   <div style={{ marginBottom: '16px' }}>
                     <Text strong style={{ display: 'block', marginBottom: '8px', color: '#595959' }}>
-                      Número da Apólice:
+                      Número da Proposta:
                     </Text>
                     <div style={{
                       background: '#fff',
@@ -346,7 +296,7 @@ const ContratarSeguroPage = () => {
                       border: '1px solid #d9d9d9'
                     }}>
                       <Text strong style={{ color: '#262626', fontSize: '16px' }}>
-                        #{successInfo?.contratacao?.id || 'AGUARDANDO'}
+                        #{successInfo?.data?.numero_proposta || 'AGUARDANDO'}
                       </Text>
                     </div>
                   </div>
@@ -369,7 +319,7 @@ const ContratarSeguroPage = () => {
                 <Col xs={24} md={12}>
                   <div style={{ marginBottom: '16px' }}>
                     <Text strong style={{ display: 'block', marginBottom: '8px', color: '#595959' }}>
-                      Prêmio Anual:
+                      Prêmio Calculado:
                     </Text>
                     <div style={{
                       background: '#1890ff',
@@ -378,7 +328,7 @@ const ContratarSeguroPage = () => {
                       textAlign: 'center'
                     }}>
                       <Text strong style={{ color: 'white', fontSize: '20px' }}>
-                        {parseFloat(successInfo?.contratacao?.premio_final || 0).toLocaleString('pt-MZ', {
+                        {parseFloat(successInfo?.data?.premio_calculado || 0).toLocaleString('pt-MZ', {
                           style: 'currency',
                           currency: 'MZN'
                         })}
@@ -388,16 +338,16 @@ const ContratarSeguroPage = () => {
 
                   <div style={{ marginBottom: '16px' }}>
                     <Text strong style={{ display: 'block', marginBottom: '8px', color: '#595959' }}>
-                      Status:
+                      Status Atual:
                     </Text>
                     <div style={{
-                      background: '#52c41a',
+                      background: '#faad14',
                       padding: '8px 16px',
                       borderRadius: '6px',
                       display: 'inline-block'
                     }}>
                       <Text strong style={{ color: 'white' }}>
-                        <CheckCircleFilled /> ATIVO
+                        <SyncOutlined spin /> EM ANÁLISE
                       </Text>
                     </div>
                   </div>
@@ -563,7 +513,7 @@ const ContratarSeguroPage = () => {
                 type="primary"
                 size="large"
                 icon={<PlusOutlined />}
-                onClick={() => setIsModalVisible(true)}
+                onClick={() => navigate('/cliente/veiculos')}
                 style={{
                   height: '40px',
                   padding: '0 24px',
@@ -572,7 +522,7 @@ const ContratarSeguroPage = () => {
                   fontWeight: 500
                 }}
               >
-                Novo Veículo
+                Gerir Veículos
               </Button>
             )}
           </div>
@@ -590,7 +540,10 @@ const ContratarSeguroPage = () => {
                         background: selectedAsset?.id_veiculo === v.id_veiculo ? '#fafafa' : 'white',
                         height: '100%'
                       }}
-                      onClick={() => { setSelectedAsset(v); setValorBem(v.valor_estimado); }}
+                      onClick={() => {
+                        setSelectedAsset(v);
+                        setValorBem(v.valor_estimado);
+                      }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
@@ -676,7 +629,7 @@ const ContratarSeguroPage = () => {
                   type="primary"
                   size="large"
                   icon={<PlusOutlined />}
-                  onClick={() => setIsModalVisible(true)}
+                  onClick={() => navigate('/cliente/veiculos')}
                   style={{
                     height: '40px',
                     padding: '0 24px',
@@ -777,179 +730,7 @@ const ContratarSeguroPage = () => {
         </div>
       )
     },
-    {
-      title: 'Avaliação',
-      icon: <SafetyCertificateOutlined />,
-      content: (
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <Title level={2} style={{ fontSize: '28px', fontWeight: 600, color: '#262626', marginBottom: '8px' }}>
-              Avaliação do Bem
-            </Title>
-            <Paragraph style={{ fontSize: '16px', color: '#595959' }}>
-              Forneça informações detalhadas para uma cotação precisa
-            </Paragraph>
-          </div>
-
-          <Card
-            style={{
-              borderRadius: '8px',
-              marginBottom: '32px',
-              border: '1px solid #f0f0f0'
-            }}
-          >
-            <div style={{ padding: '24px' }}>
-              <Title level={4} style={{ marginBottom: '16px', color: '#262626' }}>
-                <DollarOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
-                Valor do Bem Segurado
-              </Title>
-              <Paragraph style={{ marginBottom: '24px', color: '#595959' }}>
-                Defina o valor de mercado atual para cálculo do prêmio
-              </Paragraph>
-
-              <div style={{ marginBottom: '32px' }}>
-                <InputNumber
-                  style={{
-                    width: '100%',
-                    fontSize: '18px',
-                    height: '48px',
-                    borderRadius: '8px'
-                  }}
-                  prefix={<DollarOutlined style={{ color: '#595959' }} />}
-                  value={valorBem}
-                  onChange={setValorBem}
-                  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                  min={1}
-                  max={1000000000}
-                />
-              </div>
-            </div>
-          </Card>
-
-          {assetType === 'veiculo' && (
-            <>
-              <Row gutter={[32, 32]} style={{ marginBottom: '32px' }}>
-                <Col xs={24} md={12}>
-                  <Card style={{ borderRadius: '8px', height: '100%', border: '1px solid #f0f0f0' }}>
-                    <Title level={4} style={{ marginBottom: '16px', color: '#262626' }}>
-                      <ToolOutlined style={{ color: '#595959', marginRight: '8px' }} /> Quilometragem
-                    </Title>
-                    <InputNumber
-                      style={{ width: '100%' }}
-                      size="large"
-                      placeholder="Ex: 50000"
-                      value={avaliacao.quilometragem_atual}
-                      onChange={v => updateAvaliacao('quilometragem_atual', null, v)}
-                      prefix={<span style={{ color: '#595959' }}>Km</span>}
-                    />
-                  </Card>
-                </Col>
-
-                <Col xs={24} md={12}>
-                  <Card style={{ borderRadius: '8px', height: '100%', border: '1px solid #f0f0f0' }}>
-                    <Title level={4} style={{ marginBottom: '16px', color: '#262626' }}>
-                      <CarOutlined style={{ color: '#595959', marginRight: '8px' }} /> Tipo de Uso
-                    </Title>
-                    <Select
-                      style={{ width: '100%' }}
-                      size="large"
-                      value={avaliacao.tipo_uso}
-                      onChange={value => updateAvaliacao('tipo_uso', null, value)}
-                    >
-                      <Select.Option value="pessoal">Pessoal / Lazer</Select.Option>
-                      <Select.Option value="comercial">Comercial / Trabalho</Select.Option>
-                      <Select.Option value="aplicativo">Motorista de App / Táxi</Select.Option>
-                    </Select>
-                  </Card>
-                </Col>
-              </Row>
-
-              <Card style={{ borderRadius: '8px', border: '1px solid #f0f0f0' }}>
-                <div style={{ padding: '24px' }}>
-                  <Title level={4} style={{ marginBottom: '8px', color: '#262626' }}>
-                    <ToolOutlined style={{ color: '#595959', marginRight: '8px' }} /> Estado dos Componentes (Opcional)
-                  </Title>
-                  <Paragraph type="secondary" style={{ marginBottom: '24px' }}>
-                    Avalie o estado de cada componente para uma cobertura mais precisa
-                  </Paragraph>
-
-                  <Row gutter={[24, 24]}>
-                    {[
-                      { key: 'pneus', label: 'Pneus', icon: <ToolOutlined /> },
-                      { key: 'vidros', label: 'Vidros', icon: <FileTextOutlined /> },
-                      { key: 'cadeiras', label: 'Cadeiras', icon: <CarryOutOutlined /> },
-                      { key: 'bagageira', label: 'Bagageira', icon: <InboxOutlined /> },
-                      { key: 'eletronicos', label: 'Eletrônicos', icon: <CarryOutOutlined /> },
-                      { key: 'acessorios', label: 'Acessórios', icon: <ToolOutlined /> }
-                    ].map(component => (
-                      <Col xs={24} sm={12} md={8} key={component.key}>
-                        <div style={{
-                          padding: '16px',
-                          border: '1px solid #f0f0f0',
-                          borderRadius: '8px',
-                          background: 'white'
-                        }}>
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginBottom: '12px',
-                            gap: '8px'
-                          }}>
-                            <div style={{
-                              width: '32px',
-                              height: '32px',
-                              background: '#fafafa',
-                              borderRadius: '6px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: '#595959',
-                              fontSize: '16px'
-                            }}>
-                              {component.icon}
-                            </div>
-                            <Text strong style={{ fontSize: '14px' }}>{component.label}</Text>
-                          </div>
-
-                          <Select
-                            value={avaliacao[component.key].estado}
-                            onChange={value => updateAvaliacao(component.key, 'estado', value)}
-                            style={{ width: '100%', marginBottom: '12px' }}
-                            size="small"
-                          >
-                            <Select.Option value="bom">Bom</Select.Option>
-                            <Select.Option value="regular">Regular</Select.Option>
-                            <Select.Option value="ruim">Ruim</Select.Option>
-                          </Select>
-
-                          <Upload
-                            beforeUpload={(file) => {
-                              updateAvaliacao(component.key, 'foto', file);
-                              return false;
-                            }}
-                            showUploadList={false}
-                          >
-                            <Button
-                              icon={avaliacao[component.key].foto ? <CheckCircleFilled /> : <UploadOutlined />}
-                              type={avaliacao[component.key].foto ? "default" : "dashed"}
-                              block
-                              size="small"
-                            >
-                              {avaliacao[component.key].foto ? 'Foto Adicionada' : 'Adicionar Foto'}
-                            </Button>
-                          </Upload>
-                        </div>
-                      </Col>
-                    ))}
-                  </Row>
-                </div>
-              </Card>
-            </>
-          )}
-        </div>
-      )
-    },
+    // Passo Avaliação Removido
     {
       title: 'Planos',
       icon: <DollarOutlined />,
@@ -1410,7 +1191,7 @@ const ContratarSeguroPage = () => {
                                     {c.descricao}
                                   </Text>
                                   <Text type="secondary" style={{ fontSize: '11px' }}>
-                                    Franquia: {c.franquia}
+                                    Franquia: {c.franquia}%
                                   </Text>
                                 </div>
                               </div>
@@ -1593,7 +1374,7 @@ const ContratarSeguroPage = () => {
           ) : (
             <>
               <div style={{ padding: '24px 48px 40px' }}>
-                <Steps current={current} labelPlacement="vertical">
+                <Steps current={current} titlePlacement="vertical">
                   {steps.map((item, index) => (
                     <Step
                       key={item.title}
@@ -1711,148 +1492,6 @@ const ContratarSeguroPage = () => {
         </Card>
       </div>
 
-      {/* Modal de cadastro de veículo */}
-      <Modal
-        title={
-          <div style={{ padding: '16px 24px', background: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
-            <Title level={3} style={{ margin: 0, fontSize: '18px', color: '#262626' }}>
-              <CarOutlined style={{ marginRight: '8px' }} />
-              Cadastrar Novo Veículo
-            </Title>
-            <Paragraph style={{ margin: '4px 0 0 0', color: '#595959', fontSize: '13px' }}>
-              Preencha os dados do seu veículo
-            </Paragraph>
-          </div>
-        }
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
-        width={600}
-        style={{ borderRadius: '8px' }}
-      >
-        <Form
-          layout="vertical"
-          form={formVeiculo}
-          onFinish={handleCreateVeiculo}
-          style={{ padding: '24px' }}
-        >
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="marca"
-                label="Marca"
-                rules={[{ required: true, message: 'Insira a marca' }]}
-              >
-                <Input placeholder="Ex: Toyota" size="large" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="modelo"
-                label="Modelo"
-                rules={[{ required: true, message: 'Insira o modelo' }]}
-              >
-                <Input placeholder="Ex: Corolla" size="large" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="matricula"
-                label="Matrícula"
-                rules={[{ required: true, message: 'Insira a matrícula' }]}
-              >
-                <Input placeholder="Ex: ABC-123-MC" size="large" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="chassi"
-                label="Chassi (VIN)"
-                rules={[{ required: true, message: 'Insira o chassi' }]}
-              >
-                <Input placeholder="Ex: 1HGCM82633A123456" size="large" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Form.Item
-                name="ano_fabrico"
-                label="Ano de Fabricação"
-                rules={[{ required: true, message: 'Ano inválido' }]}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  min={1900}
-                  max={new Date().getFullYear() + 1}
-                  size="large"
-                  placeholder="Ex: 2022"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="cor"
-                label="Cor"
-              >
-                <Input placeholder="Ex: Prata" size="large" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Form.Item
-                name="valor_estimado"
-                label="Valor Estimado (MZN)"
-                rules={[{ required: true, message: 'Insira o valor' }]}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  size="large"
-                  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={value => value.replace(/\$\s?|(,*)/g, '')}
-                  placeholder="Ex: 500000"
-                  min={1}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <div style={{ textAlign: 'center', marginTop: '32px' }}>
-            <Button
-              onClick={() => setIsModalVisible(false)}
-              style={{
-                marginRight: '16px',
-                padding: '0 24px',
-                height: '40px',
-                borderRadius: '8px',
-                fontSize: '14px'
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              style={{
-                padding: '0 32px',
-                height: '40px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 500
-              }}
-            >
-              Salvar Veículo
-            </Button>
-          </div>
-        </Form>
-      </Modal>
     </ClienteLayout>
   );
 };

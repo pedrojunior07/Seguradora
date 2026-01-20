@@ -43,7 +43,7 @@ class ApoliceController extends Controller
             ->whereHas('seguradoraSeguro', function ($q) use ($request) {
                 $q->where('id_seguradora', $request->user()->perfil_id);
             })
-            ->with(['cliente', 'bemSegurado', 'seguradoraSeguro.seguro'])
+            ->with(['cliente', 'bemSegurado', 'seguradoraSeguro.seguro.categoria', 'seguradoraSeguro.seguro.tipo', 'aprovador', 'latestAuditLog.user'])
             ->paginate(20);
 
         return response()->json($apolices);
@@ -55,7 +55,7 @@ class ApoliceController extends Controller
             ->whereHas('seguradoraSeguro', function ($q) use ($request) {
                 $q->where('id_seguradora', $request->user()->perfil_id);
             })
-            ->with(['cliente', 'bemSegurado', 'seguradoraSeguro.seguro'])
+            ->with(['cliente', 'bemSegurado', 'seguradoraSeguro.seguro.categoria', 'seguradoraSeguro.seguro.tipo', 'aprovador', 'latestAuditLog.user'])
             ->paginate(20);
 
         return response()->json($apolices);
@@ -71,10 +71,12 @@ class ApoliceController extends Controller
         return response()->json($apolice->load([
             'cliente',
             'bemSegurado',
-            'seguradoraSeguro.seguro',
+            'seguradoraSeguro.seguro.categoria',
+            'seguradoraSeguro.seguro.tipo',
             'seguradoraSeguro.coberturas',
             'pagamentos',
             'sinistros',
+            'aprovador',
         ]));
     }
 

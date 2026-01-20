@@ -52,18 +52,10 @@ class ContratacaoController extends Controller
             'valor_bem' => 'required|numeric|min:0',
             'id_bem' => 'required|integer',
             'tipo_bem' => 'required|string|in:veiculo,propriedade',
-            // Campos específicos para Veículo
-            'quilometragem_atual' => 'nullable|integer',
-            'tipo_uso' => 'nullable|string',
-            'foto_pneus' => 'nullable|file|image|max:5120',
-            'foto_vidros' => 'nullable|file|image|max:5120',
-            'foto_cadeiras' => 'nullable|file|image|max:5120',
-            'foto_bagageira' => 'nullable|file|image|max:5120',
-            'foto_eletronicos' => 'nullable|file|image|max:5120',
-            'foto_acessorios' => 'nullable|file|image|max:5120',
         ]);
 
         if ($validator->fails()) {
+            \Illuminate\Support\Facades\Log::info('Erro validação contratar:', ['errors' => $validator->errors(), 'data' => $request->all()]);
             return response()->json(['errors' => $validator->errors()], 422);
         }
 

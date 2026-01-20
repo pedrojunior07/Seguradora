@@ -30,7 +30,7 @@ class CriarSeguroRequest extends FormRequest
             'preco.data_fim' => 'nullable|date|after:preco.data_inicio',
             'coberturas' => 'nullable|array',
             'coberturas.*.descricao' => 'required|string',
-            'coberturas.*.franquia' => 'nullable|numeric|min:0',
+            'coberturas.*.franquia' => 'nullable|numeric|min:0|max:100',
             'coberturas.*.valor_minimo' => 'nullable|numeric|min:0',
         ];
     }

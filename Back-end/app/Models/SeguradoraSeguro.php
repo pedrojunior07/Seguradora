@@ -18,6 +18,8 @@ class SeguradoraSeguro extends Model
         'valor_minimo_dano',
         'status',
         'auto_aprovacao',
+        'modificado_por',
+        'data_modificacao',
     ];
 
     protected $casts = [
@@ -25,9 +27,24 @@ class SeguradoraSeguro extends Model
         'valor_minimo_dano' => 'decimal:2',
         'status' => 'boolean',
         'auto_aprovacao' => 'boolean',
+        'data_modificacao' => 'datetime',
     ];
 
     // Relacionamentos
+    public function modificador()
+    {
+        return $this->belongsTo(User::class, 'modificado_por');
+    }
+
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable');
+    }
+
+    public function latestAuditLog()
+    {
+        return $this->morphOne(AuditLog::class, 'auditable')->latestOfMany();
+    }
     public function seguro()
     {
         return $this->belongsTo(Seguro::class, 'id_seguro', 'id_seguro');
@@ -56,10 +73,10 @@ class SeguradoraSeguro extends Model
     public function precoAtual()
     {
         return $this->hasOne(Preco::class, 'seguradora_seguro_id', 'id')
-                    ->where('data_inicio', '<=', now())
+                    ->whereDate('data_inicio', '<=', now())
                     ->where(function ($query) {
                         $query->whereNull('data_fim')
-                              ->orWhere('data_fim', '>=', now());
+                              ->orWhereDate('data_fim', '>=', now());
                     })
                     ->latest('data_inicio');
     }

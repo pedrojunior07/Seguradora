@@ -22,10 +22,10 @@ const StatsCards = () => {
         // Obter token do localStorage ou contexto (geralmente api.js já trata)
         // Substituir URL pela rota correta
         const response = await fetch('http://localhost:8000/api/seguradora/dashboard/resumo', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Accept': 'application/json'
-            }
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Accept': 'application/json'
+          }
         });
         const data = await response.json();
         setStatsData(data);
@@ -87,7 +87,7 @@ const StatsCards = () => {
   return (
     <Row gutter={[16, 16]}>
       {stats.map((stat, index) => (
-        <Col xs={12} sm={12} lg={6} key={index}>
+        <Col xs={24} sm={12} lg={6} key={index}>
           <Card
             loading={loading}
             style={{
@@ -101,15 +101,15 @@ const StatsCards = () => {
             }}
             bodyStyle={{ padding: '20px' }}
             onMouseEnter={(e) => {
-              if(!loading) {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
+              if (!loading) {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
               }
             }}
             onMouseLeave={(e) => {
-              if(!loading) {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+              if (!loading) {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
               }
             }}
           >

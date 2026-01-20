@@ -31,6 +31,27 @@ const seguradoraService = {
         return response.data;
     },
 
+    // Propostas
+    getPropostas: async (params) => {
+        const response = await api.get('/seguradora/propostas', { params });
+        return response.data;
+    },
+
+    getProposta: async (id) => {
+        const response = await api.get(`/seguradora/propostas/${id}`);
+        return response.data;
+    },
+
+    aprovarProposta: async (id) => {
+        const response = await api.post(`/seguradora/propostas/${id}/aprovar`);
+        return response.data;
+    },
+
+    rejeitarProposta: async (id, motivo) => {
+        const response = await api.post(`/seguradora/propostas/${id}/rejeitar`, { motivo });
+        return response.data;
+    },
+
     // Claims Management
     getPendingClaims: async () => {
         const response = await api.get('/seguradora/sinistros/pendentes');
@@ -51,6 +72,12 @@ const seguradoraService = {
 
     approveClaim: async (sinistroId, data) => {
         const response = await api.post(`/seguradora/sinistros/${sinistroId}/aprovar`, data);
+        return response.data;
+    },
+
+    // Pagamentos (Fictício)
+    confirmarPagamento: async (id) => {
+        const response = await api.post(`/cliente/pagamentos/${id}/confirmar-ficticio`);
         return response.data;
     },
 };

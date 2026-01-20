@@ -12,10 +12,13 @@ import clienteService from '../../../services/cliente.service';
 
 const { Title, Text } = Typography;
 
+import { useNavigate } from 'react-router-dom';
+
 const MinhasApolices = () => {
     const [apolices, setApolices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchApolices();
@@ -58,7 +61,7 @@ const MinhasApolices = () => {
             title: 'Bem Segurado',
             key: 'bem',
             render: (_, record) => {
-                const bem = record.bem_segurado;
+                const bem = record.bemSegurado || record.bem_segurado;
                 if (!bem) return 'N/A';
                 return (
                     <Space direction="vertical" size={0}>
@@ -95,17 +98,28 @@ const MinhasApolices = () => {
             key: 'validade',
             render: (_, record) => (
                 <div style={{ fontSize: '12px' }}>
-                    <Text type="secondary">Início: {record.data_inicio}</Text><br />
-                    <Text type="secondary">Fim: {record.data_fim}</Text>
+                    <Text type="secondary">Início: {record.data_inicio_vigencia ? new Date(record.data_inicio_vigencia).toLocaleDateString() : '-'}</Text><br />
+                    <Text type="secondary">Fim: {record.data_fim_vigencia ? new Date(record.data_fim_vigencia).toLocaleDateString() : '-'}</Text>
                 </div>
             ),
         },
         {
             title: 'Ações',
             key: 'action',
-            render: (_, record) => (
-                <Button type="link" size="small">Ver Detalhes</Button>
-            ),
+            render: (_, record) => {
+                // Determine ID based on whether it is a veiculo or propriedade policy
+                // Adjust this logic if the ID field name is consistent or varies
+                const id = record.id_apolice || record.id;
+                return (
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => navigate(`/cliente/apolices/${id}`)}
+                    >
+                        Ver Detalhes
+                    </Button>
+                );
+            },
         },
     ];
 
@@ -135,6 +149,7 @@ const MinhasApolices = () => {
                     rowKey="id_apolice"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    scroll={{ x: 'max-content' }}
                 />
             </Card>
         </ClienteLayout>

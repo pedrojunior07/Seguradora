@@ -58,7 +58,7 @@ const DashboardPage = () => {
           border: 'none',
           boxShadow: '0 4px 12px rgba(30, 64, 175, 0.15)'
         }}
-        bodyStyle={{ padding: isMobile ? '20px' : '32px' }}
+        bodyStyle={{ padding: isMobile ? '16px' : '32px' }}
       >
         <Space direction="vertical" size={8} style={{ width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
@@ -104,7 +104,7 @@ const DashboardPage = () => {
       <Row gutter={[24, 24]}>
         {/* Main Content - Full Width */}
         <Col xs={24}>
-          <Space direction="vertical" size={24} style={{ width: '100%' }}>
+          <Space direction="vertical" size={isMobile ? 16 : 24} style={{ width: '100%' }}>
             <ClaimsOverview />
             <RecentActivity />
           </Space>

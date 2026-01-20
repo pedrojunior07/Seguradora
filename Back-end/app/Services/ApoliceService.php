@@ -6,6 +6,7 @@ use App\Models\Apolice;
 use App\Models\Pagamento;
 use App\Models\SeguradoraSeguro;
 use App\Models\User;
+use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 
 class ApoliceService
@@ -41,8 +42,11 @@ class ApoliceService
     public function aprovarApolice(Apolice $apolice, User $aprovador): Apolice
     {
         return DB::transaction(function () use ($apolice, $aprovador) {
+            $oldState = $apolice->toArray();
             $apolice->aprovar($aprovador);
             $apolice->ativar();
+
+            AuditLog::log('aprovar', $apolice, "Apólice aprovada e ativada por {$aprovador->name}", $oldState, $apolice->fresh()->toArray());
 
             // Gerar parcelas de pagamento
             $this->gerarParcelas($apolice);
@@ -75,7 +79,10 @@ class ApoliceService
     public function cancelarApolice(Apolice $apolice, User $cancelador, string $motivo): Apolice
     {
         return DB::transaction(function () use ($apolice, $cancelador, $motivo) {
+            $oldState = $apolice->toArray();
             $apolice->cancelar($cancelador, $motivo);
+
+            AuditLog::log('cancelar', $apolice, "Apólice cancelada por {$cancelador->name}. Motivo: {$motivo}", $oldState, $apolice->fresh()->toArray());
 
             // Cancelar pagamentos pendentes
             $apolice->pagamentosPendentes()->update(['status' => 'cancelado']);
@@ -101,7 +108,10 @@ class ApoliceService
             ->whereIn('id_cobertura', $coberturasIds)
             ->get();
 
-        $franquiaTotal = $coberturas->sum('franquia');
+        $franquiaTotal = $coberturas->map(function ($cobertura) use ($valorBem) {
+            $baseCalculo = $cobertura->valor_maximo ?? $valorBem;
+            return ($baseCalculo * $cobertura->franquia) / 100;
+        })->sum();
 
         return [
             'premio_base' => round($premioBase, 2),

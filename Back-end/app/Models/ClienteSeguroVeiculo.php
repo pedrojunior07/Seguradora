@@ -39,6 +39,10 @@ class ClienteSeguroVeiculo extends Model
         'foto_bagageira',
         'foto_eletronicos',
         'foto_acessorios',
+        'foto_frente',
+        'foto_traseira',
+        'foto_lado_esquerdo',
+        'foto_lado_direito',
     ];
 
     public function veiculo(): BelongsTo

@@ -39,7 +39,7 @@ class SinistroController extends Controller
     public function index(Request $request)
     {
         $sinistros = Sinistro::where('cliente_id', $request->user()->perfil_id)
-            ->with(['apolice.bemSegurado', 'apolice.seguradoraSeguro.seguradora'])
+            ->with(['apolice.bemSegurado', 'apolice.seguradoraSeguro.seguradora', 'apolice.seguradoraSeguro.seguro.categoria', 'apolice.seguradoraSeguro.seguro.tipo'])
             ->paginate(20);
 
         return response()->json($sinistros);
@@ -90,7 +90,7 @@ class SinistroController extends Controller
 
             return response()->json([
                 'message' => 'Sinistro registado com sucesso',
-                'sinistro' => $sinistro->load(['apolice', 'apolice.seguradoraSeguro']),
+                'sinistro' => $sinistro->load(['apolice', 'apolice.seguradoraSeguro.seguro.categoria', 'apolice.seguradoraSeguro.seguro.tipo']),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -108,6 +108,8 @@ class SinistroController extends Controller
 
         return response()->json($sinistro->load([
             'apolice.seguradoraSeguro.seguradora',
+            'apolice.seguradoraSeguro.seguro.categoria',
+            'apolice.seguradoraSeguro.seguro.tipo',
             'apolice.bemSegurado',
             'analista',
         ]));

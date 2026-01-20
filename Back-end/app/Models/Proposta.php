@@ -75,6 +75,21 @@ class Proposta extends Model
         return $this->belongsTo(Apolice::class, 'apolice_gerada_id', 'id_apolice');
     }
 
+    public function apolice()
+    {
+        return $this->belongsTo(Apolice::class, 'apolice_gerada_id', 'id_apolice');
+    }
+
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable');
+    }
+
+    public function latestAuditLog()
+    {
+        return $this->morphOne(AuditLog::class, 'auditable')->latestOfMany();
+    }
+
     // Scopes
     public function scopeRascunho($query)
     {

@@ -33,6 +33,13 @@ Route::middleware('auth:api')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
+    
+    // Notificações
+    Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\Api\NotificationController::class, 'destroy']);
 
     // Categorias
     // Categorias e Tipos
@@ -50,6 +57,7 @@ Route::middleware('auth:api')->group(function () {
         // Dashboard
         Route::get('dashboard/resumo', [\App\Http\Controllers\DashboardController::class, 'resumo']);
         Route::get('dashboard/grafico-vendas', [\App\Http\Controllers\DashboardController::class, 'graficoVendas']);
+        Route::get('auditoria', [\App\Http\Controllers\Api\AuditController::class, 'index']);
 
         // Seguros
         Route::get('seguros', [SeguroController::class, 'index']);
@@ -63,6 +71,13 @@ Route::middleware('auth:api')->group(function () {
         Route::post('precos/{preco}/desativar', [SeguroController::class, 'desativarPreco']);
         Route::post('seguros/{id}/coberturas', [SeguroController::class, 'adicionarCobertura']);
 
+        // Propostas
+        Route::get('propostas', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'index']);
+        Route::get('propostas/recentes', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'recentNotifications']);
+        Route::get('propostas/{id}', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'show']);
+        Route::post('propostas/{id}/aprovar', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'aprovar']);
+        Route::post('propostas/{id}/rejeitar', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'rejeitar']);
+
         // Apólices
         Route::get('apolices/pendentes', [SeguradoraApoliceController::class, 'pendentes']);
         Route::get('apolices/ativas', [SeguradoraApoliceController::class, 'ativas']);
@@ -74,6 +89,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/contratacoes-diretas/{id}/decidir', [SeguradoraApoliceController::class, 'decidirProposta']);
 
         // Sinistros
+        Route::get('sinistros', [SeguradoraSinistroController::class, 'index']);
         Route::get('sinistros/pendentes', [SeguradoraSinistroController::class, 'pendentes']);
         Route::get('sinistros/em-analise', [SeguradoraSinistroController::class, 'emAnalise']);
         Route::get('sinistros/{sinistro}', [SeguradoraSinistroController::class, 'show']);
@@ -91,6 +107,7 @@ Route::middleware('auth:api')->group(function () {
     // ROTAS CORRETORA
     Route::prefix('corretora')->group(function () {
         // Propostas
+        Route::get('propostas/recentes', [PropostaController::class, 'recentNotifications']);
         Route::get('propostas', [PropostaController::class, 'index']);
         Route::post('propostas', [PropostaController::class, 'store']);
         Route::get('propostas/{proposta}', [PropostaController::class, 'show']);
@@ -109,6 +126,12 @@ Route::middleware('auth:api')->group(function () {
         // Bens
         Route::get('veiculos', [\App\Http\Controllers\Api\VeiculoController::class, 'index']);
         Route::post('veiculos', [\App\Http\Controllers\Api\VeiculoController::class, 'store']);
+        Route::get('veiculos/{id}', [\App\Http\Controllers\Api\VeiculoController::class, 'show']);
+        Route::post('veiculos/{id}', [\App\Http\Controllers\Api\VeiculoController::class, 'update']); // Usando POST para update por causa do FormData/Arquivos se necessário, ou PUT
+        Route::delete('veiculos/{id}', [\App\Http\Controllers\Api\VeiculoController::class, 'destroy']);
+        Route::get('veiculos/{id}/fotos', [\App\Http\Controllers\Api\VeiculoFotoController::class, 'index']);
+        Route::post('veiculos/{id}/fotos', [\App\Http\Controllers\Api\VeiculoFotoController::class, 'store']);
+        Route::delete('veiculos/{id}/fotos/{foto}', [\App\Http\Controllers\Api\VeiculoFotoController::class, 'destroy']);
         Route::get('propriedades', [\App\Http\Controllers\Api\PropriedadeController::class, 'index']);
 
         // Apólices
@@ -125,6 +148,12 @@ Route::middleware('auth:api')->group(function () {
         Route::get('sinistros/{sinistro}', [ClienteSinistroController::class, 'show']);
         Route::get('sinistros/{sinistro}/acompanhamento', [ClienteSinistroController::class, 'acompanhamento']);
 
+        // Propostas
+        Route::get('propostas/recentes', [\App\Http\Controllers\Api\PropostaController::class, 'recentNotifications']);
+        Route::get('propostas', [\App\Http\Controllers\Api\PropostaController::class, 'index']);
+        Route::post('propostas', [\App\Http\Controllers\Api\PropostaController::class, 'store']);
+        Route::get('propostas/{id}', [\App\Http\Controllers\Api\PropostaController::class, 'show']);
+
         // Pagamentos
         Route::get('pagamentos', [PagamentoController::class, 'index']);
         Route::get('pagamentos/pendentes', [PagamentoController::class, 'pendentes']);
@@ -132,5 +161,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('pagamentos/estatisticas', [PagamentoController::class, 'estatisticas']);
         Route::get('pagamentos/{pagamento}', [PagamentoController::class, 'show']);
         Route::post('pagamentos/{pagamento}/registrar', [PagamentoController::class, 'registrarPagamento']);
+        
+        // Simulação de Pagamento
+        Route::post('pagamentos/{id}/confirmar-ficticio', [\App\Http\Controllers\Api\PagamentoFicticioController::class, 'confirmarPagamento']);
     });
 });

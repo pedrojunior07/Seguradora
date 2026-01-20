@@ -98,6 +98,16 @@ class Apolice extends Model
         return $this->belongsTo(Corretora::class, 'corretora_id', 'id_corretora');
     }
 
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable');
+    }
+
+    public function latestAuditLog()
+    {
+        return $this->morphOne(AuditLog::class, 'auditable')->latestOfMany();
+    }
+
     public function bemSegurado()
     {
         return $this->morphTo('bem_segurado', 'bem_segurado_type', 'bem_segurado_id');

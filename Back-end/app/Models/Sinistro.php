@@ -40,6 +40,8 @@ class Sinistro extends Model
         'data_pagamento',
         'forma_pagamento',
         'observacoes',
+        'item_segurado_id',
+        'item_segurado_type',
     ];
 
     protected $casts = [
@@ -71,6 +73,21 @@ class Sinistro extends Model
     public function analista()
     {
         return $this->belongsTo(User::class, 'analista_id');
+    }
+
+    public function itemSegurado()
+    {
+        return $this->morphTo('itemSegurado', 'item_segurado_type', 'item_segurado_id');
+    }
+
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable');
+    }
+
+    public function latestAuditLog()
+    {
+        return $this->morphOne(AuditLog::class, 'auditable')->latestOfMany();
     }
 
     // Scopes
@@ -134,18 +151,26 @@ class Sinistro extends Model
         return $this->save();
     }
 
-    public function aprovar(float $valorAprovado, float $franquia = 0): bool
+    public function aprovar(float $valorAprovado, float $franquia = 0, ?User $analista = null): bool
     {
         $this->status = 'aprovado';
+        if ($analista) {
+            $this->analista_id = $analista->id;
+            $this->data_analise = now();
+        }
         $this->valor_aprovado = $valorAprovado;
         $this->valor_franquia = $franquia;
         $this->valor_indenizacao = $valorAprovado - $franquia;
         return $this->save();
     }
 
-    public function negar(string $motivo): bool
+    public function negar(string $motivo, ?User $analista = null): bool
     {
         $this->status = 'negado';
+        if ($analista) {
+            $this->analista_id = $analista->id;
+            $this->data_analise = now();
+        }
         $this->motivo_negacao = $motivo;
         return $this->save();
     }

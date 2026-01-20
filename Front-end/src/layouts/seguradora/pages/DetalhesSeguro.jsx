@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Descriptions, Tag, Button, Space, message, Spin, Table, Modal, Form, InputNumber, Input, DatePicker, Switch, Divider } from 'antd';
+import { Card, Descriptions, Tag, Button, Space, message, Spin, Table, Modal, Form, InputNumber, Input, DatePicker, Switch, Divider, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, PlusOutlined, DollarOutlined, SafetyOutlined, PoweroffOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import seguroService from '../../../services/seguroService';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
+const { Text } = Typography;
 
 const DetalhesSeguro = () => {
   const navigate = useNavigate();
@@ -178,10 +179,10 @@ const DetalhesSeguro = () => {
       key: 'descricao'
     },
     {
-      title: 'Franquia',
+      title: 'Franquia (%)',
       dataIndex: 'franquia',
       key: 'franquia',
-      render: (valor) => valor ? `${parseFloat(valor).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}` : '-'
+      render: (valor) => valor ? `${valor}%` : '-'
     },
     {
       title: 'Valor Mínimo',
@@ -475,16 +476,16 @@ const DetalhesSeguro = () => {
           </Form.Item>
 
           <Form.Item
-            label="Franquia (MZN)"
+            label="Franquia (%)"
             name="franquia"
           >
             <InputNumber
               style={{ width: '100%' }}
               min={0}
-              step={100}
+              max={100}
+              step={0.1}
               placeholder="0.00"
-              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              suffix="%"
             />
           </Form.Item>
 

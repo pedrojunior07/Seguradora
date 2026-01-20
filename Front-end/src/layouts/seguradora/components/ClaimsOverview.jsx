@@ -1,5 +1,5 @@
 // components/dashboard/ClaimsOverview.jsx
-import { Card, Collapse, Select, Table, Row, Col, Tag, Button, Badge } from 'antd';
+import { Card, Collapse, Select, Table, Row, Col, Tag, Button, Badge, Grid } from 'antd';
 import {
   LineChartOutlined,
   FilterOutlined,
@@ -17,6 +17,8 @@ const { Option } = Select;
 const { Panel } = Collapse;
 
 const ClaimsOverview = () => {
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const columns = [
     {
       title: 'Tipo de Sinistro',
@@ -179,30 +181,30 @@ const ClaimsOverview = () => {
       >
         <Panel
           header={
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ padding: 8, background: '#eff6ff', borderRadius: 8 }}>
-                  <LineChartOutlined style={{ color: '#1e40af', fontSize: 18 }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: isMobile ? 8 : 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12 }}>
+                <div style={{ padding: isMobile ? 6 : 8, background: '#eff6ff', borderRadius: 8 }}>
+                  <LineChartOutlined style={{ color: '#1e40af', fontSize: isMobile ? 16 : 18 }} />
                 </div>
                 <div>
-                  <span style={{ fontWeight: 600, fontSize: 16 }}>Visão Geral de Sinistros</span>
-                  <div style={{ fontSize: 12, color: '#6b7280' }}>Análise detalhada de sinistros</div>
+                  <span style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16 }}>Visão Geral</span>
+                  {!isMobile && <div style={{ fontSize: 12, color: '#6b7280' }}>Análise detalhada de sinistros</div>}
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 8 }} onClick={(e) => e.stopPropagation()}>
                 <Button
                   icon={<FilterOutlined />}
                   size="small"
                   style={{ color: '#6b7280' }}
                 >
-                  Filtrar
+                  {!isMobile && 'Filtrar'}
                 </Button>
                 <Button
                   icon={<DownloadOutlined />}
                   size="small"
                   style={{ color: '#1e40af' }}
                 >
-                  Exportar
+                  {!isMobile && 'Exportar'}
                 </Button>
               </div>
             </div>
@@ -217,36 +219,41 @@ const ClaimsOverview = () => {
                 <Col xs={12} sm={6} key={index}>
                   <div
                     style={{
-                      padding: 12,
+                      padding: isMobile ? 8 : 12,
                       borderRadius: 8,
                       border: `1px solid ${stat.color}20`,
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      height: '100%'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{stat.title}</div>
-                        <div style={{ fontSize: 20, fontWeight: 700, color: '#374151' }}>{stat.value}</div>
-                        <div style={{
-                          fontSize: 11,
-                          fontWeight: 500,
-                          marginTop: 4,
-                          color: stat.change >= 0 ? '#10b981' : '#ef4444'
-                        }}>
-                          {stat.change >= 0 ? '+' : ''}{stat.change}% vs mês anterior
+                      <div style={{ overflow: 'hidden' }}>
+                        <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 2, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{stat.title}</div>
+                        <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 700, color: '#374151' }}>{stat.value}</div>
+                        {!isMobile && (
+                          <div style={{
+                            fontSize: 10,
+                            fontWeight: 500,
+                            marginTop: 4,
+                            color: stat.change >= 0 ? '#10b981' : '#ef4444'
+                          }}>
+                            {stat.change >= 0 ? '+' : ''}{stat.change}%
+                          </div>
+                        )}
+                      </div>
+                      {!isMobile && (
+                        <div
+                          style={{
+                            padding: 8,
+                            borderRadius: 8,
+                            backgroundColor: `${stat.color}20`,
+                            color: stat.color,
+                            fontSize: 18
+                          }}
+                        >
+                          {stat.icon}
                         </div>
-                      </div>
-                      <div
-                        style={{
-                          padding: 8,
-                          borderRadius: 8,
-                          backgroundColor: `${stat.color}20`,
-                          color: stat.color,
-                          fontSize: 18
-                        }}
-                      >
-                        {stat.icon}
-                      </div>
+                      )}
                     </div>
                   </div>
                 </Col>
@@ -269,16 +276,18 @@ const ClaimsOverview = () => {
                 <Select
                   defaultValue="month"
                   size="small"
-                  style={{ width: 140 }}
+                  style={{ width: isMobile ? 100 : 140 }}
                   suffixIcon={<FilterOutlined style={{ color: '#9ca3af' }} />}
                 >
-                  <Option value="week">Esta Semana</Option>
-                  <Option value="month">Este Mês</Option>
-                  <Option value="quarter">Este Trimestre</Option>
-                  <Option value="year">Este Ano</Option>
+                  <Option value="week">Semana</Option>
+                  <Option value="month">Mês</Option>
+                  <Option value="quarter">Trimestre</Option>
+                  <Option value="year">Ano</Option>
                 </Select>
               </div>
-              <SimpleChart />
+              <div style={{ overflowX: 'auto' }}>
+                <SimpleChart />
+              </div>
 
               {/* Legenda do gráfico */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 16 }}>
@@ -316,6 +325,7 @@ const ClaimsOverview = () => {
                 dataSource={data}
                 pagination={false}
                 size="small"
+                scroll={{ x: 'max-content' }}
               />
             </div>
 

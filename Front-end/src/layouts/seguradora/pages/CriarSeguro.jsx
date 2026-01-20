@@ -305,16 +305,16 @@ const CriarSeguro = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
                       <Form.Item
                         {...restField}
-                        label="Franquia (MZN)"
+                        label="Franquia (%)"
                         name={[name, 'franquia']}
                       >
                         <InputNumber
                           style={{ width: '100%' }}
                           min={0}
-                          step={100}
+                          max={100}
+                          step={0.1}
                           placeholder="0.00"
-                          formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                          suffix="%"
                         />
                       </Form.Item>
 

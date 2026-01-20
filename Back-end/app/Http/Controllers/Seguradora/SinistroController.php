@@ -10,6 +10,24 @@ use Illuminate\Http\Request;
 class SinistroController extends Controller
 {
     public function __construct(protected SinistroService $sinistroService) {}
+    
+    public function index(Request $request)
+    {
+        $sinistros = \App\Models\Sinistro::whereHas('apolice.seguradoraSeguro', function ($q) use ($request) {
+            $q->where('id_seguradora', $request->user()->perfil_id);
+        })
+        ->with([
+            'apolice.cliente', 
+            'apolice.bemSegurado', 
+            'apolice.seguradoraSeguro.seguro.categoria', 
+            'apolice.seguradoraSeguro.seguro.tipo',
+            'latestAuditLog.user'
+        ])
+        ->orderBy('data_comunicacao', 'desc')
+        ->paginate(20);
+
+        return response()->json($sinistros);
+    }
 
     public function pendentes(Request $request)
     {
@@ -31,7 +49,7 @@ class SinistroController extends Controller
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
-        return response()->json($sinistro->load(['apolice.cliente', 'analista']));
+        return response()->json($sinistro->load(['apolice.cliente', 'analista', 'itemSegurado']));
     }
 
     public function analisar(Sinistro $sinistro, Request $request)
@@ -70,7 +88,8 @@ class SinistroController extends Controller
             $sinistroAtualizado = $this->sinistroService->aprovarSinistro(
                 $sinistro,
                 $request->valor_aprovado,
-                $request->franquia
+                $request->franquia,
+                $request->user()
             );
 
             return response()->json([
@@ -95,7 +114,7 @@ class SinistroController extends Controller
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
-        $sinistroAtualizado = $this->sinistroService->negarSinistro($sinistro, $request->motivo);
+        $sinistroAtualizado = $this->sinistroService->negarSinistro($sinistro, $request->motivo, $request->user());
 
         return response()->json([
             'message' => 'Sinistro negado',

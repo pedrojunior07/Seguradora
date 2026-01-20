@@ -1,5 +1,5 @@
 // components/dashboard/RecentActivity.jsx
-import { Card, Collapse, Tag, Button, Space, Badge, Timeline } from 'antd';
+import { Card, Collapse, Tag, Button, Space, Badge, Timeline, Grid } from 'antd';
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -14,6 +14,8 @@ import {
 const { Panel } = Collapse;
 
 const RecentActivity = () => {
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const activities = [
     {
       time: '10:30',
@@ -110,7 +112,8 @@ const RecentActivity = () => {
                   style={{
                     backgroundColor: '#f3f4f6',
                     color: '#6b7280',
-                    fontWeight: 500
+                    fontWeight: 500,
+                    display: isMobile ? 'none' : 'inline-flex'
                   }}
                 />
               </div>
@@ -135,8 +138,8 @@ const RecentActivity = () => {
                 dot: (
                   <div
                     style={{
-                      width: 32,
-                      height: 32,
+                      width: isMobile ? 24 : 32,
+                      height: isMobile ? 24 : 32,
                       borderRadius: '50%',
                       backgroundColor: activity.bgColor,
                       border: `2px solid ${activity.color}`,
@@ -144,7 +147,7 @@ const RecentActivity = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 14
+                      fontSize: isMobile ? 10 : 14
                     }}
                   >
                     {activity.icon}
@@ -161,8 +164,8 @@ const RecentActivity = () => {
                       marginBottom: index < activities.length - 1 ? 8 : 0
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 12, flexWrap: 'wrap' }}>
-                      <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 8, flexWrap: 'wrap' }}>
+                      <div style={{ flex: 1, minWidth: isMobile ? '100%' : 200 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                           <span style={{ fontWeight: 600, fontSize: 14 }}>{activity.title}</span>
                           <Tag
@@ -187,12 +190,9 @@ const RecentActivity = () => {
                           {activity.details}
                         </div>
                       </div>
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: 12, fontWeight: 500, color: '#374151' }}>
-                          {activity.date}
-                        </div>
-                        <div style={{ fontSize: 11, color: '#9ca3af' }}>
-                          {activity.time}
+                      <div style={{ textAlign: isMobile ? 'left' : 'right', flexShrink: 0, marginTop: isMobile ? 4 : 0 }}>
+                        <div style={{ fontSize: 11, fontWeight: 500, color: '#374151', display: 'flex', gap: 8 }}>
+                          {activity.date} <span style={{ color: '#9ca3af', fontWeight: 400 }}>{activity.time}</span>
                         </div>
                       </div>
                     </div>

@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\Preco;
 use App\Models\SeguradoraSeguro;
-use App\Models\ClienteSeguroVeiculo;
-use App\Models\ClienteSeguroPropriedade;
+use App\Models\Proposta;
+use App\Models\Veiculo;
+use App\Models\Propriedade;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -20,21 +21,38 @@ class CotacaoService
         
         $preco = $seguradoraSeguro->precoAtual;
 
+        // Fallback de segurança: Se a relação falhar, tenta buscar manualmente
         if (!$preco) {
-            throw new \Exception('Não existe um preço ativo para este seguro no momento.');
+            $preco = \App\Models\Preco::where('seguradora_seguro_id', $seguradoraSeguro->id)
+                ->whereDate('data_inicio', '<=', now())
+                ->where(function ($query) {
+                    $query->whereNull('data_fim')
+                          ->orWhereDate('data_fim', '>=', now());
+                })
+                ->latest('data_inicio')
+                ->latest('id')
+                ->first();
         }
 
-        $premioFinal = 0;
+        // ULTIMATE FALLBACK
+        if (!$preco) {
+             $preco = \App\Models\Preco::where('seguradora_seguro_id', $seguradoraSeguro->id)
+                ->orderBy('id', 'desc')
+                ->first();
+        }
+
+        $premioBase = 0;
 
         if ($preco->usa_valor) {
             // Valor Fixo
-            $premioFinal = $preco->premio_valor;
+            $premioBase = $preco->premio_valor;
         } else {
             // Percentagem
-            $premioFinal = $valor_bem * ($preco->premio_percentagem / 100);
+            $premioBase = $valor_bem * ($preco->premio_percentagem / 100);
         }
 
         // Aplicar prêmio mínimo
+        $premioFinal = $premioBase;
         if ($seguradoraSeguro->premio_minimo > 0) {
             $premioFinal = max($premioFinal, $seguradoraSeguro->premio_minimo);
         }
@@ -43,6 +61,7 @@ class CotacaoService
             'id_seguradora_seguro' => $id_seguradora_seguro,
             'id_preco' => $preco->id,
             'valor_bem' => $valor_bem,
+            'premio_base' => round($premioBase, 2),
             'premio_final' => round($premioFinal, 2),
             'regra_aplicada' => $preco->usa_valor ? 'valor_fixo' : 'percentagem',
             'taxa_aplicada' => $preco->usa_valor ? $preco->premio_valor : $preco->premio_percentagem,
@@ -52,87 +71,59 @@ class CotacaoService
     }
 
     /**
-     * Realizar a contratação do seguro no modelo híbrido
+     * Criar uma nova proposta (Substitui a contratação direta)
      */
-    public function contratar(array $dados): array
+    public function criarProposta(array $dados, $cliente): Proposta
     {
-        return DB::transaction(function () use ($dados) {
-            $id_seguradora_seguro = $dados['id_seguradora_seguro'];
-            $valor_bem = $dados['valor_bem'];
-            $id_bem = $dados['id_bem'];
-            $tipo_bem = $dados['tipo_bem']; // 'veiculo' ou 'propriedade'
+        return DB::transaction(function () use ($dados, $cliente) {
+            $cotacao = $this->calcularPremio($dados['id_seguradora_seguro'], $dados['valor_bem']);
 
-            // Buscar regras do seguro
-            $seguradoraSeguro = SeguradoraSeguro::findOrFail($id_seguradora_seguro);
+            // Identificar o bem
+            $bemType = null;
+            $bemId = $dados['id_bem'];
 
-            // Recalcular para garantir integridade e congelar o preço
-            $cotacao = $this->calcularPremio($id_seguradora_seguro, $valor_bem);
-
-            // Definir status inicial
-            $status = 'proposta';
-            
-            // Lógica Híbrida: Aprovação Automática ou Análise
-            if ($seguradoraSeguro->auto_aprovacao) {
-                $status = 'ativo';
-            } else {
-                $status = 'em_analise';
-            }
-
-            if ($tipo_bem === 'veiculo') {
-                // Upload de Fotos
-                $fotos = [];
-                $componentes = ['pneus', 'vidros', 'cadeiras', 'bagageira', 'eletronicos', 'acessorios'];
-                
-                foreach ($componentes as $comp) {
-                    $key = "foto_{$comp}";
-                    if (isset($dados[$key]) && $dados[$key] instanceof \Illuminate\Http\UploadedFile) {
-                        $path = $dados[$key]->store("veiculos/{$id_bem}/avaliacoes", 'public');
-                        $fotos[$key] = $path;
-                    } else {
-                        $fotos[$key] = null;
-                    }
+            if ($dados['tipo_bem'] === 'veiculo') {
+                $bemType = Veiculo::class;
+                // Verificar propriedade
+                $veiculo = Veiculo::findOrFail($bemId);
+                if ($veiculo->id_cliente !== $cliente->id_cliente) {
+                    throw new \Exception("Veículo não pertence ao cliente.");
                 }
-
-                $registro = ClienteSeguroVeiculo::create([
-                    'id_veiculo' => $id_bem,
-                    'id_seguradora_seguro' => $id_seguradora_seguro,
-                    'id_preco' => $cotacao['id_preco'],
-                    'valor_bem' => $valor_bem,
-                    'premio_final' => $cotacao['premio_final'],
-                    'status' => $status,
-                    'quilometragem_atual' => $dados['quilometragem_atual'] ?? null,
-                    'tipo_uso' => $dados['tipo_uso'] ?? null,
-                    'estado_pneus' => $dados['estado_pneus'] ?? null,
-                    'estado_vidros' => $dados['estado_vidros'] ?? null,
-                    'estado_cadeiras' => $dados['estado_cadeiras'] ?? null,
-                    'estado_bagageira' => $dados['estado_bagageira'] ?? null,
-                    'estado_eletronicos' => $dados['estado_eletronicos'] ?? null,
-                    'estado_acessorios' => $dados['estado_acessorios'] ?? null,
-                    'foto_pneus' => $fotos['foto_pneus'],
-                    'foto_vidros' => $fotos['foto_vidros'],
-                    'foto_cadeiras' => $fotos['foto_cadeiras'],
-                    'foto_bagageira' => $fotos['foto_bagageira'],
-                    'foto_eletronicos' => $fotos['foto_eletronicos'],
-                    'foto_acessorios' => $fotos['foto_acessorios'],
-                ]);
             } else {
-                $registro = ClienteSeguroPropriedade::create([
-                    'id_propriedade' => $id_bem,
-                    'id_seguradora_seguro' => $id_seguradora_seguro,
-                    'id_preco' => $cotacao['id_preco'],
-                    'valor_bem' => $valor_bem,
-                    'premio_final' => $cotacao['premio_final'],
-                    'status' => $status,
-                ]);
+                $bemType = Propriedade::class;
+                 $propriedade = Propriedade::findOrFail($bemId);
+                 if ($propriedade->id_cliente !== $cliente->id_cliente) {
+                    throw new \Exception("Propriedade não pertence ao cliente.");
+                }
             }
 
-            return [
-                'sucesso' => true,
-                'status' => $status,
-                'contratacao' => $registro,
-                'cotacao' => $cotacao,
-                'mensagem' => $status === 'ativo' ? 'Seguro ativado com sucesso!' : 'Sua proposta foi enviada para análise da seguradora.'
-            ];
+            // Criar Proposta
+            $proposta = new Proposta();
+            $proposta->numero_proposta = Proposta::gerarNumeroProposta();
+            $proposta->cliente_id = $cliente->id_cliente;
+            $proposta->seguradora_seguro_id = $dados['id_seguradora_seguro'];
+            $proposta->tipo_proposta = $dados['tipo_bem'];
+            $proposta->bem_id = $bemId;
+            $proposta->bem_type = $bemType;
+            
+            // Valores
+            $proposta->valor_bem = $cotacao['valor_bem'];
+            $proposta->premio_calculado = $cotacao['premio_final'];
+            $proposta->coberturas_selecionadas = $cotacao['detalhes_cobertura'];
+            
+            // Vigência da Proposta (Validade da oferta)
+            $proposta->data_inicio_proposta = now();
+            $proposta->data_fim_proposta = now()->addYear(); // Exemplo: proposta de um seguro anual
+            $proposta->validade_proposta = now()->addDays(15); // Proposta expira em 15 dias se não aprovada
+            
+            $proposta->status = 'em_analise';
+            
+            $proposta->save();
+
+            return $proposta;
         });
     }
+
+    // Método antigo de contratação direta mantido apenas para referência ou legados simples
+    // Pode ser removido futuramente se mudarmos 100% para o fluxo de proposta
 }

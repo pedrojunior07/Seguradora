@@ -11,7 +11,7 @@ class ApoliceController extends Controller
     public function index(Request $request)
     {
         $apolices = Apolice::where('cliente_id', $request->user()->perfil_id)
-            ->with(['seguradoraSeguro.seguro', 'bemSegurado', 'pagamentos'])
+            ->with(['seguradoraSeguro.seguro.categoria', 'seguradoraSeguro.seguro.tipo', 'bemSegurado', 'pagamentos'])
             ->paginate(20);
 
         return response()->json($apolices);
@@ -21,7 +21,7 @@ class ApoliceController extends Controller
     {
         $apolices = Apolice::where('cliente_id', $request->user()->perfil_id)
             ->where('status', 'ativa')
-            ->with(['seguradoraSeguro.seguro', 'bemSegurado', 'pagamentos'])
+            ->with(['seguradoraSeguro.seguro.categoria', 'seguradoraSeguro.seguro.tipo', 'bemSegurado', 'pagamentos'])
             ->get();
 
         return response()->json($apolices);
@@ -34,7 +34,9 @@ class ApoliceController extends Controller
         }
 
         return response()->json($apolice->load([
-            'seguradoraSeguro.seguro',
+            'cliente',
+            'seguradoraSeguro.seguro.categoria',
+            'seguradoraSeguro.seguro.tipo',
             'seguradoraSeguro.seguradora',
             'seguradoraSeguro.coberturas',
             'bemSegurado',
@@ -68,11 +70,11 @@ class ApoliceController extends Controller
             'valor_total_premios' => Apolice::where('cliente_id', $clienteId)
                 ->where('status', 'ativa')
                 ->sum('premio_total'),
-            'valor_total_pago' => Apolice::where('cliente_id', $clienteId)
-                ->whereHas('pagamentos', function ($q) {
-                    $q->where('status', 'pago');
+            'valor_total_pago' => \App\Models\Pagamento::whereHas('apolice', function ($q) use ($clienteId) {
+                    $q->where('cliente_id', $clienteId);
                 })
-                ->sum(\Illuminate\Database\Query\Expression::raw('(SELECT SUM(valor_pago) FROM pagamentos WHERE apolice_id = apolices.id_apolice)')),
+                ->where('status', 'pago')
+                ->sum('valor_pago'),
         ];
 
         return response()->json($stats);

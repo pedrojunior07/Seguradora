@@ -198,4 +198,20 @@ class PropostaController extends Controller
             ], 400);
         }
     }
+
+    public function recentNotifications(Request $request)
+    {
+        try {
+            $notifications = Proposta::where('corretora_id', $request->user()->perfil_id)
+                ->with(['cliente', 'seguradoraSeguro.seguro', 'seguradoraSeguro.seguradora'])
+                ->whereIn('status', ['aprovada', 'rejeitada'])
+                ->orderBy('updated_at', 'desc')
+                ->limit(10)
+                ->get();
+
+            return response()->json($notifications);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erro ao buscar notificações.'], 500);
+        }
+    }
 }

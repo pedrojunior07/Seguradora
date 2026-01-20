@@ -18,7 +18,7 @@ class StoreCoberturaRequest extends FormRequest
             'nome' => 'required|string|max:255',
             'descricao' => 'nullable|string',
             'valor_maximo' => 'required|numeric|min:0',
-            'franquia' => 'nullable|numeric|min:0',
+            'franquia' => 'nullable|numeric|min:0|max:100',
         ];
     }
 
