@@ -18,10 +18,18 @@ use App\Http\Controllers\Cliente\PagamentoController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
+// Verificação de Email
+Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\Api\VerificationController::class, 'verify'])->name('verification.verify');
+Route::post('email/resend', [\App\Http\Controllers\Api\VerificationController::class, 'resend'])->name('verification.resend');
+
 // Conteúdo Público (Seguradoras e Seguros)
 Route::get('public/seguradoras', [\App\Http\Controllers\Api\SeguradoraController::class, 'index']);
 Route::get('public/seguradoras/{id}/seguros', [\App\Http\Controllers\Api\SeguradoraController::class, 'seguros']);
 Route::get('public/seguros', [\App\Http\Controllers\Api\SeguradoraController::class, 'todosSeguros']);
+
+// Social Auth
+Route::get('auth/google', [\App\Http\Controllers\Api\SocialAuthController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [\App\Http\Controllers\Api\SocialAuthController::class, 'handleGoogleCallback']);
 
 /*
 |--------------------------------------------------------------------------
@@ -41,10 +49,29 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [\App\Http\Controllers\Api\NotificationController::class, 'destroy']);
 
+    // Suporte
+    Route::post('/support/send', [\App\Http\Controllers\Api\SupportController::class, 'send']);
+
     // Categorias
-    // Categorias e Tipos
-    Route::apiResource('categorias', \App\Http\Controllers\Api\CategoriaController::class);
     Route::apiResource('tipos-seguro', \App\Http\Controllers\Api\TipoSeguroController::class);
+
+    // Rotas de Governança (Super Admin do Sistema)
+    Route::middleware(['super_admin'])->prefix('governance')->group(function () {
+        Route::get('users', [\App\Http\Controllers\Api\GovernanceController::class, 'indexUsers']);
+        Route::post('users/{id}/toggle-status', [\App\Http\Controllers\Api\GovernanceController::class, 'toggleUserStatus']);
+        Route::get('settings', [\App\Http\Controllers\Api\GovernanceController::class, 'getSettings']);
+        Route::post('settings', [\App\Http\Controllers\Api\GovernanceController::class, 'updateSetting']);
+        Route::get('audit-logs', [\App\Http\Controllers\Api\GovernanceController::class, 'getAuditLogs']);
+    });
+
+    // ROTAS ADMIN (Super Admin)
+    Route::prefix('admin')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index']);
+        
+        Route::apiResource('seguradoras', \App\Http\Controllers\Admin\SeguradoraController::class);
+        Route::post('seguradoras/{id}/toggle-status', [\App\Http\Controllers\Admin\SeguradoraController::class, 'toggleStatus']);
+        Route::apiResource('users', \App\Http\Controllers\Admin\UserController::class);
+    });
 
     // Gestão de Equipe (Super Admin)
     Route::get('equipe', [\App\Http\Controllers\Api\UserController::class, 'index']);
@@ -102,6 +129,9 @@ Route::middleware('auth:api')->group(function () {
         // Gestão de Clientes
         Route::get('clientes', [\App\Http\Controllers\Seguradora\ClienteController::class, 'index']);
         Route::post('clientes', [\App\Http\Controllers\Seguradora\ClienteController::class, 'store']);
+
+        // Gestão de Agentes
+        Route::apiResource('agentes', \App\Http\Controllers\Api\AgenteController::class);
     });
 
     // ROTAS CORRETORA

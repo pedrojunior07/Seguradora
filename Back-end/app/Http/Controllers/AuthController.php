@@ -67,16 +67,10 @@ class AuthController extends Controller
 
             $resultado = $this->authService->registrar($validated);
 
-            // Generate JWT token for the newly registered user
-            $token = auth('api')->login($resultado['user']);
-
             return response()->json([
-                'message' => 'Registro realizado com sucesso',
+                'message' => 'Registro realizado com sucesso. Verifique seu email para ativar a conta.',
                 'user' => $resultado['user'],
                 'entidade' => $resultado['entidade'],
-                'token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => auth('api')->factory()->getTTL() * 60,
             ], 201);
         } catch (\Exception $e) {
             \Log::error('Registro falhou', [

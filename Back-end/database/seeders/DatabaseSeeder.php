@@ -21,5 +21,18 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Create Admin User
+        $adminEmail = 'admin@segurostm.com';
+        if (!User::where('email', $adminEmail)->exists()) {
+            User::factory()->create([
+                'name' => 'Admin Sistema',
+                'email' => $adminEmail,
+                'password' => 'password', // Will be hashed by model cast or factory if needed, but 'hashed' cast does it automatically
+                'perfil' => 'admin',
+                'role' => 'super_admin_system',
+                'status' => true,
+            ]);
+        }
     }
 }

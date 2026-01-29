@@ -17,6 +17,7 @@ import { useAuth } from '@context/AuthContext';
 import { useState, useEffect } from 'react';
 import api from '@services/api';
 import notificationService from '@services/notification.service';
+import ContactSupportModal from '../../../../components/ContactSupportModal';
 import moment from 'moment';
 import 'moment/locale/pt';
 
@@ -28,6 +29,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
 
   const apiBase = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api').replace(/\/api\/?$/, '');
   const getLogoUrl = (logoPath) => (logoPath ? `${apiBase}/storage/${logoPath}` : null);
@@ -247,6 +249,24 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
       />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        {/* Support Button */}
+        <Button
+          type="text"
+          icon={<InfoCircleOutlined />}
+          onClick={() => setSupportOpen(true)}
+          title="Contactar Suporte"
+          style={{
+            fontSize: 18,
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+        />
+        <ContactSupportModal open={supportOpen} onClose={() => setSupportOpen(false)} />
+
         {/* Notifications */}
         <Popover
           content={notificationContent}

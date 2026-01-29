@@ -15,7 +15,8 @@ import {
   UnorderedListOutlined,
   AppstoreOutlined,
   SolutionOutlined,
-  HistoryOutlined
+  HistoryOutlined,
+  UserSwitchOutlined
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -65,6 +66,9 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
       case '7-1':
         navigate('/seguradora/usuarios');
         break;
+      case '7-3':
+        navigate('/seguradora/agentes');
+        break;
       case 'auditoria':
         navigate('/seguradora/auditoria');
         break;
@@ -111,6 +115,11 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
       key: '4',
       icon: <TeamOutlined />,
       label: 'Clientes',
+    },
+    {
+      key: '7-3',
+      icon: <UserSwitchOutlined />,
+      label: 'Gestão de Agentes',
     },
     // Apenas Super Admin vê Relatórios e Configurações
     ...(isSuperAdmin ? [

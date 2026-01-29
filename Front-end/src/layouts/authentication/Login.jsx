@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -42,6 +42,7 @@ const Login = () => {
             if (profile === 'seguradora') navigate('/seguradora/dashboard');
             else if (profile === 'corretora') navigate('/corretora/dashboard');
             else if (profile === 'cliente') navigate('/cliente/dashboard');
+            else if (profile === 'admin') navigate('/admin/dashboard');
             else navigate('/');
         } catch (err) {
             console.error('Login error:', err);
@@ -56,6 +57,32 @@ const Login = () => {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const [successMessage, setSuccessMessage] = useState('');
+
+    // Check for URL params (verified=1) using useEffect
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('verified')) {
+            setSuccessMessage('Email verificado com sucesso! Pode entrar.');
+            // Clear the query string to avoid showing the message on refresh
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, []);
+
+    const handleResendEmail = async () => {
+        if (!formData.email) {
+            setError('Preencha o email para reenviar a verificação.');
+            return;
+        }
+        try {
+            await api.post('/email/resend', { email: formData.email });
+            setSuccessMessage('Link de verificação reenviado! Verifique seu email.');
+            setError('');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Erro ao reenviar email.');
         }
     };
 
@@ -101,8 +128,24 @@ const Login = () => {
                             </Typography>
                         </Box>
 
+                        {successMessage && (
+                            <Alert severity="success" sx={{ mb: 2 }}>
+                                {successMessage}
+                            </Alert>
+                        )}
+
                         {error && (
-                            <Alert severity="error" sx={{ mb: 2 }}>
+                            <Alert
+                                severity="error"
+                                sx={{ mb: 2 }}
+                                action={
+                                    error.includes('Email não verificado') || error.includes('verifique') ? (
+                                        <Button color="inherit" size="small" onClick={handleResendEmail}>
+                                            Reenviar
+                                        </Button>
+                                    ) : null
+                                }
+                            >
                                 {error}
                             </Alert>
                         )}

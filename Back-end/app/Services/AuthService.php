@@ -72,6 +72,8 @@ class AuthService
                 'role' => 'super_admin',
             ]);
 
+            event(new \Illuminate\Auth\Events\Registered($user));
+
             return [
                 'user' => $user,
                 'entidade' => $entidade,
@@ -91,13 +93,27 @@ class AuthService
             throw new \Exception('Usuário inativo');
         }
 
+        if (!$user->hasVerifiedEmail()) {
+            throw new \Exception('Email não verificado. Por favor, verifique sua caixa de entrada.');
+        }
+
+        // Verificar status da entidade associada (Seguradora, Corretora, Agente)
+        if ($user->perfil_id && in_array($user->perfil, ['seguradora', 'corretora', 'agente'])) {
+            $entidade = $user->load($user->perfil)->{$user->perfil};
+            if ($entidade && !$entidade->status) {
+                throw new \Exception("Acesso negado. A sua conta de {$user->perfil} está inativa. Contacte o suporte.");
+            }
+        }
+
         $user->ultimo_acesso = now();
         $user->save();
 
         $token = auth('api')->login($user);
 
         return [
-            'user' => $user->load($user->perfil),
+            'user' => in_array($user->perfil, ['seguradora', 'corretora', 'cliente', 'agente']) 
+                ? $user->load($user->perfil) 
+                : $user,
             'token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,

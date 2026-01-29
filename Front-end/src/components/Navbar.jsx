@@ -1,5 +1,6 @@
 import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem, Badge, Tooltip, Divider, CircularProgress } from '@mui/material';
-import { Menu as MenuIcon, AccountCircle, ExitToApp, Notifications, CheckCircle, Error } from '@mui/icons-material';
+import { Menu as MenuIcon, AccountCircle, ExitToApp, Notifications, CheckCircle, Error, Help } from '@mui/icons-material';
+import ContactSupportModal from './ContactSupportModal';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ const Navbar = ({ title, onMenuClick }) => {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [notifAnchorEl, setNotifAnchorEl] = useState(null);
+    const [supportOpen, setSupportOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -94,6 +96,12 @@ const Navbar = ({ title, onMenuClick }) => {
                     {title}
                 </Typography>
                 <Box display="flex" alignItems="center" gap={1}>
+                    <Tooltip title="Contactar Suporte">
+                        <IconButton color="inherit" onClick={() => setSupportOpen(true)}>
+                            <Help />
+                        </IconButton>
+                    </Tooltip>
+
                     <Tooltip title="Notificações">
                         <IconButton color="inherit" onClick={handleNotifMenu}>
                             <Badge badgeContent={unreadCount} color="error">
@@ -101,6 +109,8 @@ const Navbar = ({ title, onMenuClick }) => {
                             </Badge>
                         </IconButton>
                     </Tooltip>
+
+                    <ContactSupportModal open={supportOpen} onClose={() => setSupportOpen(false)} />
 
                     <Menu
                         anchorEl={notifAnchorEl}

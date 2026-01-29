@@ -20,15 +20,31 @@ class ClienteController extends Controller
      */
     public function index(Request $request)
     {
-        // Idealmente, filtraríamos apenas clientes desta seguradora.
-        // Como o modelo de dados pode não ter vínculo direto "Cliente pertence a Seguradora X" (cliente é livre),
-        // podemos listar todos ou apenas aqueles com apólices nesta seguradora.
-        // Para "Criar Clientes" e depois "Associar", o operador precisa ver o que criou.
+        $user = auth()->user();
         
-        // Vamos listar todos os clientes para permitir selecionar qualquer um.
-        $clientes = Cliente::with('user')->paginate(15);
-        
-        return response()->json($clientes);
+        // Se for seguradora, filtrar apenas clientes que têm apólices nesta seguradora
+        if ($user->perfil === 'seguradora') {
+            $seguradoraId = $user->perfil_id; // Assumindo que perfil_id é o ID da seguradora
+            
+            // Buscar clientes que tenham pelo menos uma apólice (ativa ou não) com esta seguradora
+            // Precisamos garantir que a relação 'apolices' esteja definida no model Cliente
+            // e que a tabela 'apolices' tenha 'seguradora_id'.
+            // Consulta: Clientes que possuem apolices onde a seguradora_seguro associada pertence a esta seguradora
+            $clientes = Cliente::whereHas('apolices', function ($query) use ($seguradoraId) {
+                // Usando o scope do modelo Apolice ou relacionamento direto
+                $query->whereHas('seguradoraSeguro', function ($q) use ($seguradoraId) {
+                    $q->where('id_seguradora', $seguradoraId);
+                });
+            })
+            ->with('user')
+            ->orderBy('nome')
+            ->paginate(15);
+            
+            return response()->json($clientes);
+        }
+
+        // Fallback ou erro se não for seguradora (embora a rota seja prefixada)
+        return response()->json(['data' => []]);
     }
 
     /**

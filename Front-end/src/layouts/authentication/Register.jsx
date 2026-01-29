@@ -50,6 +50,10 @@ import {
     Verified,
 } from '@mui/icons-material';
 import { useAuth } from '@context/AuthContext';
+import { Card as AntCard, Row, Col, Typography as AntTypography, Badge as AntBadge } from 'antd';
+import { CheckCircleFilled } from '@ant-design/icons';
+
+const { Title, Paragraph } = AntTypography;
 
 const Register = () => {
     const navigate = useNavigate();
@@ -148,10 +152,8 @@ const Register = () => {
             setSuccess(true);
 
             setTimeout(() => {
-                if (perfil === 'seguradora') navigate('/seguradora/dashboard', { replace: true });
-                else if (perfil === 'corretora') navigate('/corretora/dashboard', { replace: true });
-                else navigate('/cliente/dashboard', { replace: true });
-            }, 2000);
+                navigate('/login');
+            }, 3000);
         } catch (err) {
             console.error('Registration error:', err);
 
@@ -172,79 +174,134 @@ const Register = () => {
         }
     };
 
-    const renderPerfilStep = () => (
-        <Box sx={{ textAlign: 'center', py: 2 }}>
-            <Typography variant="h5" gutterBottom fontWeight={600}>
-                Qual é o seu perfil?
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                Selecione o tipo de conta que melhor se adapta às suas necessidades
-            </Typography>
+    const handleGoogleLogin = () => {
+        window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+    };
 
-            <Grid container spacing={3} sx={{ mt: 2 }}>
-                {perfilOptions.map((option, index) => (
-                    <Grid item xs={12} md={4} key={option.value}>
-                        <Grow in timeout={300 + (index * 100)}>
-                            <Paper
-                                onClick={() => setPerfil(option.value)}
-                                sx={{
-                                    p: 3,
-                                    borderRadius: 3,
-                                    cursor: 'pointer',
-                                    border: perfil === option.value ? `2px solid ${option.color}` : '2px solid transparent',
-                                    backgroundColor: perfil === option.value
-                                        ? alpha(option.color, 0.08)
-                                        : 'background.paper',
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-                                        backgroundColor: alpha(option.color, 0.05),
-                                        borderColor: alpha(option.color, 0.3),
-                                    },
-                                }}
-                                className="card-hover"
+    const renderPerfilStep = () => (
+        <div style={{ textAlign: 'center', padding: '32px 0' }}>
+            <Title level={2} style={{
+                marginBottom: '48px',
+                background: 'linear-gradient(45deg, #1e40af, #7c3aed)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 800
+            }}>
+                Como deseja se cadastrar?
+            </Title>
+
+
+
+            <Row gutter={[24, 24]} justify="center">
+                {perfilOptions.map((option) => {
+                    const isSelected = perfil === option.value;
+                    return (
+                        <Col xs={24} sm={12} md={8} key={option.value}>
+                            <AntBadge.Ribbon
+                                text={isSelected ? "Selecionado" : ""}
+                                color={option.color}
+                                style={{ display: isSelected ? 'block' : 'none' }}
                             >
-                                <Box sx={{
-                                    width: 70,
-                                    height: 70,
-                                    borderRadius: '50%',
-                                    backgroundColor: alpha(option.color, 0.1),
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 20px',
-                                    color: option.color
-                                }}>
-                                    {option.icon}
-                                </Box>
-                                <Typography variant="h6" fontWeight={600} gutterBottom>
-                                    {option.label}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {option.description}
-                                </Typography>
-                                {perfil === option.value && (
-                                    <Zoom in>
-                                        <Chip
-                                            icon={<CheckCircle />}
-                                            label="Selecionado"
-                                            size="small"
-                                            sx={{ mt: 2, backgroundColor: option.color, color: 'white' }}
-                                        />
-                                    </Zoom>
-                                )}
-                            </Paper>
-                        </Grow>
-                    </Grid>
-                ))}
-            </Grid>
-        </Box>
+                                <AntCard
+                                    hoverable
+                                    onClick={() => setPerfil(option.value)}
+                                    style={{
+                                        height: '100%',
+                                        borderRadius: '16px',
+                                        borderColor: isSelected ? option.color : 'transparent',
+                                        borderWidth: isSelected ? '2px' : '1px',
+                                        background: isSelected
+                                            ? `linear-gradient(135deg, ${alpha(option.color, 0.04)} 0%, ${alpha(option.color, 0.1)} 100%)`
+                                            : '#ffffff',
+                                        transition: 'all 0.3s ease',
+                                        transform: isSelected ? 'translateY(-4px)' : 'none',
+                                        boxShadow: isSelected
+                                            ? `0 12px 24px ${alpha(option.color, 0.15)}`
+                                            : '0 4px 12px rgba(0,0,0,0.05)'
+                                    }}
+                                    bodyStyle={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        padding: '24px',
+                                        textAlign: 'left'
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '60px',
+                                        height: '60px',
+                                        borderRadius: '50%',
+                                        background: `linear-gradient(135deg, ${alpha(option.color, 0.1)} 0%, ${alpha(option.color, 0.2)} 100%)`,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '20px',
+                                        flexShrink: 0,
+                                        color: option.color
+                                    }}>
+                                        {option.icon}
+                                    </div>
+
+                                    <div style={{ flex: 1 }}>
+                                        <Title level={4} style={{ marginBottom: '4px', color: '#1e293b', fontSize: '18px' }}>
+                                            {option.label}
+                                        </Title>
+                                        <Paragraph type="secondary" style={{ marginBottom: 0, fontSize: '14px', lineHeight: '1.4' }}>
+                                            {option.description}
+                                        </Paragraph>
+                                    </div>
+
+                                    <div style={{ marginLeft: '16px' }}>
+                                        {isSelected ? (
+                                            <CheckCircleFilled style={{ fontSize: '24px', color: option.color }} />
+                                        ) : (
+                                            <div style={{
+                                                width: '24px',
+                                                height: '24px',
+                                                borderRadius: '50%',
+                                                border: '2px solid #e2e8f0'
+                                            }} />
+                                        )}
+                                    </div>
+                                </AntCard>
+                            </AntBadge.Ribbon>
+                        </Col>
+                    );
+                })}
+            </Row>
+        </div>
     );
 
     const renderBasicInfoStep = () => (
         <Fade in timeout={500}>
             <Box>
+                {perfil === 'cliente' && (
+                    <Box sx={{ mb: 4, textAlign: 'center' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google" style={{ width: 24, height: 24 }} />}
+                            onClick={handleGoogleLogin}
+                            sx={{
+                                py: 1.5,
+                                px: 4,
+                                borderRadius: 50,
+                                textTransform: 'none',
+                                fontSize: '1rem',
+                                fontWeight: 500,
+                                color: '#333',
+                                borderColor: '#ddd',
+                                '&:hover': {
+                                    backgroundColor: '#f5f5f5',
+                                    borderColor: '#ccc'
+                                }
+                            }}
+                        >
+                            Continuar com Google
+                        </Button>
+                        <Divider sx={{ my: 3 }}>OU</Divider>
+                    </Box>
+                )}
+
                 <Grid container spacing={2.5}>
                     <Grid item xs={12}>
                         <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -629,93 +686,11 @@ const Register = () => {
                 }}
             />
 
-            <Container maxWidth="lg">
-                <Grid container spacing={4} alignItems="center">
-                    <Grid item xs={12} md={6}>
-                        <Fade in timeout={800}>
-                            <Box sx={{ color: 'white', textAlign: { xs: 'center', md: 'left' } }}>
-                                <Typography
-                                    variant="h1"
-                                    fontWeight={800}
-                                    gutterBottom
-                                    sx={{
-                                        fontSize: { xs: '2.5rem', md: '3.5rem' },
-                                        textShadow: '0 2px 20px rgba(0,0,0,0.2)',
-                                        mb: 3,
-                                    }}
-                                >
-                                    Transforme sua <Box component="span" sx={{ color: '#60a5fa' }}>experiência</Box> em seguros
-                                </Typography>
+            <Container maxWidth="xl">
+                <Grid container spacing={4} alignItems="center" justifyContent="center">
 
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mb: 4 }}>
-                                    {[
-                                        { icon: <Security />, text: 'Segurança de nível bancário', subtext: 'Proteção avançada para seus dados' },
-                                        { icon: <Speed />, text: 'Processos ágeis', subtext: 'Gestão simplificada e eficiente' },
-                                        { icon: <Verified />, text: 'Plataforma certificada', subtext: 'Conformidade com regulamentações' },
-                                    ].map((item, index) => (
-                                        <Grow in timeout={1000 + (index * 200)} key={index}>
-                                            <Box sx={{
-                                                display: 'flex',
-                                                alignItems: 'flex-start',
-                                                gap: 2,
-                                                backgroundColor: 'rgba(255,255,255,0.08)',
-                                                p: 2,
-                                                borderRadius: 2,
-                                                backdropFilter: 'blur(10px)',
-                                            }}>
-                                                <Box sx={{
-                                                    p: 1,
-                                                    borderRadius: '50%',
-                                                    backgroundColor: 'rgba(255,255,255,0.15)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}>
-                                                    {item.icon}
-                                                </Box>
-                                                <Box>
-                                                    <Typography variant="h6" sx={{ mb: 0.5 }}>
-                                                        {item.text}
-                                                    </Typography>
-                                                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                                                        {item.subtext}
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                        </Grow>
-                                    ))}
-                                </Box>
 
-                                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                                    {[
-                                        { number: '99%', label: 'Satisfação' },
-                                        { number: '24/7', label: 'Suporte' },
-                                        { number: '10K+', label: 'Usuários' },
-                                    ].map((stat, index) => (
-                                        <Zoom in timeout={1200 + (index * 200)} key={index}>
-                                            <Box sx={{
-                                                textAlign: 'center',
-                                                p: 2,
-                                                minWidth: '100px',
-                                                backgroundColor: 'rgba(255,255,255,0.1)',
-                                                borderRadius: 2,
-                                                backdropFilter: 'blur(10px)',
-                                            }}>
-                                                <Typography variant="h4" fontWeight={700}>
-                                                    {stat.number}
-                                                </Typography>
-                                                <Typography variant="body2">
-                                                    {stat.label}
-                                                </Typography>
-                                            </Box>
-                                        </Zoom>
-                                    ))}
-                                </Box>
-                            </Box>
-                        </Fade>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={10}>
                         <Slide direction="up" in timeout={600}>
                             <Card
                                 sx={{
@@ -757,7 +732,10 @@ const Register = () => {
                                                 Conta criada com sucesso!
                                             </Typography>
                                             <Typography color="text.secondary">
-                                                Redirecionando para o dashboard...
+                                                Verifique seu email para ativar a conta.
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                                Redirecionando para o login...
                                             </Typography>
                                         </Box>
                                     ) : (

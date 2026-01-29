@@ -7,6 +7,7 @@ import ProtectedRoute from '@components/ProtectedRoute';
 // Authentication
 import Login from '@layouts/authentication/Login';
 import Register from '@layouts/authentication/Register';
+import SocialCallback from '@layouts/authentication/SocialCallback';
 
 // Seguradora
 import SeguradoraDashboard from '@layouts/seguradora/pages/DashboardPage';
@@ -23,10 +24,19 @@ import DetalhesPropostaPage from '@layouts/seguradora/pages/DetalhesPropostaPage
 import SinistrosSeguradoraPage from '@layouts/seguradora/pages/SinistrosPage';
 import DetalhesSinistroPage from '@layouts/seguradora/pages/DetalhesSinistroPage';
 import AuditoriaPage from '@layouts/seguradora/pages/AuditoriaPage';
+import AgentesPage from '@layouts/seguradora/pages/AgentesPage';
 import AdminRoute from '@components/AdminRoute';
 
 // Corretora
 import CorretoraDashboard from '@layouts/corretora/Dashboard';
+
+// Admin
+import AdminLayout from '@layouts/admin/AdminLayout';
+import AdminDashboard from '@layouts/admin/pages/DashboardPage';
+import AdminSeguradoras from '@layouts/admin/pages/SeguradorasPage';
+import AdminUsers from '@layouts/admin/pages/UsersPage';
+import AdminSystemSettings from '@layouts/admin/pages/SystemSettings';
+import AdminAuditLogs from '@layouts/admin/pages/AuditLogs';
 
 // Cliente
 import ClienteDashboard from '@layouts/cliente/pages/Dashboard';
@@ -60,7 +70,11 @@ const theme = createTheme({
 
 // Landing page that redirects based on user role
 const Home = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   if (!user) {
     return <Navigate to="/register" replace />;
@@ -73,6 +87,8 @@ const Home = () => {
       return <Navigate to="/corretora/dashboard" replace />;
     case 'cliente':
       return <Navigate to="/cliente/dashboard" replace />;
+    case 'admin':
+      return <Navigate to="/admin/dashboard" replace />;
     default:
       return <Navigate to="/login" replace />;
   }
@@ -88,9 +104,27 @@ function App() {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/social-callback" element={<SocialCallback />} />
 
             {/* Home Route */}
             <Route path="/" element={<Home />} />
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'super_admin_system']}>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="seguradoras" element={<AdminSeguradoras />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="settings" element={<AdminSystemSettings />} />
+              <Route path="audit-logs" element={<AdminAuditLogs />} />
+            </Route>
 
             {/* Seguradora Routes */}
             <Route
@@ -129,6 +163,7 @@ function App() {
                   <AuditoriaPage />
                 </AdminRoute>
               } />
+              <Route path="agentes" element={<AgentesPage />} />
             </Route>
 
             {/* Corretora Routes */}

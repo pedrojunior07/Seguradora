@@ -12,7 +12,13 @@ class Cliente extends Model
     protected $table = 'clientes';
     protected $primaryKey = 'id_cliente';
 
+    protected static function booted()
+    {
+        static::addGlobalScope(new \App\Scopes\AgenteScope);
+    }
+
     protected $fillable = [
+        'agente_id', // Novo campo
         'tipo_cliente',
         'nome',
         'nuit',
@@ -24,6 +30,11 @@ class Cliente extends Model
     ];
 
     // Relacionamentos
+    public function agente()
+    {
+        return $this->belongsTo(Agente::class, 'agente_id', 'id_agente');
+    }
+
     public function user()
     {
         return $this->hasOne(User::class, 'perfil_id', 'id_cliente')
