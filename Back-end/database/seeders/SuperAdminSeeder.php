@@ -26,6 +26,7 @@ class SuperAdminSeeder extends Seeder
                 'perfil' => 'admin',
                 'status' => true,
                 'password' => 'password', // Hash cast will handle this
+                'email_verified_at' => now(),
             ]);
             $this->command->info('Usuário Super Admin atualizado com sucesso!');
         } else {
@@ -36,6 +37,7 @@ class SuperAdminSeeder extends Seeder
                 'perfil' => 'admin',
                 'role' => 'super_admin_system',
                 'status' => true,
+                'email_verified_at' => now(),
             ]);
             $this->command->info('Usuário Super Admin criado com sucesso!');
         }

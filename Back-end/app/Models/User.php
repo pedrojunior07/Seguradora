@@ -12,6 +12,20 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
+    /**
+     * Determine if the user has verified their email address.
+     *
+     * @return bool
+     */
+    public function hasVerifiedEmail()
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return ! is_null($this->email_verified_at);
+    }
+
     protected $fillable = [
         'name',
         'email',

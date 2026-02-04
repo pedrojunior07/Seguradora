@@ -20,6 +20,7 @@ class Cliente extends Model
     protected $fillable = [
         'agente_id', // Novo campo
         'tipo_cliente',
+        'tipo_empresa', // Novo
         'nome',
         'nuit',
         'endereco',
@@ -27,6 +28,12 @@ class Cliente extends Model
         'telefone2',
         'documento',
         'email',
+        // Uploads
+        'upload_nuit',
+        'upload_doc_representante',
+        'upload_certidao_comercial',
+        'upload_licenca',
+        'upload_br',
     ];
 
     // Relacionamentos

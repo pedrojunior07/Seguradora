@@ -65,7 +65,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // ROTAS ADMIN (Super Admin)
-    Route::prefix('admin')->group(function () {
+    Route::middleware(['super_admin'])->prefix('admin')->group(function () {
         Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index']);
         
         Route::apiResource('seguradoras', \App\Http\Controllers\Admin\SeguradoraController::class);

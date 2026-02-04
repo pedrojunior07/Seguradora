@@ -65,6 +65,21 @@ class AuthController extends Controller
                 $validated['logo'] = $request->file('logo')->store('seguradoras/logos', 'public');
             }
 
+            // Uploads para Clientes Empresas
+            $clientUploads = [
+                'upload_nuit', 
+                'upload_doc_representante', 
+                'upload_certidao_comercial', 
+                'upload_licenca', 
+                'upload_br'
+            ];
+
+            foreach ($clientUploads as $field) {
+                if ($request->hasFile($field)) {
+                    $validated[$field] = $request->file($field)->store('clientes/docs', 'public');
+                }
+            }
+
             $resultado = $this->authService->registrar($validated);
 
             return response()->json([

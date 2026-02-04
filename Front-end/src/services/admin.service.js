@@ -11,6 +11,11 @@ const AdminService = {
         return response.data;
     },
 
+    toggleSeguradoraStatus: async (id) => {
+        const response = await api.post(`/admin/seguradoras/${id}/toggle-status`);
+        return response.data;
+    },
+
     getUsers: async (params) => {
         const response = await api.get('/admin/users', { params });
         return response.data;

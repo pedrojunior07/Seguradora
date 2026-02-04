@@ -48,6 +48,7 @@ import {
     Security,
     Speed,
     Verified,
+    CloudUpload,
 } from '@mui/icons-material';
 import { useAuth } from '@context/AuthContext';
 import { Card as AntCard, Row, Col, Typography as AntTypography, Badge as AntBadge } from 'antd';
@@ -73,12 +74,21 @@ const Register = () => {
         endereco: '',
         licenca: '',
         tipo_cliente: 'fisica',
+        tipo_empresa: '', // Novo para cliente juridica
         nome_completo: '',
         documento: '',
         telefone1: '',
         telefone2: '',
     });
     const [logoFile, setLogoFile] = useState(null);
+    // Estados para arquivos de cliente juridica
+    const [clientFiles, setClientFiles] = useState({
+        upload_nuit: null,
+        upload_doc_representante: null,
+        upload_certidao_comercial: null,
+        upload_licenca: null,
+        upload_br: null
+    });
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -137,13 +147,27 @@ const Register = () => {
         try {
             let payload;
 
-            if (perfil === 'seguradora' && logoFile) {
+
+
+            const isClienteJuridica = perfil === 'cliente' && formData.tipo_cliente === 'juridica';
+            const hasFiles = (perfil === 'seguradora' && logoFile) || (isClienteJuridica);
+
+            if (hasFiles) {
                 payload = new FormData();
                 Object.entries(formData).forEach(([k, v]) => {
                     if (v !== undefined && v !== null) payload.append(k, v);
                 });
                 payload.append('perfil', perfil);
-                payload.append('logo', logoFile);
+
+                if (perfil === 'seguradora' && logoFile) {
+                    payload.append('logo', logoFile);
+                }
+
+                if (isClienteJuridica) {
+                    Object.entries(clientFiles).forEach(([key, file]) => {
+                        if (file) payload.append(key, file);
+                    });
+                }
             } else {
                 payload = { ...formData, perfil };
             }
@@ -551,10 +575,30 @@ const Register = () => {
                                         defaultValue="fisica"
                                     >
                                         <MenuItem value="fisica">Pessoa Física</MenuItem>
-                                        <MenuItem value="juridica">Pessoa Jurídica</MenuItem>
+                                        <MenuItem value="juridica">Pessoa Jurídica (Empresa)</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
+
+                            {formData.tipo_cliente === 'juridica' && (
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Tipo de Empresa (ex: Lda, SA)"
+                                        name="tipo_empresa"
+                                        onChange={handleChange}
+                                        required
+                                        variant="outlined"
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Business color="action" />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </Grid>
+                            )}
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     fullWidth
@@ -639,11 +683,67 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
+
+
+                            {formData.tipo_cliente === 'juridica' && (
+                                <>
+                                    <Grid item xs={12}>
+                                        <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 3 }}>
+                                            <Assignment /> Documentos da Empresa
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <InputLabel>Cópia do NUIT</InputLabel>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            onChange={(e) => setClientFiles({ ...clientFiles, upload_nuit: e.target.files[0] })}
+                                            style={{ marginTop: 8 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <InputLabel>Documento do Representante</InputLabel>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            onChange={(e) => setClientFiles({ ...clientFiles, upload_doc_representante: e.target.files[0] })}
+                                            style={{ marginTop: 8 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <InputLabel>Certidão Comercial</InputLabel>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            onChange={(e) => setClientFiles({ ...clientFiles, upload_certidao_comercial: e.target.files[0] })}
+                                            style={{ marginTop: 8 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <InputLabel>Licença (Alvará)</InputLabel>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            onChange={(e) => setClientFiles({ ...clientFiles, upload_licenca: e.target.files[0] })}
+                                            style={{ marginTop: 8 }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <InputLabel>Boletim da República (Opcional)</InputLabel>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            onChange={(e) => setClientFiles({ ...clientFiles, upload_br: e.target.files[0] })}
+                                            style={{ marginTop: 8 }}
+                                        />
+                                    </Grid>
+                                </>
+                            )}
                         </Grid>
                     </>
                 )}
             </Box>
-        </Slide>
+        </Slide >
     );
 
     return (

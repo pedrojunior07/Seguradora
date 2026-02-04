@@ -47,7 +47,7 @@ class AuthService
                     break;
 
                 case 'cliente':
-                    $entidade = Cliente::create([
+                    $dadosCliente = [
                         'tipo_cliente' => $dados['tipo_cliente'],
                         'nome' => $dados['nome_completo'],
                         'nuit' => $dados['nuit'],
@@ -56,7 +56,33 @@ class AuthService
                         'documento' => $dados['documento'] ?? null,
                         'email' => $dados['email'],
                         'endereco' => $dados['endereco'] ?? null,
-                    ]);
+                    ];
+
+                    if ($dados['tipo_cliente'] === 'juridica') {
+                        $dadosCliente['tipo_empresa'] = $dados['tipo_empresa'] ?? null;
+                        
+                        // Uploads (os arquivos já devem vir processados do controller/request ou ser strings se forem paths.
+                        // O AuthController original (que vi antes) salva logo no controller ou aqui? 
+                        // Verificando AuthController... o controller chama registrar($validated).
+                        // O RegisterRequest valida. O AuthController.php linha 64 vejo: if ($request->hasFile('logo')) $validated['logo'] = ...
+                        // Então a lógica de salvar arquivos deve estar lá ou adaptamos aqui se passarmos o request ou paths.
+                        // Assumindo que o Controller vai ser atualizado para passar os paths ou passar os arquivos.
+                        // Por padrão, vou salvar aqui se vierem no array $dados como paths (strings) ou arquivos.
+                        // Mas o AuthController atual só trata 'logo'. Precisamos atualizar o AuthController também.
+                        // Vou assumir que o $dados já traz os caminhos ou eu processo aqui. 
+                        // Melhor: O AuthController deve processar uploads antes de chamar o Service, OU o Service processa.
+                        // O Service atual (linha 65 AuthController) recebe $validated.
+                        // Vou adicionar campos ao array.
+                        
+                        $uploads = ['upload_nuit', 'upload_doc_representante', 'upload_certidao_comercial', 'upload_licenca', 'upload_br'];
+                        foreach ($uploads as $field) {
+                            if (isset($dados[$field]) && is_string($dados[$field])) {
+                                $dadosCliente[$field] = $dados[$field];
+                            }
+                        }
+                    }
+
+                    $entidade = Cliente::create($dadosCliente);
                     break;
             }
 

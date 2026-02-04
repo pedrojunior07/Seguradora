@@ -10,7 +10,7 @@ class SeguradoraController extends Controller
 {
     public function index()
     {
-        $seguradoras = Seguradora::with('user')->paginate(10);
+        $seguradoras = Seguradora::with('users')->paginate(10);
         return response()->json($seguradoras);
     }
 
@@ -56,8 +56,12 @@ class SeguradoraController extends Controller
     public function toggleStatus($id)
     {
         $seguradora = Seguradora::findOrFail($id);
-        $seguradora->status = !$seguradora->status;
+        $novoStatus = !$seguradora->status;
+        
+        $seguradora->status = $novoStatus;
         $seguradora->save();
+
+        // Bloqueio de usuários agora é verificado dinamicamente no login (AuthService)
 
         $status = $seguradora->status ? 'ativada' : 'bloqueada';
         return response()->json([

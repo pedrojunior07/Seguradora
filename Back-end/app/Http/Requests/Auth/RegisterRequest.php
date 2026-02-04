@@ -50,6 +50,15 @@ class RegisterRequest extends FormRequest
             $rules['endereco'] = 'nullable|string|max:255';
             $rules['telefone1'] = 'required|string|max:20';
             $rules['telefone2'] = 'nullable|string|max:20';
+
+            if ($this->tipo_cliente === 'juridica') {
+                $rules['tipo_empresa'] = 'required|string|max:100';
+                $rules['upload_nuit'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120'; // 5MB
+                $rules['upload_doc_representante'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+                $rules['upload_certidao_comercial'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+                $rules['upload_licenca'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+                $rules['upload_br'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+            }
         }
 
         return $rules;
