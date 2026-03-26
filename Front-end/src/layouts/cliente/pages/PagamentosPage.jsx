@@ -5,17 +5,21 @@ import {
     CheckCircleOutlined,
     SyncOutlined,
     AlertOutlined,
-    EyeOutlined
+    EyeOutlined,
+    MobileOutlined
 } from '@ant-design/icons';
 import clienteService from '../../../services/cliente.service';
 import ClienteLayout from '../Components/layouts/ClienteLayout';
+import MpesaPaymentModal from '../Components/MpesaPaymentModal';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const PagamentosPage = () => {
     const [pagamentos, setPagamentos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
+    const [mpesaModalVisible, setMpesaModalVisible] = useState(false);
+    const [selectedPagamento, setSelectedPagamento] = useState(null);
 
     const fetchPagamentos = async () => {
         try {
@@ -116,15 +120,27 @@ const PagamentosPage = () => {
             render: (_, record) => (
                 <Space>
                     {record.status === 'pendente' && (
-                        <Button
-                            type="primary"
-                            icon={<CreditCardOutlined />}
-                            onClick={() => handleConfirmarPagamento(record)}
-                            loading={actionLoading}
-                            style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
-                        >
-                            Pagar
-                        </Button>
+                        <>
+                            <Button
+                                type="primary"
+                                icon={<MobileOutlined />}
+                                onClick={() => {
+                                    setSelectedPagamento(record);
+                                    setMpesaModalVisible(true);
+                                }}
+                                style={{ backgroundColor: '#e60000', borderColor: '#e60000' }}
+                            >
+                                Pagar com M-Pesa
+                            </Button>
+                            <Button
+                                type="default"
+                                icon={<CreditCardOutlined />}
+                                onClick={() => handleConfirmarPagamento(record)}
+                                loading={actionLoading}
+                            >
+                                Simular
+                            </Button>
+                        </>
                     )}
                 </Space>
             ),
@@ -145,6 +161,16 @@ const PagamentosPage = () => {
                         locale={{ emptyText: 'Nenhum pagamento pendente encontrado.' }}
                     />
                 </Card>
+
+                <MpesaPaymentModal
+                    visible={mpesaModalVisible}
+                    pagamento={selectedPagamento}
+                    onCancel={() => setMpesaModalVisible(false)}
+                    onSuccess={() => {
+                        setMpesaModalVisible(false);
+                        fetchPagamentos();
+                    }}
+                />
             </div>
         </ClienteLayout>
     );

@@ -17,8 +17,8 @@ const AdminRoute = ({ children }) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (user.role !== 'super_admin_system') {
-        // Se não for super admin, redireciona para dashboard ou página não autorizada
+    if (user.role !== 'super_admin_system' && user.role !== 'super_admin') {
+        // Se não for super admin (sistema ou entidade), redireciona para dashboard
         return <Navigate to="/seguradora/dashboard" replace />;
     }
 

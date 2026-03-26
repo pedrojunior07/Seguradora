@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject, MustVerifyEmail
+class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
@@ -19,11 +19,16 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      */
     public function hasVerifiedEmail()
     {
+        return true;
+        
+        // Mantendo lógica original comentada para referência
+        /*
         if ($this->isSuperAdmin()) {
             return true;
         }
 
         return ! is_null($this->email_verified_at);
+        */
     }
 
     protected $fillable = [
@@ -119,6 +124,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function isSuperAdmin(): bool
     {
         return $this->role === 'super_admin_system';
+    }
+
+    public function isEntityAdmin(): bool
+    {
+        return $this->role === 'super_admin';
     }
 
     public function isOperador(): bool

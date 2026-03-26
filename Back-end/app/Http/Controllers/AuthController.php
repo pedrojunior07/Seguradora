@@ -83,7 +83,7 @@ class AuthController extends Controller
             $resultado = $this->authService->registrar($validated);
 
             return response()->json([
-                'message' => 'Registro realizado com sucesso. Verifique seu email para ativar a conta.',
+                'message' => 'Registro realizado com sucesso.',
                 'user' => $resultado['user'],
                 'entidade' => $resultado['entidade'],
             ], 201);

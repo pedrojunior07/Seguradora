@@ -89,6 +89,23 @@ class CotacaoService
                 if ($veiculo->id_cliente !== $cliente->id_cliente) {
                     throw new \Exception("Veículo não pertence ao cliente.");
                 }
+            } elseif ($dados['tipo_bem'] === 'frota') {
+                $bemType = \App\Models\Frota::class;
+                $frota = \App\Models\Frota::with('veiculos')->findOrFail($bemId);
+                
+                if ($frota->cliente_id !== $cliente->id_cliente) {
+                    throw new \Exception("Esta frota não pertence ao cliente.");
+                }
+
+                // Recalcular valor_bem somando todos os veículos da frota
+                // Nota: O valor_bem enviado pelo frontend pode ser usado, mas aqui garantimos a soma real do DB
+                $valorFrota = $frota->veiculos->sum('valor_estimado');
+                if ($valorFrota <= 0) {
+                    throw new \Exception("A frota não possui veículos com valor estimado cadastrado.");
+                }
+                
+                // Sobrescrever valor do bem para o cálculo da cotação
+                $dados['valor_bem'] = $valorFrota;
             } else {
                 $bemType = Propriedade::class;
                  $propriedade = Propriedade::findOrFail($bemId);

@@ -37,7 +37,7 @@ const SeguradoraLayout = () => {
     };
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
+        <Layout style={{ minHeight: '100vh', background: '#F8FAFC' }}>
             {/* Desktop: Sidebar fixa */}
             {!isMobile && <Sidebar collapsed={collapsed} />}
 
@@ -48,16 +48,16 @@ const SeguradoraLayout = () => {
                     onClose={() => setDrawerVisible(false)}
                     open={drawerVisible}
                     closable={false}
-                    size={250}
+                    width={280}
                     styles={{
-                        body: { padding: 0, background: '#001529' }
+                        body: { padding: 0, background: '#FFFFFF' }
                     }}
                 >
                     <Sidebar collapsed={false} onMenuClick={() => setDrawerVisible(false)} />
                 </Drawer>
             )}
 
-            <Layout>
+            <Layout style={{ background: 'transparent' }}>
                 <Header
                     collapsed={collapsed}
                     setCollapsed={toggleSidebar}
@@ -66,12 +66,15 @@ const SeguradoraLayout = () => {
 
                 <Content
                     style={{
-                        margin: isMobile ? '16px' : '24px',
+                        margin: isMobile ? '16px' : '32px',
+                        padding: isMobile ? '0' : '8px',
                         minHeight: 280,
-                        transition: 'margin 0.2s'
+                        transition: 'all 0.2s',
                     }}
                 >
-                    <Outlet />
+                    <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
+                        <Outlet />
+                    </div>
                 </Content>
             </Layout>
         </Layout>

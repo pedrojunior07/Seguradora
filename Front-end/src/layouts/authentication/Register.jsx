@@ -832,7 +832,7 @@ const Register = () => {
                                                 Conta criada com sucesso!
                                             </Typography>
                                             <Typography color="text.secondary">
-                                                Verifique seu email para ativar a conta.
+                                                Sua conta foi criada. Você já pode fazer login.
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                                                 Redirecionando para o login...

@@ -17,16 +17,8 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        // Garante que só lista usuários da mesma entidade (seguradora ou corretora)
-        // e que não lista a si mesmo se não quiser (opcional)
         $query = User::where('perfil', $user->perfil)
-                    ->where('perfil_id', $user->perfil_id)
-                    ->where('role', 'operador'); // Lista apenas operadores? Ou todos da equipe?
-                    // Vou listar todos exceto o próprio user, ou todos para exibir na tabela
-
-        // Se quiser listar TODOS da equipe (incluindo outros admins se houver futuramente)
-        // mas o requisito é "Gerir Operadores".
-        // Vamos listar todos os usuários vinculados à mesma entidade.
+                    ->where('perfil_id', $user->perfil_id);
 
         return $query->paginate(15);
     }
@@ -39,7 +31,7 @@ class UserController extends Controller
         $admin = $request->user();
 
         // Validação básica de segurança: Apenas Super Admin pode criar
-        if (!$admin->isSuperAdmin()) {
+        if (!$admin->isSuperAdmin() && !$admin->isEntityAdmin()) {
             return response()->json(['message' => 'Sem permissão.'], 403);
         }
 
@@ -74,7 +66,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $admin = $request->user();
-        if (!$admin->isSuperAdmin()) {
+        if (!$admin->isSuperAdmin() && !$admin->isEntityAdmin()) {
             return response()->json(['message' => 'Sem permissão.'], 403);
         }
 
@@ -105,7 +97,7 @@ class UserController extends Controller
     public function destroy(Request $request, $id)
     {
         $admin = $request->user();
-        if (!$admin->isSuperAdmin()) {
+        if (!$admin->isSuperAdmin() && !$admin->isEntityAdmin()) {
             return response()->json(['message' => 'Sem permissão.'], 403);
         }
 

@@ -54,55 +54,56 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 100%);
+  background-color: #F8FAFC;
+  /* Fundo principal */
   min-height: 100vh;
 }
 
 .insurance-main-card {
-  border-radius: 24px !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08) !important;
-  border: none !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #E2E8F0 !important;
   overflow: hidden;
-  background: #ffffff;
+  background: #FFFFFF;
 }
 
 /* Typography */
 .gradient-title {
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 800 !important;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.025em;
 }
 
 /* Interactive Cards (Assets) */
 .asset-card {
-  border-radius: 20px !important;
-  border: 2px solid transparent !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 16px !important;
+  border: 1px solid #E2E8F0 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   cursor: pointer;
   background: white;
   height: 100%;
 }
 
 .asset-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(24, 144, 255, 0.15) !important;
-  border-color: #91d5ff !important;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -8px rgba(37, 99, 235, 0.2) !important;
+  border-color: #3B82F6 !important;
 }
 
 .asset-card.selected {
-  border-color: #1890ff !important;
-  background: #f0f9ff !important;
-  box-shadow: 0 16px 48px rgba(24, 144, 255, 0.2) !important;
-  transform: translateY(-8px);
+  border-color: #2563EB !important;
+  background: #EFF6FF !important;
+  box-shadow: 0 12px 20px -8px rgba(37, 99, 235, 0.2) !important;
+  transform: translateY(-4px);
 }
 
 /* Pricing/Insurance Cards */
 .insurance-plan-card {
-  border-radius: 20px !important;
-  border: 1px solid #f0f0f0 !important;
+  border-radius: 16px !important;
+  border: 1px solid #E2E8F0 !important;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -111,36 +112,36 @@
 }
 
 .insurance-plan-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
-  border-color: #40a9ff !important;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  border-color: #3B82F6 !important;
 }
 
 .insurance-plan-card.selected {
-  border: 2px solid #1890ff !important;
-  background: linear-gradient(to bottom, #f0f9ff, #ffffff) !important;
-  box-shadow: 0 20px 50px rgba(24, 144, 255, 0.2) !important;
+  border: 2px solid #2563EB !important;
+  background: linear-gradient(to bottom, #F0F9FF, #FFFFFF) !important;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1) !important;
 }
 
 .insurance-plan-card .rec-badge {
   position: absolute;
   top: 15px;
   right: -30px;
-  background: linear-gradient(135deg, #ffec3d 0%, #ffa940 100%);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: #fff;
   padding: 5px 30px;
   transform: rotate(45deg);
   font-size: 10px;
   font-weight: 800;
-  box-shadow: 0 2px 8px rgba(255, 169, 64, 0.4);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   z-index: 10;
 }
 
 /* Summary Receipt */
 .receipt-card {
   background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
   position: relative;
   overflow: hidden;
 }
@@ -152,14 +153,49 @@
   left: 0;
   width: 100%;
   height: 6px;
-  background: repeating-linear-gradient(45deg, #1890ff, #1890ff 10px, #fff 10px, #fff 20px, #ff4d4f 20px, #ff4d4f 30px, #fff 30px, #fff 40px);
+  background: repeating-linear-gradient(45deg, #2563EB, #2563EB 10px, #fff 10px, #fff 20px, #10B981 20px, #10B981 30px, #fff 30px, #fff 40px);
+}
+
+/* Sidebar Menu Enhancements */
+.sidebar-menu.ant-menu-light .ant-menu-item-selected {
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.01) 100%) !important;
+  color: #2563EB !important;
+  font-weight: 700 !important;
+  border-right: 3px solid #2563EB !important;
+}
+
+.sidebar-menu.ant-menu-light .ant-menu-item {
+  height: 48px !important;
+  line-height: 48px !important;
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+  border-radius: 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.sidebar-menu.ant-menu-light .ant-menu-item:hover {
+  background-color: #F1F5F9 !important;
+  color: #1E40AF !important;
+}
+
+.sidebar-menu .ant-menu-item .anticon {
+  font-size: 18px !important;
+  transition: transform 0.3s ease !important;
+}
+
+.sidebar-menu .ant-menu-item:hover .anticon {
+  transform: scale(1.1);
+}
+
+.sidebar-menu .ant-menu-item-selected .anticon {
+  color: #2563EB !important;
 }
 
 /* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
 
   to {
@@ -169,7 +205,7 @@
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.4s ease-out forwards;
 }
 
 /* Custom Steps Overrides */

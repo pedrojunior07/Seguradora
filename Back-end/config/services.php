@@ -41,4 +41,12 @@ return [
         ],
     ],
 
+    'mpesa' => [
+        'service_provider_code' => env('MPESA_SERVICE_PROVIDER_CODE'),
+        'api_key' => env('MPESA_API_KEY'),
+        'public_key' => env('MPESA_PUBLIC_KEY'),
+        'endpoint' => env('MPESA_ENDPOINT', 'https://api.sandbox.vm.co.mz:18352'),
+        'origin' => env('MPESA_ORIGIN', 'developer.mpesa.vm.co.mz'),
+    ],
+
 ];

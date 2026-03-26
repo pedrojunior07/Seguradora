@@ -15,6 +15,7 @@ class Frota extends Model
 
     public function veiculos()
     {
-        return $this->hasMany(Veiculo::class);
+        return $this->belongsToMany(Veiculo::class, 'frota_veiculo', 'frota_id', 'veiculo_id')
+                    ->withTimestamps();
     }
 }

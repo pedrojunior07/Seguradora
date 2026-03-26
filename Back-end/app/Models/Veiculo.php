@@ -24,6 +24,11 @@ class Veiculo extends Model
         'tipo_veiculo',
         'quilometragem_registrada',
         'tipo_uso',
+        'cilindrada',
+        'combustivel',
+        'numero_lugares',
+        'estado_veiculo',
+        'observacoes',
         'estado_pneus', 'estado_vidros', 'estado_cadeiras', 'estado_bagageira', 'estado_eletronicos', 'estado_acessorios',
     ];
 

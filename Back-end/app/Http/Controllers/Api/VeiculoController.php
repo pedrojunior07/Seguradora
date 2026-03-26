@@ -21,8 +21,13 @@ class VeiculoController extends Controller
                  return response()->json(['message' => 'Usuário não é um cliente ou não tem perfil associado.'], 403);
             }
 
-            $veiculos = $user->cliente->veiculos()->with('fotos')->get(); 
-            
+            $query = $user->cliente->veiculos()->with(['fotos', 'frotas']);
+
+            if (request('sem_frota')) {
+                $query->whereDoesntHave('frotas');
+            }
+
+            $veiculos = $query->get();            
             return response()->json([
                 'data' => $veiculos
             ], 200);

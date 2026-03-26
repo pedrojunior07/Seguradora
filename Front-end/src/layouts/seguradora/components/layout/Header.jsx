@@ -229,11 +229,12 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottom: '1px solid #f0f0f0',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+        borderBottom: '1px solid #E2E8F0',
+        boxShadow: 'none', // Remover sombra pesada
         position: 'sticky',
         top: 0,
-        zIndex: 10
+        zIndex: 10,
+        height: 64,
       }}
     >
       <Button
@@ -242,13 +243,16 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
         onClick={() => setCollapsed(!collapsed)}
         style={{
           fontSize: 18,
-          width: 48,
-          height: 48,
-          transition: 'all 0.2s'
+          width: 40,
+          height: 40,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#64748B'
         }}
       />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {/* Support Button */}
         <Button
           type="text"
@@ -256,14 +260,12 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
           onClick={() => setSupportOpen(true)}
           title="Contactar Suporte"
           style={{
-            fontSize: 18,
+            fontSize: 20,
             width: 40,
             height: 40,
-            borderRadius: '50%',
-            transition: 'all 0.2s'
+            borderRadius: '8px',
+            color: '#64748B'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
         />
         <ContactSupportModal open={supportOpen} onClose={() => setSupportOpen(false)} />
 
@@ -274,22 +276,22 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
           placement="bottomRight"
           overlayStyle={{ paddingTop: 8 }}
         >
-          <Badge count={unreadCount} offset={[-5, 5]}>
+          <Badge count={unreadCount} offset={[-5, 5]} size="small">
             <Button
               type="text"
               icon={<BellOutlined />}
               style={{
-                fontSize: 18,
+                fontSize: 20,
                 width: 40,
                 height: 40,
-                borderRadius: '50%',
-                transition: 'all 0.2s'
+                borderRadius: '8px',
+                color: '#64748B'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             />
           </Badge>
         </Popover>
+
+        <Divider type="vertical" style={{ height: 24, margin: '0 8px' }} />
 
         {/* Profile Dropdown */}
         <Dropdown
@@ -303,23 +305,24 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
               alignItems: 'center',
               gap: 10,
               cursor: 'pointer',
-              padding: '6px 12px',
+              padding: '4px 8px',
               borderRadius: 8,
               transition: 'background 0.2s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
             <Avatar
-              size={36}
+              size={32}
               icon={<UserOutlined />}
               src={entidade?.logo ? getLogoUrl(entidade.logo) : user?.avatar}
-              style={{ background: '#1e40af' }}
+              style={{ background: '#2563EB' }}
             />
             <span
               style={{
-                fontWeight: 500,
+                fontWeight: 600,
                 fontSize: 14,
+                color: '#1F2937',
                 display: isMobile ? 'none' : 'block'
               }}
             >

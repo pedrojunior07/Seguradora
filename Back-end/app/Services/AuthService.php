@@ -98,7 +98,7 @@ class AuthService
                 'role' => 'super_admin',
             ]);
 
-            event(new \Illuminate\Auth\Events\Registered($user));
+            // event(new \Illuminate\Auth\Events\Registered($user));
 
             return [
                 'user' => $user,
@@ -119,9 +119,11 @@ class AuthService
             throw new \Exception('Usuário inativo');
         }
 
+        /*
         if (!$user->hasVerifiedEmail()) {
             throw new \Exception('Email não verificado. Por favor, verifique sua caixa de entrada.');
         }
+        */
 
         // Verificar status da entidade associada (Seguradora, Corretora, Agente)
         if ($user->perfil_id && in_array($user->perfil, ['seguradora', 'corretora', 'agente'])) {

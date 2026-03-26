@@ -19,8 +19,8 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
 // Verificação de Email
-Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\Api\VerificationController::class, 'verify'])->name('verification.verify');
-Route::post('email/resend', [\App\Http\Controllers\Api\VerificationController::class, 'resend'])->name('verification.resend');
+// Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\Api\VerificationController::class, 'verify'])->name('verification.verify');
+// Route::post('email/resend', [\App\Http\Controllers\Api\VerificationController::class, 'resend'])->name('verification.resend');
 
 // Conteúdo Público (Seguradoras e Seguros)
 Route::get('public/seguradoras', [\App\Http\Controllers\Api\SeguradoraController::class, 'index']);
@@ -162,6 +162,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('veiculos/{id}/fotos', [\App\Http\Controllers\Api\VeiculoFotoController::class, 'index']);
         Route::post('veiculos/{id}/fotos', [\App\Http\Controllers\Api\VeiculoFotoController::class, 'store']);
         Route::delete('veiculos/{id}/fotos/{foto}', [\App\Http\Controllers\Api\VeiculoFotoController::class, 'destroy']);
+        // Frotas
+        Route::apiResource('frotas', \App\Http\Controllers\Api\FrotaController::class);
+        Route::post('frotas/{id}/importar-veiculos', [\App\Http\Controllers\Api\FrotaController::class, 'importVeiculos']);
+
         Route::get('propriedades', [\App\Http\Controllers\Api\PropriedadeController::class, 'index']);
 
         // Apólices
@@ -194,5 +198,7 @@ Route::middleware('auth:api')->group(function () {
         
         // Simulação de Pagamento
         Route::post('pagamentos/{id}/confirmar-ficticio', [\App\Http\Controllers\Api\PagamentoFicticioController::class, 'confirmarPagamento']);
+        Route::post('pagamentos/{id}/mpesa', [\App\Http\Controllers\Api\MpesaController::class, 'pagar']);
+        Route::get('pagamentos/{id}/mpesa/status', [\App\Http\Controllers\Api\MpesaController::class, 'consultarStatus']);
     });
 });

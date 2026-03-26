@@ -52,7 +52,7 @@ class PropostaController extends Controller
             'id_seguradora_seguro' => 'required|integer|exists:seguradora_seguro,id',
             'valor_bem' => 'required|numeric|min:0',
             'id_bem' => 'required|integer',
-            'tipo_bem' => 'required|string|in:veiculo,propriedade',
+            'tipo_bem' => 'required|string|in:veiculo,propriedade,frota',
         ]);
 
         if ($validator->fails()) {

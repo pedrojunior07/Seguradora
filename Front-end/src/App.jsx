@@ -51,20 +51,52 @@ import SinistrosClientePage from '@layouts/cliente/pages/SinistrosPage';
 import ClienteLayout from '@layouts/cliente/Components/layouts/ClienteLayout'; // Temp path, will fix
 import NotificacoesPage from '@layouts/shared/pages/NotificacoesPage';
 
+import { ConfigProvider, theme as antdTheme } from 'antd';
+
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#667eea',
+      main: '#2563EB', // Blue moderno
     },
     secondary: {
-      main: '#764ba2',
+      main: '#10B981', // Verde suave
+    },
+    background: {
+      default: '#F8FAFC',
+      paper: '#FFFFFF',
+    },
+    text: {
+      primary: '#1F2937',
+      secondary: '#6B7280',
     },
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 700 },
+    h3: { fontWeight: 600 },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12, // Bordas mais suaves
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: 8,
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        },
+      },
+    },
   },
 });
 
@@ -96,175 +128,186 @@ const Home = () => {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <Router>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/social-callback" element={<SocialCallback />} />
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#2563EB',
+          borderRadius: 8,
+          fontFamily: '"Inter", sans-serif',
+        },
+        algorithm: antdTheme.defaultAlgorithm,
+      }}
+    >
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <Router>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/social-callback" element={<SocialCallback />} />
 
-            {/* Home Route */}
-            <Route path="/" element={<Home />} />
+              {/* Home Route */}
+              <Route path="/" element={<Home />} />
 
-            {/* Admin Routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute allowedRoles={['admin', 'super_admin_system']}>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="seguradoras" element={<AdminSeguradoras />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="settings" element={<AdminSystemSettings />} />
-              <Route path="audit-logs" element={<AdminAuditLogs />} />
-            </Route>
+              {/* Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['admin', 'super_admin_system']}>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="seguradoras" element={<AdminSeguradoras />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="settings" element={<AdminSystemSettings />} />
+                <Route path="audit-logs" element={<AdminAuditLogs />} />
+              </Route>
 
-            {/* Seguradora Routes */}
-            <Route
-              path="/seguradora"
-              element={
-                <ProtectedRoute allowedRoles={['seguradora']}>
-                  <SeguradoraLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/seguradora/dashboard" replace />} />
-              <Route path="dashboard" element={<SeguradoraDashboard />} />
-              <Route path="seguros" element={<ListaSeguros />} />
-              <Route path="seguros/criar" element={
-                <AdminRoute>
-                  <CriarSeguro />
-                </AdminRoute>
-              } />
-              <Route path="seguros/:id" element={<DetalhesSeguro />} />
+              {/* Seguradora Routes */}
+              <Route
+                path="/seguradora"
+                element={
+                  <ProtectedRoute allowedRoles={['seguradora']}>
+                    <SeguradoraLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/seguradora/dashboard" replace />} />
+                <Route path="dashboard" element={<SeguradoraDashboard />} />
+                <Route path="seguros" element={<ListaSeguros />} />
+                <Route path="seguros/criar" element={
+                  <AdminRoute>
+                    <CriarSeguro />
+                  </AdminRoute>
+                } />
+                <Route path="seguros/:id" element={<DetalhesSeguro />} />
 
-              <Route path="categorias" element={<ListaCategorias />} />
-              <Route path="usuarios" element={
-                <AdminRoute>
-                  <UsuariosPage />
-                </AdminRoute>
-              } />
-              <Route path="clientes" element={<ListaClientes />} />
-              <Route path="apolices" element={<ListaApolices />} />
-              <Route path="propostas" element={<ListaPropostasPage />} />
-              <Route path="propostas/:id" element={<DetalhesPropostaPage />} />
-              <Route path="sinistros" element={<SinistrosSeguradoraPage />} />
-              <Route path="sinistros/:id" element={<DetalhesSinistroPage />} />
-              <Route path="notificacoes" element={<NotificacoesPage />} />
-              <Route path="auditoria" element={
-                <AdminRoute>
-                  <AuditoriaPage />
-                </AdminRoute>
-              } />
-              <Route path="agentes" element={<AgentesPage />} />
-            </Route>
+                <Route path="categorias" element={<ListaCategorias />} />
+                <Route path="usuarios" element={
+                  <AdminRoute>
+                    <UsuariosPage />
+                  </AdminRoute>
+                } />
+                <Route path="clientes" element={<ListaClientes />} />
+                <Route path="apolices" element={<ListaApolices />} />
+                <Route path="propostas" element={<ListaPropostasPage />} />
+                <Route path="propostas/:id" element={<DetalhesPropostaPage />} />
+                <Route path="sinistros" element={<SinistrosSeguradoraPage />} />
+                <Route path="sinistros/:id" element={<DetalhesSinistroPage />} />
+                <Route path="notificacoes" element={<NotificacoesPage />} />
+                <Route path="auditoria" element={
+                  <AdminRoute>
+                    <AuditoriaPage />
+                  </AdminRoute>
+                } />
+                <Route path="agentes" element={<AgentesPage />} />
+              </Route>
 
-            {/* Corretora Routes */}
-            <Route
-              path="/corretora/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={['corretora']}>
-                  <CorretoraDashboard />
-                </ProtectedRoute>
-              }
-            />
+              {/* Corretora Routes */}
+              <Route
+                path="/corretora/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={['corretora']}>
+                    <CorretoraDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Cliente Routes */}
-            <Route
-              path="/cliente/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <ClienteDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/seguradoras"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <ListaSeguradorasPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/veiculos"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <VeiculosPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/contratar"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <ContratarSeguroPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/minhas-propostas"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <MinhasPropostasPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/apolices"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <MinhasApolices />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/pagamentos"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <PagamentosPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/sinistros"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <SinistrosClientePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cliente/apolices/:id"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <DetalhesApoliceCliente />
-                </ProtectedRoute>
-              }
-            />
+              {/* Cliente Routes */}
+              <Route
+                path="/cliente/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <ClienteDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/seguradoras"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <ListaSeguradorasPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/veiculos"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <VeiculosPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/contratar"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <ContratarSeguroPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/minhas-propostas"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <MinhasPropostasPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/apolices"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <MinhasApolices />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/pagamentos"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <PagamentosPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/sinistros"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <SinistrosClientePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cliente/apolices/:id"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <DetalhesApoliceCliente />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/cliente/notificacoes"
-              element={
-                <ProtectedRoute allowedRoles={['cliente']}>
-                  <NotificacoesPage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/cliente/notificacoes"
+                element={
+                  <ProtectedRoute allowedRoles={['cliente']}>
+                    <NotificacoesPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Catch all - redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
+              {/* Catch all - redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </ConfigProvider>
   );
 }
 
