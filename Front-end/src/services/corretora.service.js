@@ -26,6 +26,21 @@ const corretoraService = {
         const response = await api.post(`/corretora/propostas/${propostaId}/converter-apolice`);
         return response.data;
     },
+
+    // Perfil e Verificação
+    getVerificacaoStatus: async () => {
+        const response = await api.get('/corretora/perfil/verificacao');
+        return response.data;
+    },
+
+    uploadDocumentos: async (formData) => {
+        const response = await api.post('/corretora/perfil/verificacao', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
 };
 
 export default corretoraService;

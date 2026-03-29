@@ -11,8 +11,9 @@ import Navbar from '@components/Navbar';
 import Sidebar from '@components/Sidebar';
 import StatCard from '@components/StatCard';
 import seguradoraService from '@services/seguradora.service';
-import { drawerWidth } from '@components/Sidebar';
-
+import { Alert, Button, Space } from 'antd';
+import { SafetyCertificateOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 const menuItems = [
     { name: 'Dashboard', route: '/seguradora/dashboard', icon: <DashboardIcon />, key: 'dashboard' },
     {
@@ -36,7 +37,6 @@ const menuItems = [
 ];
 
 const SeguradoraDashboard = () => {
-    const [mobileOpen, setMobileOpen] = useState(false);
     const [stats, setStats] = useState({
         pendingPolicies: 0,
         activePolicies: 0,
@@ -44,6 +44,8 @@ const SeguradoraDashboard = () => {
         totalRevenue: 0,
     });
     const [loading, setLoading] = useState(true);
+    const [verificationStatus, setVerificationStatus] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadDashboardData();
@@ -51,11 +53,14 @@ const SeguradoraDashboard = () => {
 
     const loadDashboardData = async () => {
         try {
-            const [pending, active, claims] = await Promise.all([
+            const [pending, active, claims, vStatus] = await Promise.all([
                 seguradoraService.getPendingPolicies(),
                 seguradoraService.getActivePolicies(),
                 seguradoraService.getPendingClaims(),
+                seguradoraService.getVerificacaoStatus(),
             ]);
+
+            setVerificationStatus(vStatus);
 
             setStats({
                 pendingPolicies: pending.data?.length || 0,
@@ -70,27 +75,52 @@ const SeguradoraDashboard = () => {
         }
     };
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
+
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <Navbar title="Dashboard - Seguradora" onMenuClick={handleDrawerToggle} />
-            <Sidebar items={menuItems} mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
+        <div style={{ padding: '24px' }}>
+            <Container maxWidth="xl">
+                    {verificationStatus?.status_verificacao !== 'aprovado' && (
+                        <Alert
+                            message={
+                                <span style={{ fontWeight: 700, fontSize: '16px', color: '#856404' }}>
+                                    {verificationStatus?.status_verificacao === 'pendente' 
+                                        ? 'Verificação em Análise' 
+                                        : 'Ação Necessária: Verificação de Conta'}
+                                </span>
+                            }
+                            description={
+                                <div style={{ marginTop: '8px' }}>
+                                    <Typography variant="body2" sx={{ color: '#856404', mb: 2 }}>
+                                        {verificationStatus?.status_verificacao === 'pendente'
+                                            ? 'Seus documentos foram enviados e estão sendo analisados pelo Super Admin. Você poderá vender seguros assim que for aprovado.'
+                                            : 'Sua conta ainda não foi verificada. Para começar a vender seus serviços e gerenciar apólices, você precisa enviar seus documentos de legitimidade.'}
+                                    </Typography>
+                                    {verificationStatus?.status_verificacao !== 'pendente' && (
+                                        <Button 
+                                            type="primary" 
+                                            icon={<ArrowRightOutlined />}
+                                            onClick={() => navigate('/seguradora/perfil/verificacao')}
+                                            style={{ borderRadius: '8px', background: '#856404', borderColor: '#856404' }}
+                                        >
+                                            Ir para Verificação
+                                        </Button>
+                                    )}
+                                </div>
+                            }
+                            type="warning"
+                            showIcon
+                            icon={<SafetyCertificateOutlined style={{ fontSize: '24px' }} />}
+                            style={{ 
+                                marginBottom: '24px', 
+                                padding: '20px', 
+                                borderRadius: '16px', 
+                                border: '1px solid #ffeeba',
+                                backgroundColor: '#fff3cd'
+                            }}
+                        />
+                    )}
 
-            <Box
-                component="main"
-                sx={{
-                    flexGrow: 1,
-                    p: 3,
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
-                    backgroundColor: '#f5f5f5',
-                    minHeight: '100vh',
-                }}
-            >
-                <Toolbar />
-                <Container maxWidth="xl">
                     <Typography variant="h4" fontWeight="bold" mb={4} mt={2}>
                         Visão Geral
                     </Typography>
@@ -158,9 +188,8 @@ const SeguradoraDashboard = () => {
                             </Paper>
                         </Grid>
                     </Grid>
-                </Container>
-            </Box>
-        </Box>
+            </Container>
+        </div>
     );
 };
 

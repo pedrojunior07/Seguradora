@@ -10,15 +10,21 @@ class DetalhesBancarios extends Model
 
     protected $fillable = [
         'nome_banco',
+        'codigo_banco',
+        'agencia',
         'numero_conta',
+        'tipo_conta',
         'titular',
-        'id_seguradora'
+        'nuit_titular',
+        'principal',
+        'bankable_id',
+        'bankable_type'
     ];
 
     // Relacionamentos
-    public function seguradora()
+    public function bankable()
     {
-        return $this->belongsTo(Seguradora::class, 'id_seguradora', 'id_seguradora');
+        return $this->morphTo();
     }
 }
 

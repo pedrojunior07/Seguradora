@@ -1,17 +1,15 @@
+// src/layouts/corretora/CorretoraLayout.jsx
 import { useState, useEffect } from 'react';
-import { Layout, Drawer } from 'antd';
-import { Outlet } from 'react-router-dom';
+import { Layout, Drawer, Modal, Typography, Button } from 'antd';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
-import Sidebar from './components/layout/SideBar';
-import { Modal, Typography, Button } from 'antd';
+import SideBar from './components/layout/SideBar';
 import { SafetyCertificateOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 
 const { Text, Title, Paragraph } = Typography;
-
 const { Content } = Layout;
 
-const SeguradoraLayout = () => {
+const CorretoraLayout = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [drawerVisible, setDrawerVisible] = useState(false);
@@ -21,26 +19,26 @@ const SeguradoraLayout = () => {
     useEffect(() => {
         const handleNotVerified = (event) => {
             Modal.warning({
-                title: 'Verificação de Conta Necessária',
+                title: 'Verificação de Corretora Necessária',
                 icon: <SafetyCertificateOutlined style={{ color: '#faad14' }} />,
                 content: (
                     <div style={{ marginTop: '16px' }}>
                         <Paragraph style={{ fontSize: '15px' }}>
-                            {event.detail.message}
+                            {event.detail.message || 'Sua corretora ainda não foi verificada pelos administradores.'}
                         </Paragraph>
                         <Text type="secondary">
-                            Para garantir a segurança do sistema, todas as seguradoras devem autenticar seus documentos legais antes de fornecer serviços.
+                            Como Corretora, você deve submeter sua documentação de legitimidade antes de emitir propostas ou gerenciar seguros na plataforma.
                         </Text>
                     </div>
                 ),
-                okText: 'Fazer Upload Agora',
+                okText: 'Ir para Verificação',
                 onOk: () => {
-                    navigate('/seguradora/perfil/verificacao');
+                    navigate('/corretora/perfil/verificacao');
                 },
                 width: 500,
                 okButtonProps: {
                     icon: <ArrowRightOutlined />,
-                    style: { borderRadius: '10px', height: '40px', fontWeight: 600 }
+                    style: { borderRadius: '10px', height: '40px', fontWeight: 600, background: '#1e293b' }
                 }
             });
         };
@@ -77,7 +75,7 @@ const SeguradoraLayout = () => {
     return (
         <Layout style={{ minHeight: '100vh', background: '#F8FAFC' }}>
             {/* Desktop: Sidebar fixa */}
-            {!isMobile && <Sidebar collapsed={collapsed} />}
+            {!isMobile && <SideBar collapsed={collapsed} />}
 
             {/* Mobile: Drawer lateral */}
             {isMobile && (
@@ -91,7 +89,7 @@ const SeguradoraLayout = () => {
                         body: { padding: 0, background: '#FFFFFF' }
                     }}
                 >
-                    <Sidebar collapsed={false} onMenuClick={() => setDrawerVisible(false)} />
+                    <SideBar collapsed={false} onMenuClick={() => setDrawerVisible(false)} />
                 </Drawer>
             )}
 
@@ -119,4 +117,4 @@ const SeguradoraLayout = () => {
     );
 };
 
-export default SeguradoraLayout;
+export default CorretoraLayout;

@@ -90,28 +90,28 @@ const DashboardCliente = () => {
 
   return (
     <ClienteLayout>
-      <Title level={2}>Olá, Bem-vindo ao SegurosTM</Title>
+      <Title level={2}>Seu Painel de Seguros</Title>
       <Text type="secondary">Aqui está um resumo das suas proteções atuais.</Text>
 
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="shadow-sm">
+          <Card variant="borderless" className="shadow-sm">
             <Statistic
               title="Seguros Ativos"
               value={stats.ativas}
-              valueStyle={{ color: '#3f8600' }}
+              styles={{ content: { color: '#3f8600' } }}
               prefix={<FileProtectOutlined />}
             />
           </Card>
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="shadow-sm">
+          <Card variant="borderless" className="shadow-sm">
             <Statistic
               title="Prémio Total (Anual)"
               value={stats.valor_total_premios}
               precision={2}
-              valueStyle={{ color: '#1890ff' }}
+              styles={{ content: { color: '#1890ff' } }}
               suffix="MT"
               prefix={<DollarOutlined />}
             />
@@ -119,18 +119,18 @@ const DashboardCliente = () => {
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="shadow-sm">
+          <Card variant="borderless" className="shadow-sm">
             <Statistic
               title="Sinistros Pendentes"
               value={0} // To be implemented
-              valueStyle={{ color: '#cf1322' }}
+              styles={{ content: { color: '#cf1322' } }}
               prefix={<ClockCircleOutlined />}
             />
           </Card>
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="shadow-sm">
+          <Card variant="borderless" className="shadow-sm">
             <Statistic
               title="Meus Bens"
               value={stats.bens_segurados}
@@ -140,7 +140,7 @@ const DashboardCliente = () => {
         </Col>
       </Row>
 
-      <Card title="Apólices Recentes" style={{ marginTop: 24 }} bordered={false} className="shadow-sm">
+      <Card title="Apólices Recentes" style={{ marginTop: 24 }} variant="borderless" className="shadow-sm">
         <Table
           columns={columns}
           dataSource={recentPolicies.slice(0, 5)}

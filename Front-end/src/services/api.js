@@ -1,12 +1,14 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
+export const STORAGE_BASE_URL = API_BASE_URL.replace('/api', '/storage');
 
 // Create axios instance
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Bypass-Tunnel-Reminder': 'true',
     },
 });
@@ -37,9 +39,18 @@ api.interceptors.response.use(
                 window.location.href = '/login';
             }
 
+            // Handle 403 Forbidden - Entity not verified
+            if (error.response.status === 403 && error.response.data?.error === 'ENTITY_NOT_VERIFIED') {
+                window.dispatchEvent(new CustomEvent('entity-not-verified', { 
+                    detail: { 
+                        message: error.response.data.message,
+                        isSeguradora: window.location.pathname.includes('/seguradora')
+                    } 
+                }));
+            }
+
             // Handle other errors
             const errorMessage = error.response.data?.message || 'An error occurred';
-            console.error('API Error:', errorMessage);
 
             return Promise.reject({
                 status: error.response.status,

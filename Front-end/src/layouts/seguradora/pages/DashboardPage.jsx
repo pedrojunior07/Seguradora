@@ -65,7 +65,7 @@ const DashboardPage = () => {
             <div>
               <Title level={isMobile ? 3 : 2} style={{ margin: 0, color: '#fff', fontWeight: 600 }}>
                 <DashboardOutlined style={{ marginRight: 12 }} />
-                Olá, {entidade?.nome || user?.name || 'Seguradora'}!
+                Controle Operacional
               </Title>
               <Text style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: isMobile ? 13 : 15, marginTop: 8, display: 'block' }}>
                 Bem-vindo ao seu painel de controle

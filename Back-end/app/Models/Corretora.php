@@ -23,7 +23,18 @@ class Corretora extends Model
         'status',
         'licenca',
         'data_licenca_validade',
+        'licenca_br_path',
+        'nuit_file_path',
+        'bank_details_file_path',
+        'verificado',
+        'status_verificacao',
+        'motivo_rejeicao',
     ];
+
+    public function isVerificada()
+    {
+        return $this->verificado && $this->status_verificacao === 'aprovado';
+    }
 
     protected $casts = [
         'status' => 'boolean',
@@ -81,6 +92,11 @@ class Corretora extends Model
     public function propostas()
     {
         return $this->hasMany(Proposta::class, 'corretora_id', 'id_corretora');
+    }
+
+    public function detalhesBancarios()
+    {
+        return $this->morphMany(DetalhesBancarios::class, 'bankable');
     }
 
     public function comissoes()

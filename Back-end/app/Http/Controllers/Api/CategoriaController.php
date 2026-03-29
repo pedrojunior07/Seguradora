@@ -69,7 +69,7 @@ class CategoriaController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        if (!$request->user()->isSuperAdmin()) {
+        if (!$request->user()->isSuperAdmin() && !$request->user()->isEntityAdmin()) {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -88,7 +88,7 @@ class CategoriaController extends Controller
 
     public function update(Request $request, $id): JsonResponse
     {
-        if (!$request->user()->isSuperAdmin()) {
+        if (!$request->user()->isSuperAdmin() && !$request->user()->isEntityAdmin()) {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
 
@@ -109,7 +109,7 @@ class CategoriaController extends Controller
 
     public function destroy(Request $request, $id): JsonResponse
     {
-        if (!$request->user()->isSuperAdmin()) {
+        if (!$request->user()->isSuperAdmin() && !$request->user()->isEntityAdmin()) {
             return response()->json(['message' => 'Não autorizado'], 403);
         }
         $categoria = Categoria::findOrFail($id);

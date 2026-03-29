@@ -16,8 +16,28 @@ const AdminService = {
         return response.data;
     },
 
+    verificarSeguradora: async (id, data) => {
+        const response = await api.post(`/admin/seguradoras/${id}/verificar`, data);
+        return response.data;
+    },
+
     getUsers: async (params) => {
         const response = await api.get('/admin/users', { params });
+        return response.data;
+    },
+
+    getCorretoras: async (params) => {
+        const response = await api.get('/admin/corretoras', { params });
+        return response.data;
+    },
+
+    toggleCorretoraStatus: async (id) => {
+        const response = await api.post(`/admin/corretoras/${id}/toggle-status`);
+        return response.data;
+    },
+
+    verificarCorretora: async (id, data) => {
+        const response = await api.post(`/admin/corretoras/${id}/verificar`, data);
         return response.data;
     },
 

@@ -10,7 +10,8 @@ import {
     LogoutOutlined,
     SettingOutlined,
     FileProtectOutlined,
-    QuestionCircleOutlined
+    QuestionCircleOutlined,
+    AuditOutlined
 } from '@ant-design/icons';
 import { useAuth } from '@context/AuthContext';
 import ContactSupportModal from '../../components/ContactSupportModal';
@@ -57,6 +58,11 @@ const AdminLayout = () => {
             key: '/admin/seguradoras',
             icon: <BankOutlined />,
             label: 'Seguradoras',
+        },
+        {
+            key: '/admin/corretoras',
+            icon: <AuditOutlined />,
+            label: 'Corretoras',
         },
         {
             key: '/admin/users',
@@ -121,8 +127,10 @@ const AdminLayout = () => {
                     onClose={() => setDrawerVisible(false)}
                     open={drawerVisible}
                     closable={false}
-                    width={250}
-                    bodyStyle={{ padding: 0, background: '#001529' }}
+                    size="default"
+                    styles={{
+                        body: { padding: 0, background: '#001529' }
+                    }}
                 >
                     <SidebarContent />
                 </Drawer>

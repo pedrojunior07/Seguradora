@@ -61,7 +61,7 @@ const DashboardPage = () => {
                             title="Total de Usuários"
                             value={stats?.stats?.total_usuarios}
                             prefix={<TeamOutlined />}
-                            valueStyle={{ color: '#3f8600' }}
+                            styles={{ content: { color: '#3f8600' } }}
                         />
                     </Card>
                 </Col>
@@ -71,7 +71,7 @@ const DashboardPage = () => {
                             title="Seguradoras"
                             value={stats?.stats?.total_seguradoras}
                             prefix={<BankOutlined />}
-                            valueStyle={{ color: '#cf1322' }}
+                            styles={{ content: { color: '#cf1322' } }}
                         />
                         <div style={{ fontSize: 12, color: '#888' }}>
                             Ativas: {stats?.stats?.seguradoras_ativas}
@@ -88,7 +88,7 @@ const DashboardPage = () => {
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} md={6}>
-                    <Card loading={loading}>
+                    <Card variant="borderless" className="shadow-sm" loading={loading}>
                         <Statistic
                             title="Sinistros"
                             value={stats?.stats?.total_sinistros}

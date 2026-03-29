@@ -120,7 +120,7 @@ const ListaApolices = () => {
                 if (!audit) return <Text type="secondary" style={{ fontSize: '11px' }}>Sem logs</Text>;
 
                 return (
-                    <Space direction="vertical" size={0}>
+                    <Space orientation="vertical" size={0}>
                         <Space size={4}>
                             <Text strong style={{ fontSize: '11px' }}>{audit.user?.name || 'Sistema'}</Text>
                             <Tag color="blue" style={{ fontSize: '9px', padding: '0 4px', lineHeight: '14px' }}>
@@ -193,7 +193,7 @@ const ListaApolices = () => {
                 className="mb-4"
             />
 
-            <Card bordered={false} className="shadow-sm rounded-lg"
+            <Card variant="borderless" className="shadow-sm rounded-lg"
                 tabList={[
                     { key: 'pendentes', tab: 'Pendentes de Aprovação' },
                     { key: 'ativas', tab: 'Apólices Ativas' },

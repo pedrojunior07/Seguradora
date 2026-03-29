@@ -22,6 +22,12 @@ class Seguradora extends Model
         'email',
         'endereco',
         'licenca',
+        'licenca_br_path',
+        'nuit_file_path',
+        'bank_details_file_path',
+        'verificado',
+        'status_verificacao',
+        'motivo_rejeicao',
         'status',
     ];
 
@@ -78,7 +84,7 @@ class Seguradora extends Model
 
     public function detalhesBancarios()
     {
-        return $this->hasMany(DetalhesBancarios::class, 'seguradora_id', 'id_seguradora');
+        return $this->morphMany(DetalhesBancarios::class, 'bankable');
     }
 
     public function apolices()

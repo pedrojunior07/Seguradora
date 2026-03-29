@@ -12,6 +12,8 @@ import SocialCallback from '@layouts/authentication/SocialCallback';
 // Seguradora
 import SeguradoraDashboard from '@layouts/seguradora/pages/DashboardPage';
 import SeguradoraLayout from '@layouts/seguradora/SeguradoraLayout';
+import CorretoraDashboardPage from '@layouts/corretora/pages/DashboardPage';
+import CorretoraLayout from '@layouts/corretora/CorretoraLayout';
 import ListaSeguros from '@layouts/seguradora/pages/ListaSeguros';
 import CriarSeguro from '@layouts/seguradora/pages/CriarSeguro';
 import DetalhesSeguro from '@layouts/seguradora/pages/DetalhesSeguro';
@@ -25,15 +27,17 @@ import SinistrosSeguradoraPage from '@layouts/seguradora/pages/SinistrosPage';
 import DetalhesSinistroPage from '@layouts/seguradora/pages/DetalhesSinistroPage';
 import AuditoriaPage from '@layouts/seguradora/pages/AuditoriaPage';
 import AgentesPage from '@layouts/seguradora/pages/AgentesPage';
+import VerificacaoConta from '@layouts/seguradora/pages/VerificacaoConta';
 import AdminRoute from '@components/AdminRoute';
 
 // Corretora
-import CorretoraDashboard from '@layouts/corretora/Dashboard';
+import VerificacaoContaCorretora from '@layouts/corretora/pages/VerificacaoConta';
 
 // Admin
 import AdminLayout from '@layouts/admin/AdminLayout';
 import AdminDashboard from '@layouts/admin/pages/DashboardPage';
 import AdminSeguradoras from '@layouts/admin/pages/SeguradorasPage';
+import AdminCorretoras from '@layouts/admin/pages/CorretorasPage';
 import AdminUsers from '@layouts/admin/pages/UsersPage';
 import AdminSystemSettings from '@layouts/admin/pages/SystemSettings';
 import AdminAuditLogs from '@layouts/admin/pages/AuditLogs';
@@ -53,6 +57,9 @@ import NotificacoesPage from '@layouts/shared/pages/NotificacoesPage';
 
 import { ConfigProvider, theme as antdTheme } from 'antd';
 
+
+
+ 
 const theme = createTheme({
   palette: {
     primary: {
@@ -163,6 +170,7 @@ function App() {
                 <Route index element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="seguradoras" element={<AdminSeguradoras />} />
+                <Route path="corretoras" element={<AdminCorretoras />} />
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="settings" element={<AdminSystemSettings />} />
                 <Route path="audit-logs" element={<AdminAuditLogs />} />
@@ -206,17 +214,27 @@ function App() {
                   </AdminRoute>
                 } />
                 <Route path="agentes" element={<AgentesPage />} />
+                <Route path="perfil/verificacao" element={
+                  <AdminRoute>
+                    <VerificacaoConta />
+                  </AdminRoute>
+                } />
               </Route>
 
               {/* Corretora Routes */}
               <Route
-                path="/corretora/dashboard"
+                path="/corretora"
                 element={
                   <ProtectedRoute allowedRoles={['corretora']}>
-                    <CorretoraDashboard />
+                    <CorretoraLayout />
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route index element={<Navigate to="/corretora/dashboard" replace />} />
+                <Route path="dashboard" element={<CorretoraDashboardPage />} />
+                <Route path="perfil/verificacao" element={<VerificacaoContaCorretora />} />
+                <Route path="notificacoes" element={<NotificacoesPage />} />
+              </Route>
 
               {/* Cliente Routes */}
               <Route

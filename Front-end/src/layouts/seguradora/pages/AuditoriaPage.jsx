@@ -153,7 +153,7 @@ const AuditoriaPage = () => {
 
     return (
         <div className="p-6">
-            <Card bordered={false} className="shadow-sm">
+            <Card variant="borderless" className="shadow-sm">
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <Title level={2} style={{ margin: 0 }}>

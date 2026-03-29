@@ -1,0 +1,17 @@
+/* Hide scrollbar for Chrome, Safari and Opera */
+.sidebar-menu-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.sidebar-menu-container {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Ensure the sider itself doesn't have an outer scrollbar */
+.ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}

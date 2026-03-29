@@ -10,7 +10,7 @@ class SeguradoraController extends Controller
 {
     public function index()
     {
-        $seguradoras = Seguradora::with('users')->paginate(10);
+        $seguradoras = Seguradora::with(['users', 'detalhesBancarios'])->paginate(10);
         return response()->json($seguradoras);
     }
 
@@ -66,6 +66,35 @@ class SeguradoraController extends Controller
         $status = $seguradora->status ? 'ativada' : 'bloqueada';
         return response()->json([
             'message' => "Seguradora {$status} com sucesso",
+            'seguradora' => $seguradora
+        ]);
+    }
+
+    /**
+     * Verificar documentos da seguradora
+     */
+    public function verificar(Request $request, $id)
+    {
+        $seguradora = Seguradora::findOrFail($id);
+        
+        $validated = $request->validate([
+            'status_verificacao' => 'required|in:aprovado,rejeitado',
+            'motivo_rejeicao' => 'required_if:status_verificacao,rejeitado|string|nullable',
+        ]);
+
+        $seguradora->status_verificacao = $validated['status_verificacao'];
+        $seguradora->verificado = ($validated['status_verificacao'] === 'aprovado');
+        
+        if ($validated['status_verificacao'] === 'rejeitado') {
+            $seguradora->motivo_rejeicao = $validated['motivo_rejeicao'];
+        } else {
+            $seguradora->motivo_rejeicao = null;
+        }
+
+        $seguradora->save();
+
+        return response()->json([
+            'message' => 'Status de verificação atualizado com sucesso',
             'seguradora' => $seguradora
         ]);
     }

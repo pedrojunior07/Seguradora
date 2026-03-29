@@ -80,6 +80,21 @@ const seguradoraService = {
         const response = await api.post(`/cliente/pagamentos/${id}/confirmar-ficticio`);
         return response.data;
     },
+
+    // Perfil e Verificação
+    getVerificacaoStatus: async () => {
+        const response = await api.get('/seguradora/perfil/verificacao');
+        return response.data;
+    },
+
+    uploadDocumentos: async (formData) => {
+        const response = await api.post('/seguradora/perfil/verificacao', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
 };
 
 export default seguradoraService;

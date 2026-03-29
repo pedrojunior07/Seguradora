@@ -53,6 +53,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/support/send', [\App\Http\Controllers\Api\SupportController::class, 'send']);
 
     // Categorias
+    Route::apiResource('categorias', \App\Http\Controllers\Api\CategoriaController::class);
     Route::apiResource('tipos-seguro', \App\Http\Controllers\Api\TipoSeguroController::class);
 
     // Rotas de Governança (Super Admin do Sistema)
@@ -70,6 +71,12 @@ Route::middleware('auth:api')->group(function () {
         
         Route::apiResource('seguradoras', \App\Http\Controllers\Admin\SeguradoraController::class);
         Route::post('seguradoras/{id}/toggle-status', [\App\Http\Controllers\Admin\SeguradoraController::class, 'toggleStatus']);
+        Route::post('seguradoras/{id}/verificar', [\App\Http\Controllers\Admin\SeguradoraController::class, 'verificar']);
+
+        Route::apiResource('corretoras', \App\Http\Controllers\Admin\CorretoraController::class);
+        Route::post('corretoras/{id}/toggle-status', [\App\Http\Controllers\Admin\CorretoraController::class, 'toggleStatus']);
+        Route::post('corretoras/{id}/verificar', [\App\Http\Controllers\Admin\CorretoraController::class, 'verificar']);
+
         Route::apiResource('users', \App\Http\Controllers\Admin\UserController::class);
     });
 
@@ -86,63 +93,75 @@ Route::middleware('auth:api')->group(function () {
         Route::get('dashboard/grafico-vendas', [\App\Http\Controllers\DashboardController::class, 'graficoVendas']);
         Route::get('auditoria', [\App\Http\Controllers\Api\AuditController::class, 'index']);
 
-        // Seguros
-        Route::get('seguros', [SeguroController::class, 'index']);
-        Route::post('seguros', [SeguroController::class, 'store']);
-        Route::get('seguros/{id}', [SeguroController::class, 'show']);
-        Route::put('seguros/{id}', [SeguroController::class, 'update']);
-        Route::post('seguros/{id}/ativar', [SeguroController::class, 'ativar']);
-        Route::post('seguros/{id}/desativar', [SeguroController::class, 'desativar']);
-        Route::post('seguros/{id}/precos', [SeguroController::class, 'adicionarPreco']);
-        Route::post('precos/{preco}/ativar', [SeguroController::class, 'ativarPreco']);
-        Route::post('precos/{preco}/desativar', [SeguroController::class, 'desativarPreco']);
-        Route::post('seguros/{id}/coberturas', [SeguroController::class, 'adicionarCobertura']);
+        // Perfil e Verificação
+        Route::get('perfil/verificacao', [\App\Http\Controllers\Api\Seguradora\PerfilController::class, 'getVerificacaoStatus']);
+        Route::post('perfil/verificacao', [\App\Http\Controllers\Api\Seguradora\PerfilController::class, 'uploadDocumentos']);
 
-        // Propostas
+        // Gestão de Agentes
+        Route::apiResource('agentes', \App\Http\Controllers\Api\AgenteController::class);
+
+        // Operações que requerem verificação
+        Route::middleware(['entity_verified'])->group(function () {
+            // Seguros
+            Route::post('seguros', [SeguroController::class, 'store']);
+            Route::put('seguros/{id}', [SeguroController::class, 'update']);
+            Route::post('seguros/{id}/ativar', [SeguroController::class, 'ativar']);
+            Route::post('seguros/{id}/desativar', [SeguroController::class, 'desativar']);
+            Route::post('seguros/{id}/precos', [SeguroController::class, 'adicionarPreco']);
+            Route::post('precos/{preco}/ativar', [SeguroController::class, 'ativarPreco']);
+            Route::post('precos/{preco}/desativar', [SeguroController::class, 'desativarPreco']);
+            Route::post('seguros/{id}/coberturas', [SeguroController::class, 'adicionarCobertura']);
+
+            // Propostas
+            Route::post('propostas/{id}/aprovar', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'aprovar']);
+            Route::post('propostas/{id}/rejeitar', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'rejeitar']);
+
+            // Apólices
+            Route::post('apolices/{apolice}/aprovar', [SeguradoraApoliceController::class, 'aprovar']);
+            Route::post('apolices/{apolice}/rejeitar', [SeguradoraApoliceController::class, 'rejeitar']);
+            Route::post('/contratacoes-diretas/{id}/decidir', [SeguradoraApoliceController::class, 'decidirProposta']);
+
+            // Sinistros
+            Route::post('sinistros/{sinistro}/analisar', [SeguradoraSinistroController::class, 'analisar']);
+            Route::post('sinistros/{sinistro}/aprovar', [SeguradoraSinistroController::class, 'aprovar']);
+            Route::post('sinistros/{sinistro}/negar', [SeguradoraSinistroController::class, 'negar']);
+        });
+
+        // Visualização (Sempre permitido)
+        Route::get('seguros', [SeguroController::class, 'index']);
+        Route::get('seguros/{id}', [SeguroController::class, 'show']);
         Route::get('propostas', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'index']);
         Route::get('propostas/recentes', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'recentNotifications']);
         Route::get('propostas/{id}', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'show']);
-        Route::post('propostas/{id}/aprovar', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'aprovar']);
-        Route::post('propostas/{id}/rejeitar', [\App\Http\Controllers\Api\Seguradora\PropostaController::class, 'rejeitar']);
-
-        // Apólices
         Route::get('apolices/pendentes', [SeguradoraApoliceController::class, 'pendentes']);
         Route::get('apolices/ativas', [SeguradoraApoliceController::class, 'ativas']);
         Route::get('apolices/{apolice}', [SeguradoraApoliceController::class, 'show']);
-        Route::post('apolices/{apolice}/aprovar', [SeguradoraApoliceController::class, 'aprovar']);
-        Route::post('apolices/{apolice}/rejeitar', [SeguradoraApoliceController::class, 'rejeitar']);
         Route::get('apolices/estatisticas', [SeguradoraApoliceController::class, 'estadisticas']);
         Route::get('/contratacoes-diretas', [SeguradoraApoliceController::class, 'contratacoesDiretas']);
-        Route::post('/contratacoes-diretas/{id}/decidir', [SeguradoraApoliceController::class, 'decidirProposta']);
-
-        // Sinistros
         Route::get('sinistros', [SeguradoraSinistroController::class, 'index']);
         Route::get('sinistros/pendentes', [SeguradoraSinistroController::class, 'pendentes']);
         Route::get('sinistros/em-analise', [SeguradoraSinistroController::class, 'emAnalise']);
         Route::get('sinistros/{sinistro}', [SeguradoraSinistroController::class, 'show']);
-        Route::post('sinistros/{sinistro}/analisar', [SeguradoraSinistroController::class, 'analisar']);
-        Route::post('sinistros/{sinistro}/aprovar', [SeguradoraSinistroController::class, 'aprovar']);
-        Route::post('sinistros/{sinistro}/negar', [SeguradoraSinistroController::class, 'negar']);
         Route::get('sinistros/estatisticas', [SeguradoraSinistroController::class, 'estatisticas']);
-        Route::get('sinistros/estatisticas', [SeguradoraSinistroController::class, 'estatisticas']);
-
-        // Gestão de Clientes
-        Route::get('clientes', [\App\Http\Controllers\Seguradora\ClienteController::class, 'index']);
-        Route::post('clientes', [\App\Http\Controllers\Seguradora\ClienteController::class, 'store']);
-
-        // Gestão de Agentes
-        Route::apiResource('agentes', \App\Http\Controllers\Api\AgenteController::class);
     });
 
     // ROTAS CORRETORA
     Route::prefix('corretora')->group(function () {
-        // Propostas
+        // Perfil e Verificação
+        Route::get('perfil/verificacao', [\App\Http\Controllers\Api\Corretora\PerfilController::class, 'getVerificacaoStatus']);
+        Route::post('perfil/verificacao', [\App\Http\Controllers\Api\Corretora\PerfilController::class, 'uploadDocumentos']);
+
+        // Operações que requerem verificação
+        Route::middleware(['entity_verified'])->group(function () {
+            Route::post('propostas', [PropostaController::class, 'store']);
+            Route::post('propostas/{proposta}/enviar', [PropostaController::class, 'enviar']);
+            Route::post('propostas/{proposta}/converter-apolice', [PropostaController::class, 'converterEmApolice']);
+        });
+
+        // Visualização
         Route::get('propostas/recentes', [PropostaController::class, 'recentNotifications']);
         Route::get('propostas', [PropostaController::class, 'index']);
-        Route::post('propostas', [PropostaController::class, 'store']);
         Route::get('propostas/{proposta}', [PropostaController::class, 'show']);
-        Route::post('propostas/{proposta}/enviar', [PropostaController::class, 'enviar']);
-        Route::post('propostas/{proposta}/converter-apolice', [PropostaController::class, 'converterEmApolice']);
     });
 
     // CONTRATAÇÃO

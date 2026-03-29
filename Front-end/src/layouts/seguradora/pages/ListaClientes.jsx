@@ -116,7 +116,7 @@ const ListaClientes = () => {
                 </Button>
             </div>
 
-            <Card bordered={false} className="shadow-sm rounded-lg">
+            <Card variant="borderless" className="shadow-sm rounded-lg">
                 <div className="mb-4">
                     <Input
                         placeholder="Buscar por nome ou NUIT..."

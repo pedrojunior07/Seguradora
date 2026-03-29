@@ -1,7 +1,9 @@
 // components/layout/Sidebar.jsx
 import { Layout, Menu, Badge, Button, Avatar } from 'antd';
+import { drawerWidth } from '@components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
+import './Sidebar.css'; // Importing CSS for custom scrollbar hidden
 import {
   DashboardOutlined,
   InsuranceOutlined,
@@ -73,6 +75,9 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
         break;
       case 'auditoria':
         navigate('/seguradora/auditoria');
+        break;
+      case 'verificacao':
+        navigate('/seguradora/perfil/verificacao');
         break;
       default:
         break;
@@ -148,6 +153,11 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
           { key: '7-2', label: 'Parâmetros' },
         ],
       },
+      {
+        key: 'verificacao',
+        icon: <SafetyCertificateOutlined />,
+        label: 'Verificação de Conta',
+      },
     ] : []),
     {
       key: '6',
@@ -167,9 +177,12 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
       theme="light"
       style={{
         borderRight: '1px solid #E2E8F0',
-        zIndex: 10,
+        zIndex: 20,
         display: 'flex',
         flexDirection: 'column',
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
       }}
     >
       <div className="h-16 flex items-center px-6" style={{ borderBottom: '1px solid #F1F5F9' }}>
@@ -187,7 +200,7 @@ const Sidebar = ({ collapsed, onMenuClick }) => {
         )}
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+      <div className="sidebar-menu-container" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         <Menu
           theme="light"
           mode="inline"

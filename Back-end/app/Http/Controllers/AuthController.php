@@ -174,7 +174,13 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        $user = $request->user()->load($request->user()->perfil);
+        $user = $request->user();
+        $perfil = $user->perfil;
+
+        // Só carrega relacionamento se existas nos models (cliente, seguradora, corretora, agente)
+        if ($perfil && in_array($perfil, ['seguradora', 'corretora', 'cliente', 'agente'])) {
+            $user->load($perfil);
+        }
 
         return response()->json([
             'user' => $user,
