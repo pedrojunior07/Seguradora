@@ -92,44 +92,34 @@ const Login = () => {
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
-                background: 'linear-gradient(135deg, #eef2ff, #f8fafc)',
+                background: '#F8FAFC', // Clean solid premium background
+                position: 'relative'
             }}
         >
-            <Container maxWidth="sm">
+            <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
                 <Card
+                    elevation={0}
                     sx={{
-                        borderRadius: 3,
-                        boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                        borderRadius: 4,
+                        border: '1px solid #E2E8F0',
+                        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05)',
+                        p: { xs: 2, sm: 4 },
                         animation: 'fadeIn 0.6s ease-in-out',
+                        backgroundColor: '#ffffff'
                     }}
                 >
-                    <CardContent sx={{ p: 4 }}>
-                        <Box textAlign="center" mb={3}>
-                            <Box
-                                sx={{
-                                    width: 60,
-                                    height: 60,
-                                    borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 16px',
-                                    color: 'white'
-                                }}
-                            >
-                                <Lock fontSize="large" />
-                            </Box>
-                            <Typography variant="h4" fontWeight={700} gutterBottom color="#1e3a8a">
+                    <CardContent sx={{ p: 0 }}>
+                        <Box textAlign="center" mb={4}>
+                            <Typography variant="h4" fontWeight={700} gutterBottom color="text.primary">
                                 Seguro+
                             </Typography>
-                            <Typography variant="body1" color="text.secondary">
-                                Bem-vindo ao seu portal de seguros
+                            <Typography variant="body2" color="text.secondary">
+                                Aceda à sua conta
                             </Typography>
                         </Box>
 
                         {successMessage && (
-                            <Alert severity="success" sx={{ mb: 2 }}>
+                            <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
                                 {successMessage}
                             </Alert>
                         )}
@@ -137,10 +127,10 @@ const Login = () => {
                         {error && (
                             <Alert
                                 severity="error"
-                                sx={{ mb: 2 }}
+                                sx={{ mb: 3, borderRadius: 2 }}
                                 action={
                                     error.includes('Email não verificado') || error.includes('verifique') ? (
-                                        <Button color="inherit" size="small" onClick={handleResendEmail}>
+                                        <Button color="inherit" size="small" onClick={handleResendEmail} sx={{ fontWeight: 600 }}>
                                             Reenviar
                                         </Button>
                                     ) : null
@@ -155,21 +145,24 @@ const Login = () => {
                                 fullWidth
                                 label="Email"
                                 name="email"
+                                type="email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 margin="normal"
                                 required
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Email fontSize="small" sx={{ color: '#1e40af' }} />
-                                        </InputAdornment>
-                                    ),
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Email fontSize="small" sx={{ color: '#94A3B8' }} />
+                                            </InputAdornment>
+                                        ),
+                                    }
                                 }}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
-                                        '&:hover fieldset': { borderColor: '#1e40af' },
-                                        '&.Mui-focused fieldset': { borderColor: '#1e40af' },
+                                        borderRadius: 2,
+                                        backgroundColor: '#F8FAFC',
                                     }
                                 }}
                             />
@@ -183,27 +176,31 @@ const Login = () => {
                                 onChange={handleChange}
                                 margin="normal"
                                 required
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Lock fontSize="small" sx={{ color: '#1e40af' }} />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                size="small"
-                                            >
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Lock fontSize="small" sx={{ color: '#94A3B8' }} />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    size="small"
+                                                    edge="end"
+                                                    sx={{ color: '#94A3B8' }}
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }
                                 }}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
-                                        '&:hover fieldset': { borderColor: '#1e40af' },
-                                        '&.Mui-focused fieldset': { borderColor: '#1e40af' },
+                                        borderRadius: 2,
+                                        backgroundColor: '#F8FAFC',
                                     }
                                 }}
                             />
@@ -212,37 +209,34 @@ const Login = () => {
                                 type="submit"
                                 fullWidth
                                 disabled={loading}
+                                variant="contained"
+                                size="large"
                                 sx={{
-                                    mt: 3,
+                                    mt: 4,
                                     py: 1.5,
                                     borderRadius: 2,
                                     textTransform: 'none',
                                     fontSize: '1rem',
                                     fontWeight: 600,
-                                    backgroundColor: '#1e40af',
-                                    boxShadow: '0 4px 14px 0 rgba(30, 64, 175, 0.39)',
-                                    '&:hover': {
-                                        backgroundColor: '#1e3a8a',
-                                        boxShadow: '0 6px 20px rgba(30, 64, 175, 0.23)'
-                                    },
+                                    boxShadow: 'none',
                                 }}
                             >
-                                {loading ? 'Entrando...' : 'Acessar Conta'}
+                                {loading ? 'A entrar...' : 'Entrar'}
                             </Button>
                         </form>
 
-                        <Box textAlign="center" mt={3}>
+                        <Box textAlign="center" mt={4}>
                             <Typography variant="body2" color="text.secondary">
-                                Não tem uma conta?{' '}
+                                Não tem conta?{' '}
                                 <Link
                                     to="/register"
                                     style={{
-                                        color: '#1e40af',
-                                        fontWeight: 500,
+                                        color: '#2563EB',
+                                        fontWeight: 600,
                                         textDecoration: 'none',
                                     }}
                                 >
-                                    Criar conta
+                                    Registar
                                 </Link>
                             </Typography>
                         </Box>
@@ -250,11 +244,10 @@ const Login = () => {
                 </Card>
             </Container>
 
-            {/* animação */}
             <style>
                 {`
                 @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
+                    from { opacity: 0; transform: translateY(16px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
                 `}

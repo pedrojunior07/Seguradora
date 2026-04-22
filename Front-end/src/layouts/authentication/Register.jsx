@@ -204,15 +204,9 @@ const Register = () => {
 
     const renderPerfilStep = () => (
         <div style={{ textAlign: 'center', padding: '32px 0' }}>
-            <Title level={2} style={{
-                marginBottom: '48px',
-                background: 'linear-gradient(45deg, #1e40af, #7c3aed)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontWeight: 800
-            }}>
+            <Typography variant="h4" fontWeight={800} color="text.primary" sx={{ mb: 6 }}>
                 Como deseja se cadastrar?
-            </Title>
+            </Typography>
 
 
 
@@ -752,72 +746,45 @@ const Register = () => {
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
-                background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)',
-                backgroundSize: '400% 400%',
-                animation: 'gradient 15s ease infinite',
+                background: '#F8FAFC',
                 py: 4,
                 position: 'relative',
-                overflow: 'hidden',
             }}
         >
-            {/* Elementos decorativos */}
-            <Box
-                sx={{
-                    position: 'absolute',
-                    top: '-10%',
-                    right: '-10%',
-                    width: '600px',
-                    height: '600px',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
-                    animation: 'float 20s ease-in-out infinite',
-                }}
-            />
-            <Box
-                sx={{
-                    position: 'absolute',
-                    bottom: '-15%',
-                    left: '-10%',
-                    width: '500px',
-                    height: '500px',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%)',
-                    animation: 'float 25s ease-in-out infinite reverse',
-                }}
-            />
-
-            <Container maxWidth="xl">
-                <Grid container spacing={4} alignItems="center" justifyContent="center">
-
-
-                    <Grid item xs={12} md={10}>
+            <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+                <Grid container spacing={0} alignItems="center" justifyContent="center">
+                    <Grid item xs={12}>
                         <Slide direction="up" in timeout={600}>
                             <Card
+                                elevation={0}
                                 sx={{
                                     borderRadius: 4,
-                                    boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+                                    border: '1px solid #E2E8F0',
+                                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05)',
                                     overflow: 'hidden',
-                                    background: 'rgba(255, 255, 255, 0.97)',
-                                    backdropFilter: 'blur(20px)',
-                                    border: '1px solid rgba(255,255,255,0.3)',
+                                    background: '#ffffff',
                                     position: 'relative',
                                     zIndex: 1,
                                 }}
                             >
                                 <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
                                     <Box textAlign="center" mb={3}>
-                                        <Avatar
+                                        <Box
                                             sx={{
-                                                width: 80,
-                                                height: 80,
-                                                margin: '0 auto 16px',
-                                                background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
-                                                animation: 'pulse 2s infinite',
+                                                width: 64,
+                                                height: 64,
+                                                borderRadius: '16px',
+                                                background: 'rgba(37, 99, 235, 0.1)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                margin: '0 auto 20px',
+                                                color: '#2563EB'
                                             }}
                                         >
-                                            <BadgeIcon sx={{ fontSize: 40 }} />
-                                        </Avatar>
-                                        <Typography variant="h4" fontWeight={700} gutterBottom>
+                                            <Person sx={{ fontSize: 32 }} />
+                                        </Box>
+                                        <Typography variant="h4" fontWeight={800} gutterBottom>
                                             Comece Agora
                                         </Typography>
                                         <Typography variant="body1" color="text.secondary">
@@ -910,11 +877,12 @@ const Register = () => {
                                                                 borderRadius: 2,
                                                                 fontWeight: 600,
                                                                 textTransform: 'none',
-                                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                                backgroundColor: '#2563EB',
+                                                                boxShadow: 'none',
                                                                 '&:hover': {
-                                                                    background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                                                                    transform: 'translateY(-2px)',
-                                                                    boxShadow: '0 15px 30px rgba(102, 126, 234, 0.4)',
+                                                                    backgroundColor: '#1D4ED8',
+                                                                    transform: 'none',
+                                                                    boxShadow: 'none',
                                                                 },
                                                                 transition: 'all 0.3s ease',
                                                                 minWidth: '180px',
@@ -947,11 +915,12 @@ const Register = () => {
                                                                 borderRadius: 2,
                                                                 fontWeight: 600,
                                                                 textTransform: 'none',
-                                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                                backgroundColor: '#2563EB',
+                                                                boxShadow: 'none',
                                                                 '&:hover': {
-                                                                    background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                                                                    transform: 'translateY(-2px)',
-                                                                    boxShadow: '0 15px 30px rgba(102, 126, 234, 0.4)',
+                                                                    backgroundColor: '#1D4ED8',
+                                                                    transform: 'none',
+                                                                    boxShadow: 'none',
                                                                 },
                                                                 transition: 'all 0.3s ease',
                                                                 minWidth: '120px',
@@ -980,13 +949,13 @@ const Register = () => {
                                                         textTransform: 'none',
                                                         fontWeight: 600,
                                                         py: 1.2,
-                                                        borderColor: '#667eea',
-                                                        color: '#667eea',
+                                                        borderColor: '#2563EB',
+                                                        color: '#2563EB',
                                                         '&:hover': {
-                                                            borderColor: '#5a67d8',
-                                                            backgroundColor: 'rgba(102, 126, 234, 0.04)',
-                                                            transform: 'translateY(-2px)',
-                                                            boxShadow: '0 5px 15px rgba(102, 126, 234, 0.2)',
+                                                            borderColor: '#1D4ED8',
+                                                            backgroundColor: 'rgba(37, 99, 235, 0.04)',
+                                                            transform: 'none',
+                                                            boxShadow: 'none',
                                                         },
                                                         transition: 'all 0.3s ease',
                                                     }}

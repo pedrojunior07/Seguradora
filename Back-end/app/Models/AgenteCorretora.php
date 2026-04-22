@@ -12,7 +12,8 @@ class AgenteCorretora extends Model
         'id_agente',
         'id_corretora',
         'data_inicio',
-        'data_fim'
+        'data_fim',
+        'status'
     ];
 }
 

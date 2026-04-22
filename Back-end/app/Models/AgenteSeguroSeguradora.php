@@ -11,7 +11,11 @@ class AgenteSeguroSeguradora extends Model
     protected $fillable = [
         'id_agente',
         'id_seguro_seguradora',
-        'status'
+        'status',
+        'percentagem_comissao_angariacao',
+        'percentagem_comissao_cobranca',
+        'data_inicio',
+        'data_fim'
     ];
 }
 

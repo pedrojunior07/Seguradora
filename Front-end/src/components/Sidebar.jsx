@@ -25,25 +25,25 @@ const Sidebar = ({ items, mobileOpen, onDrawerToggle }) => {
     const getLogoUrl = (logoPath) => (logoPath ? `${apiBase}/storage/${logoPath}` : null);
 
     const drawer = (
-        <Box>
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#ffffff' }}>
             <Toolbar
                 sx={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    color: 'white',
+                    background: '#ffffff',
+                    color: '#0F172A',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 2,
+                    borderBottom: '1px solid #E2E8F0',
                 }}
             >
-                <Avatar src={entidade?.logo ? getLogoUrl(entidade.logo) : undefined} sx={{ bgcolor: 'transparent', width: 40, height: 40 }} />
+                <Avatar src={entidade?.logo ? getLogoUrl(entidade.logo) : undefined} sx={{ bgcolor: 'transparent', width: 36, height: 36 }} />
                 <Box>
-                    <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                    <Typography variant="h6" fontWeight="800" sx={{ color: '#0F172A', fontSize: '1.1rem' }}>
                         {entidade?.nome || 'Menu'}
                     </Typography>
                 </Box>
             </Toolbar>
-            <Divider />
-            <List sx={{ pt: 2 }}>
+            <List sx={{ pt: 3, px: 2, flexGrow: 1 }}>
                 {items.map((item) => (
                     <ListItem key={item.key} disablePadding sx={{ mb: 0.5 }}>
                         <ListItemButton
@@ -53,24 +53,34 @@ const Sidebar = ({ items, mobileOpen, onDrawerToggle }) => {
                             }}
                             selected={location.pathname === item.route}
                             sx={{
-                                mx: 1,
-                                borderRadius: 2,
+                                borderRadius: '12px',
+                                py: 1.2,
                                 '&.Mui-selected': {
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    color: 'white',
+                                    background: '#EFF6FF',
+                                    color: '#2563EB',
                                     '& .MuiListItemIcon-root': {
-                                        color: 'white',
+                                        color: '#2563EB',
                                     },
                                     '&:hover': {
-                                        background: 'linear-gradient(135deg, #5568d3 0%, #6a4293 100%)',
+                                        background: '#DBEAFE',
                                     },
                                 },
+                                '&:hover:not(.Mui-selected)': {
+                                    background: '#F8FAFC',
+                                }
                             }}
                         >
-                            <ListItemIcon sx={{ color: location.pathname === item.route ? 'white' : 'inherit' }}>
+                            <ListItemIcon sx={{ color: location.pathname === item.route ? '#2563EB' : '#64748B', minWidth: 40 }}>
                                 {item.icon}
                             </ListItemIcon>
-                            <ListItemText primary={item.name} />
+                            <ListItemText 
+                                primary={item.name} 
+                                primaryTypographyProps={{ 
+                                    variant: 'body2', 
+                                    fontWeight: location.pathname === item.route ? '700' : '600',
+                                    color: location.pathname === item.route ? '#2563EB' : '#475569'
+                                }} 
+                            />
                         </ListItemButton>
                     </ListItem>
                 ))}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Container, Grid, Paper, Typography, Toolbar } from '@mui/material';
+import { Box, Container, Grid, Typography } from '@mui/material';
 import {
     Dashboard as DashboardIcon,
     Description,
@@ -121,7 +121,7 @@ const SeguradoraDashboard = () => {
                         />
                     )}
 
-                    <Typography variant="h4" fontWeight="bold" mb={4} mt={2}>
+                    <Typography variant="h5" fontWeight="600" sx={{ color: '#0F172A' }} mb={3} mt={2}>
                         Visão Geral
                     </Typography>
 
@@ -131,7 +131,7 @@ const SeguradoraDashboard = () => {
                                 title="Apólices Pendentes"
                                 value={stats.pendingPolicies}
                                 icon={Warning}
-                                bgColor="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+                                bgColor="#F59E0B"
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={3}>
@@ -139,7 +139,7 @@ const SeguradoraDashboard = () => {
                                 title="Apólices Ativas"
                                 value={stats.activePolicies}
                                 icon={CheckCircle}
-                                bgColor="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+                                bgColor="#10B981"
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={3}>
@@ -147,47 +147,19 @@ const SeguradoraDashboard = () => {
                                 title="Sinistros Pendentes"
                                 value={stats.pendingClaims}
                                 icon={Description}
-                                bgColor="linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
+                                bgColor="#EF4444"
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={3}>
                             <StatCard
-                                title="Receita Total"
+                                title="Receita (Mensal)"
                                 value={`${stats.totalRevenue.toLocaleString()} MT`}
                                 icon={TrendingUp}
-                                bgColor="linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
+                                bgColor="#3B82F6"
                             />
                         </Grid>
                     </Grid>
 
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={8}>
-                            <Paper
-                                sx={{
-                                    p: 3,
-                                    borderRadius: 3,
-                                    height: '400px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Typography variant="h6" color="text.secondary">
-                                    Gráfico de tendências será exibido aqui
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Paper sx={{ p: 3, borderRadius: 3, height: '400px' }}>
-                                <Typography variant="h6" fontWeight="bold" mb={2}>
-                                    Atividades Recentes
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Últimas atividades do sistema serão exibidas aqui
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                    </Grid>
             </Container>
         </div>
     );

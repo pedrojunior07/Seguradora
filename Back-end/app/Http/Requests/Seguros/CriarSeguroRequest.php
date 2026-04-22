@@ -28,7 +28,7 @@ class CriarSeguroRequest extends FormRequest
             'preco.usaValor' => 'nullable|boolean',
             'preco.data_inicio' => 'nullable|date',
             'preco.data_fim' => 'nullable|date|after:preco.data_inicio',
-            'coberturas' => 'nullable|array',
+            'coberturas' => 'required|array|min:1',
             'coberturas.*.descricao' => 'required|string',
             'coberturas.*.franquia' => 'nullable|numeric|min:0|max:100',
             'coberturas.*.valor_minimo' => 'nullable|numeric|min:0',
@@ -44,6 +44,8 @@ class CriarSeguroRequest extends FormRequest
             'id_tipo_seguro.required' => 'O tipo de seguro é obrigatório',
             'id_tipo_seguro.exists' => 'Tipo de seguro inválido',
             'premio_minimo.required' => 'O prêmio mínimo é obrigatório',
+            'coberturas.required' => 'O seguro deve possuir pelo menos uma cobertura',
+            'coberturas.min' => 'O seguro deve possuir pelo menos uma cobertura',
         ];
     }
 }

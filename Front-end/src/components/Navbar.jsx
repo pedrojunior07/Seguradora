@@ -80,7 +80,10 @@ const Navbar = ({ title, onMenuClick }) => {
             position="fixed"
             sx={{
                 zIndex: (theme) => theme.zIndex.drawer + 1,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: '#ffffff',
+                color: '#0F172A',
+                boxShadow: 'none',
+                borderBottom: '1px solid #E2E8F0',
             }}
         >
             <Toolbar>
@@ -156,24 +159,22 @@ const Navbar = ({ title, onMenuClick }) => {
                                 </MenuItem>
                             ))
                         )}
-                        <Divider />
-                        <MenuItem onClick={() => { navigate('/corretora/proposals'); handleClose(); }} sx={{ justifyContent: 'center' }}>
-                            <Typography variant="caption" color="primary" fontWeight="bold">Ver todas as propostas</Typography>
-                        </MenuItem>
                     </Menu>
 
                     <Box display="flex" alignItems="center" ml={1}>
-                        <Typography variant="body2" sx={{ mr: 1, display: { xs: 'none', sm: 'block' } }}>{user?.name}</Typography>
-                        <IconButton color="inherit" onClick={handleMenu}>
-                            <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(255,255,255,0.2)' }}>
-                                <AccountCircle />
+                        <Typography variant="body2" sx={{ mr: 1, display: { xs: 'none', sm: 'block' }, color: '#475569' }}>{user?.name}</Typography>
+                        <IconButton onClick={handleMenu} size="small">
+                            <Avatar sx={{ width: 32, height: 32, bgcolor: '#2563EB', fontSize: '0.85rem', fontWeight: 700 }}>
+                                {user?.name?.charAt(0)?.toUpperCase() || <AccountCircle />}
                             </Avatar>
                         </IconButton>
                     </Box>
 
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-                        <MenuItem onClick={handleLogout}>
-                            <ExitToApp sx={{ mr: 1 }} /> Sair
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}
+                        PaperProps={{ sx: { minWidth: 160 } }}
+                    >
+                        <MenuItem onClick={handleLogout} sx={{ gap: 1.5 }}>
+                            <ExitToApp fontSize="small" sx={{ color: '#64748B' }} /> Sair
                         </MenuItem>
                     </Menu>
                 </Box>

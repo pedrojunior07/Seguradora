@@ -73,18 +73,27 @@ const theme = createTheme({
       paper: '#FFFFFF',
     },
     text: {
-      primary: '#1F2937',
-      secondary: '#6B7280',
+      primary: '#0F172A',
+      secondary: '#64748B',
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: { fontWeight: 700 },
-    h2: { fontWeight: 700 },
-    h3: { fontWeight: 600 },
+    fontFamily: '"Outfit", sans-serif',
+    fontSize: 16,
+    h1: { fontWeight: 800, color: '#0F172A', fontSize: '2.5rem' },
+    h2: { fontWeight: 700, color: '#0F172A', fontSize: '2rem' },
+    h3: { fontWeight: 700, color: '#0F172A', fontSize: '1.75rem' },
+    h4: { fontWeight: 700, color: '#0F172A', fontSize: '1.5rem' },
+    h5: { fontWeight: 600, color: '#0F172A', fontSize: '1.25rem' },
+    h6: { fontWeight: 600, color: '#0F172A', fontSize: '1.15rem' },
+    subtitle1: { fontWeight: 500, fontSize: '1.05rem' },
+    subtitle2: { fontWeight: 500, fontSize: '0.95rem' },
+    body1: { fontSize: '1.05rem' },
+    body2: { fontSize: '0.95rem' },
+    button: { fontWeight: 600, fontSize: '1rem' },
   },
   shape: {
-    borderRadius: 12, // Bordas mais suaves
+    borderRadius: 16, // Bordas mais suaves
   },
   components: {
     MuiButton: {
@@ -93,14 +102,28 @@ const theme = createTheme({
           textTransform: 'none',
           borderRadius: 8,
           fontWeight: 600,
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          }
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          borderRadius: 20,
+          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
+          border: '1px solid #E2E8F0',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 20,
+          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
+          border: '1px solid #E2E8F0',
         },
       },
     },
@@ -140,7 +163,7 @@ function App() {
         token: {
           colorPrimary: '#2563EB',
           borderRadius: 8,
-          fontFamily: '"Inter", sans-serif',
+          fontFamily: '"Outfit", sans-serif',
         },
         algorithm: antdTheme.defaultAlgorithm,
       }}

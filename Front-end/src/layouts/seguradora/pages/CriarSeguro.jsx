@@ -272,10 +272,21 @@ const CriarSeguro = () => {
           </div>
 
           {/* Coberturas */}
-          <Divider orientation="left">Coberturas (Opcional)</Divider>
+          <Divider orientation="left">Coberturas</Divider>
 
-          <Form.List name="coberturas">
-            {(fields, { add, remove }) => (
+          <Form.List 
+            name="coberturas"
+            rules={[
+              {
+                validator: async (_, coberturas) => {
+                  if (!coberturas || coberturas.length < 1) {
+                    return Promise.reject(new Error('É obrigatório adicionar pelo menos uma cobertura.'));
+                  }
+                },
+              },
+            ]}
+          >
+            {(fields, { add, remove }, { errors }) => (
               <>
                 {fields.map(({ key, name, ...restField }) => (
                   <Card
@@ -341,10 +352,11 @@ const CriarSeguro = () => {
                   onClick={() => add()}
                   block
                   icon={<PlusOutlined />}
-                  style={{ marginBottom: '24px' }}
+                  style={{ marginBottom: '8px' }}
                 >
                   Adicionar Cobertura
                 </Button>
+                <Form.ErrorList errors={errors} style={{ color: '#ff4d4f', marginBottom: '24px' }} />
               </>
             )}
           </Form.List>

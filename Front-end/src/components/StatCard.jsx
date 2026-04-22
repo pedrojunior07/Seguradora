@@ -1,41 +1,47 @@
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Box, Card, CardContent, Typography, useTheme } from '@mui/material';
 
 const StatCard = ({ title, value, icon: Icon, color = 'primary', bgColor }) => {
+    const theme = useTheme();
+    const colorCode = theme.palette[color]?.main || color;
+
     return (
         <Card
             sx={{
                 height: '100%',
-                background: bgColor || `linear-gradient(135deg, ${color}.light, ${color}.main)`,
-                color: 'white',
-                borderRadius: 3,
-                transition: 'transform 0.2s',
+                background: '#ffffff',
+                color: theme.palette.text.primary,
+                borderRadius: '16px',
+                border: '1px solid #E2E8F0',
+                boxShadow: '0 1px 3px rgb(0 0 0 / 0.06)',
+                transition: 'box-shadow 0.2s',
                 '&:hover': {
-                    transform: 'translateY(-5px)',
+                    boxShadow: '0 4px 12px rgb(0 0 0 / 0.08)',
                 },
             }}
         >
-            <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
+            <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                     <Box>
-                        <Typography variant="h6" fontWeight="300" sx={{ opacity: 0.9 }}>
+                        <Typography variant="body2" fontWeight="500" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
                             {title}
                         </Typography>
-                        <Typography variant="h3" fontWeight="bold" mt={1}>
+                        <Typography variant="h5" fontWeight="700" sx={{ color: theme.palette.text.primary }}>
                             {value}
                         </Typography>
                     </Box>
                     {Icon && (
                         <Box
                             sx={{
-                                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                borderRadius: '50%',
-                                p: 2,
+                                backgroundColor: `${bgColor || colorCode}12`,
+                                borderRadius: '10px',
+                                p: 1.25,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                color: bgColor || colorCode
                             }}
                         >
-                            <Icon sx={{ fontSize: 40 }} />
+                            <Icon sx={{ fontSize: 24 }} />
                         </Box>
                     )}
                 </Box>

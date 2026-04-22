@@ -11,6 +11,8 @@ class AgenteSeguradora extends Model
     protected $fillable = [
         'id_agente',
         'id_seguradora',
+        'data_inicio',
+        'data_fim',
         'status'
     ];
 }
