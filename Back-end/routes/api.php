@@ -11,12 +11,16 @@ use App\Http\Controllers\Cliente\SinistroController as ClienteSinistroController
 use App\Http\Controllers\Cliente\PagamentoController;
 
 /*
-|--------------------------------------------------------------------------
+|----------------------------------------------------------------------
 | Rotas públicas (SEM JWT)
-|--------------------------------------------------------------------------
+|----------------------------------------------------------------------
 */
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
+Route::post('register', function () {
+    return response()->json(['ok' => true]);
+});
 
 // Verificação de Email
 // Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\Api\VerificationController::class, 'verify'])->name('verification.verify');
@@ -32,11 +36,12 @@ Route::get('auth/google', [\App\Http\Controllers\Api\SocialAuthController::class
 Route::get('auth/google/callback', [\App\Http\Controllers\Api\SocialAuthController::class, 'handleGoogleCallback']);
 
 /*
-|--------------------------------------------------------------------------
+|----------------------------------------------------------------------
 | Rotas protegidas (COM JWT)
-|--------------------------------------------------------------------------
+|----------------------------------------------------------------------
 */
 Route::middleware('auth:api')->group(function () {
+<<<<<<< Updated upstream
     // Auth
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
@@ -243,4 +248,14 @@ Route::middleware('auth:api')->group(function () {
         Route::post('pagamentos/{id}/mpesa', [\App\Http\Controllers\Api\MpesaController::class, 'pagar']);
         Route::get('pagamentos/{id}/mpesa/status', [\App\Http\Controllers\Api\MpesaController::class, 'consultarStatus']);
     });
+=======
+    Route::get('me', [AuthController::class, 'me']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    
+    Route::apiResource('clientes', ClienteController::class);
+    Route::apiResource('veiculos', VeiculoController::class);
+    Route::apiResource('seguradoras', SeguradoraController::class);
+    Route::apiResource('seguros', SeguroController::class);
+    Route::apiResource('categorias', CategoriaController::class);
+>>>>>>> Stashed changes
 });
