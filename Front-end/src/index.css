@@ -14,3 +14,143 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* ─── Responsive Grid Utilities ──────────────────────────────────────────── */
+
+.resp-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .resp-grid-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+.resp-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .resp-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .resp-grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+.resp-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .resp-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1280px) {
+  .resp-grid-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* 2 col desktop, 1 col mobile — with custom gap */
+.resp-grid-2.gap-sm { gap: 12px; }
+.resp-grid-2.gap-lg { gap: 24px; }
+.resp-grid-3.gap-sm { gap: 12px; }
+.resp-grid-3.gap-lg { gap: 24px; }
+
+/* ─── Page Container ─────────────────────────────────────────────────────── */
+
+.page-container {
+  padding: 16px;
+}
+@media (min-width: 640px) {
+  .page-container { padding: 20px 24px; }
+}
+@media (min-width: 1024px) {
+  .page-container { padding: 28px 32px; }
+}
+
+/* ─── Page Header Row (title + action button) ────────────────────────────── */
+
+.page-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media (min-width: 640px) {
+  .page-header-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+}
+
+/* ─── Responsive Modal ───────────────────────────────────────────────────── */
+
+.ant-modal {
+  max-width: calc(100vw - 32px) !important;
+}
+@media (max-width: 639px) {
+  .ant-modal { margin: 8px auto !important; }
+  .ant-modal-content { border-radius: 16px !important; }
+}
+
+/* ─── Tables: horizontal scroll on small screens ─────────────────────────── */
+
+.ant-table-wrapper {
+  overflow-x: auto;
+}
+
+/* ─── Ant Design Drawer width on mobile ──────────────────────────────────── */
+
+@media (max-width: 639px) {
+  .ant-drawer-content-wrapper { width: 85vw !important; max-width: 300px !important; }
+}
+
+/* ─── Sidebar: hide text labels when sidebar is icon-only ───────────────── */
+
+.ant-layout-sider-collapsed .ant-menu-item-icon + span,
+.ant-layout-sider-collapsed .ant-menu-submenu-title .ant-menu-item-icon + span {
+  display: none;
+}
+
+/* ─── Stats cards row ────────────────────────────────────────────────────── */
+
+.stats-row .ant-col {
+  margin-bottom: 0;
+}
+
+/* ─── Agentes: seguros/comissões grid ───────────────────────────────────── */
+
+.agents-seguros-header {
+  display: none;
+}
+.agents-seguros-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+@media (min-width: 520px) {
+  .agents-seguros-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 40px;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .agents-seguros-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 40px;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+  }
+}

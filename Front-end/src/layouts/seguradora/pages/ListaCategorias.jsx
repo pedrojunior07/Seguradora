@@ -276,9 +276,9 @@ const ListaCategorias = () => {
     };
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div className="page-container">
             <Card>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div className="page-header-row">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <FolderOpenOutlined style={{ fontSize: '24px', color: '#1e40af' }} />
                         <div>

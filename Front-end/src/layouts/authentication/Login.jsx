@@ -37,17 +37,21 @@ const Login = () => {
         try {
             const data = await login(formData.email, formData.password);
             const profile = data.user.perfil;
-            console.log("token:   " + data.token)
+            const nome = data.user.name?.split(' ')[0] || 'utilizador';
 
-            if (profile === 'seguradora') navigate('/seguradora/dashboard');
-            else if (profile === 'corretora') navigate('/corretora/dashboard');
-            else if (profile === 'cliente') navigate('/cliente/dashboard');
-            else if (profile === 'admin') navigate('/admin/dashboard');
-            else navigate('/');
+            const routes = {
+                seguradora: '/seguradora/dashboard',
+                corretora: '/corretora/dashboard',
+                cliente: '/cliente/dashboard',
+                admin: '/admin/dashboard',
+            };
+            const destination = routes[profile] || '/';
+
+            setSuccessMessage(`Bem-vindo de volta, ${nome}! Credenciais válidas. Redirecionando...`);
+            setTimeout(() => navigate(destination), 1500);
         } catch (err) {
             console.error('Login error:', err);
 
-            // Extract error message from API response
             if (err.data?.message) {
                 setError(err.data.message);
             } else if (err.message) {
@@ -55,7 +59,6 @@ const Login = () => {
             } else {
                 setError('Email ou senha inválidos. Verifique suas credenciais e tente novamente.');
             }
-        } finally {
             setLoading(false);
         }
     };
@@ -119,7 +122,19 @@ const Login = () => {
                         </Box>
 
                         {successMessage && (
-                            <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+                            <Alert
+                                severity="success"
+                                sx={{
+                                    mb: 3,
+                                    borderRadius: 2,
+                                    fontWeight: 600,
+                                    fontSize: '0.95rem',
+                                    backgroundColor: '#f0fdf4',
+                                    border: '1px solid #bbf7d0',
+                                    color: '#166534',
+                                    '& .MuiAlert-icon': { color: '#16a34a' }
+                                }}
+                            >
                                 {successMessage}
                             </Alert>
                         )}

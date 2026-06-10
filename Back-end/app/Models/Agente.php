@@ -34,7 +34,7 @@ class Agente extends Model
     public function corretoras()
     {
         return $this->belongsToMany(Corretora::class, 'agente_corretora', 'id_agente', 'id_corretora')
-                    ->withPivot('data_inicio', 'data_fim', 'comissao_angariacao', 'comissao_cobranca', 'status')
+                    ->withPivot('data_inicio', 'data_fim', 'status')
                     ->withTimestamps();
     }
 
@@ -46,7 +46,7 @@ class Agente extends Model
     public function seguradoras()
     {
         return $this->belongsToMany(Seguradora::class, 'agente_seguradora', 'id_agente', 'id_seguradora')
-                    ->withPivot('status', 'comissao_percentagem', 'data_inicio', 'data_fim')
+                    ->withPivot('status', 'data_inicio', 'data_fim')
                     ->withTimestamps();
     }
 
@@ -58,7 +58,7 @@ class Agente extends Model
     public function segurosSeguradoras()
     {
         return $this->belongsToMany(SeguradoraSeguro::class, 'agente_seguroseguradora', 'id_agente', 'id_seguro_seguradora')
-                    ->withPivot('status')
+                    ->withPivot('status', 'percentagem_comissao_angariacao', 'percentagem_comissao_cobranca', 'data_inicio', 'data_fim')
                     ->withTimestamps();
     }
 

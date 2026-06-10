@@ -267,7 +267,7 @@ const VerificacaoContaCorretora = () => {
     }
 
     return (
-        <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto', fontFamily: '"Inter", sans-serif' }}>
+        <div className="page-container" style={{ maxWidth: '1200px', margin: '0 auto', fontFamily: '"Inter", sans-serif' }}>
             <div style={{ marginBottom: '40px', textAlign: 'center' }}>
                 <Title level={1} style={{ fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>Verificação da Corretora</Title>
                 <Paragraph style={{ fontSize: '16px', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>

@@ -321,12 +321,12 @@ const Register = () => {
                 )}
 
                 <Grid container spacing={2.5}>
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Person /> Informações Básicas
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
                             fullWidth
                             label="Nome"
@@ -343,7 +343,7 @@ const Register = () => {
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
                             fullWidth
                             label="Email"
@@ -362,7 +362,7 @@ const Register = () => {
                         />
                     </Grid>
 
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
                             fullWidth
                             label="Senha"
@@ -388,7 +388,7 @@ const Register = () => {
                         />
                     </Grid>
 
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
                             fullWidth
                             label="Confirmar Senha"
@@ -420,7 +420,7 @@ const Register = () => {
                             <Business /> Informações da Empresa
                         </Typography>
                         <Grid container spacing={2.5}>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Nome da Empresa"
@@ -437,7 +437,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Nome do Responsável"
@@ -453,7 +453,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="NUIT"
@@ -470,7 +470,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Telefone Principal"
@@ -487,7 +487,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Telefone Secundário"
@@ -503,7 +503,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={perfil === 'seguradora' ? 6 : 12}>
+                            <Grid size={12}>
                                 <TextField
                                     fullWidth
                                     label="Endereço"
@@ -520,25 +520,7 @@ const Register = () => {
                                 />
                             </Grid>
                             {perfil === 'seguradora' && (
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        label="Número da Licença"
-                                        name="licenca"
-                                        onChange={handleChange}
-                                        variant="outlined"
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <Assignment color="action" />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                    />
-                                </Grid>
-                            )}
-                            {perfil === 'seguradora' && (
-                                <Grid item xs={12} md={6}>
+                                <Grid size={{ xs: 12, md: 6 }}>
                                     <div>
                                         <InputLabel sx={{ mb: 1 }}>Logo da Seguradora (opcional)</InputLabel>
                                         <input
@@ -559,7 +541,7 @@ const Register = () => {
                             <Person /> Informações Pessoais
                         </Typography>
                         <Grid container spacing={2.5}>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <FormControl fullWidth>
                                     <InputLabel>Tipo de Cliente</InputLabel>
                                     <Select
@@ -575,7 +557,7 @@ const Register = () => {
                             </Grid>
 
                             {formData.tipo_cliente === 'juridica' && (
-                                <Grid item xs={12} md={6}>
+                                <Grid size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
                                         label="Tipo de Empresa (ex: Lda, SA)"
@@ -593,7 +575,7 @@ const Register = () => {
                                     />
                                 </Grid>
                             )}
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Nome Completo"
@@ -610,7 +592,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="NUIT"
@@ -627,7 +609,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Documento (BI/Passaporte)"
@@ -643,7 +625,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <TextField
                                     fullWidth
                                     label="Telefone"
@@ -660,7 +642,7 @@ const Register = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid size={12}>
                                 <TextField
                                     fullWidth
                                     label="Endereço"
@@ -681,12 +663,12 @@ const Register = () => {
 
                             {formData.tipo_cliente === 'juridica' && (
                                 <>
-                                    <Grid item xs={12}>
+                                    <Grid size={12}>
                                         <Typography variant="h6" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 3 }}>
                                             <Assignment /> Documentos da Empresa
                                         </Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid size={{ xs: 12, md: 6 }}>
                                         <InputLabel>Cópia do NUIT</InputLabel>
                                         <input
                                             type="file"
@@ -695,7 +677,7 @@ const Register = () => {
                                             style={{ marginTop: 8 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid size={{ xs: 12, md: 6 }}>
                                         <InputLabel>Documento do Representante</InputLabel>
                                         <input
                                             type="file"
@@ -704,7 +686,7 @@ const Register = () => {
                                             style={{ marginTop: 8 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid size={{ xs: 12, md: 6 }}>
                                         <InputLabel>Certidão Comercial</InputLabel>
                                         <input
                                             type="file"
@@ -713,7 +695,7 @@ const Register = () => {
                                             style={{ marginTop: 8 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid size={{ xs: 12, md: 6 }}>
                                         <InputLabel>Licença (Alvará)</InputLabel>
                                         <input
                                             type="file"
@@ -722,7 +704,7 @@ const Register = () => {
                                             style={{ marginTop: 8 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid size={{ xs: 12, md: 6 }}>
                                         <InputLabel>Boletim da República (Opcional)</InputLabel>
                                         <input
                                             type="file"
@@ -753,7 +735,7 @@ const Register = () => {
         >
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
                 <Grid container spacing={0} alignItems="center" justifyContent="center">
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                         <Slide direction="up" in timeout={600}>
                             <Card
                                 elevation={0}

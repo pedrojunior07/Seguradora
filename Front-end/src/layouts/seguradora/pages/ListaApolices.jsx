@@ -168,8 +168,8 @@ const ListaApolices = () => {
     ];
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+        <div className="page-container">
+            <div className="page-header-row">
                 <div>
                     <Title level={2} style={{ margin: 0 }}>Gestão de Propostas e Apólices</Title>
                     <p className="text-gray-500">Analise propostas e gerencie apólices ativas</p>

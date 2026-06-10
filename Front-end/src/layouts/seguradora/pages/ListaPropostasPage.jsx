@@ -112,8 +112,8 @@ const ListaPropostasPage = () => {
     ];
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div className="page-container">
+            <div className="page-header-row">
                 <Title level={2}><FileTextOutlined /> Gestão de Propostas</Title>
                 <Select
                     defaultValue="em_analise"

@@ -80,8 +80,8 @@ const AuditLogs = () => {
     };
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div className="page-container">
+            <div className="page-header-row">
                 <Title level={2} style={{ margin: 0 }}>Logs de Auditoria</Title>
                 <Button icon={<ReloadOutlined />} onClick={() => fetchLogs(pagination.current)}>
                     Atualizar

@@ -75,7 +75,7 @@ const QuickActions = () => {
         </div>
       }
       className="shadow-sm border border-gray-100 rounded-xl hover:shadow-md transition-shadow duration-300"
-      bodyStyle={{ padding: '16px' }}
+      styles={{ body: { padding: '16px' } }}
     >
       <div className="grid grid-cols-1 gap-2">
         {actions.map((action, index) => (

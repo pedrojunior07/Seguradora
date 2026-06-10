@@ -127,7 +127,7 @@ const CorretoraDashboard = () => {
     };
 
     return (
-        <div style={{ backgroundColor: '#F8FAFC', minHeight: '100vh', padding: '24px' }}>
+        <div className="page-container" style={{ backgroundColor: '#F8FAFC', minHeight: '100vh' }}>
             {/* Navbar removed */}
             {/* Sidebar removed */}
 
@@ -229,7 +229,7 @@ const CorretoraDashboard = () => {
                     ) : (
                         <>
                             <Grid container spacing={3} mb={5}>
-                                <Grid item xs={12} sm={6} md={3}>
+                                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                     <PremiumStatCard
                                         title="Total de Propostas"
                                         value={stats.totalProposals}
@@ -239,7 +239,7 @@ const CorretoraDashboard = () => {
                                         trend="up"
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
+                                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                     <PremiumStatCard
                                         title="Propostas Pendentes"
                                         value={stats.pendingProposals}
@@ -249,7 +249,7 @@ const CorretoraDashboard = () => {
                                         trend="down"
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
+                                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                     <PremiumStatCard
                                         title="Propostas Aprovadas"
                                         value={stats.approvedProposals}
@@ -259,7 +259,7 @@ const CorretoraDashboard = () => {
                                         trend="up"
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={3}>
+                                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                     <PremiumStatCard
                                         title="Apólices Convertidas"
                                         value={stats.convertedPolicies}
@@ -272,7 +272,7 @@ const CorretoraDashboard = () => {
                             </Grid>
 
                             <Grid container spacing={4}>
-                                <Grid item xs={12} md={8}>
+                                <Grid size={{ xs: 12, md: 8 }}>
                                     <Paper
                                         elevation={0}
                                         sx={{
@@ -301,7 +301,7 @@ const CorretoraDashboard = () => {
                                         </Box>
                                     </Paper>
                                 </Grid>
-                                <Grid item xs={12} md={4}>
+                                <Grid size={{ xs: 12, md: 4 }}>
                                     <Paper 
                                         elevation={0}
                                         sx={{ 

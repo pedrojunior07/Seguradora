@@ -149,7 +149,7 @@ const PagamentosPage = () => {
 
     return (
         <ClienteLayout>
-            <div style={{ padding: 24 }}>
+            <div className="page-container">
                 <Title level={2}><CreditCardOutlined /> Meus Pagamentos</Title>
                 <Card>
                     <Table

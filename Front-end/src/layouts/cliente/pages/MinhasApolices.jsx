@@ -125,7 +125,7 @@ const MinhasApolices = () => {
 
     return (
         <ClienteLayout>
-            <div style={{ padding: '0 0 24px 0' }}>
+            <div className="page-container">
                 <Title level={2}>Minhas Apólices</Title>
                 <Text type="secondary">Gerencie suas proteções e acompanhe a vigência de seus seguros.</Text>
             </div>

@@ -127,6 +127,13 @@ Route::middleware('auth:api')->group(function () {
             Route::post('sinistros/{sinistro}/negar', [SeguradoraSinistroController::class, 'negar']);
         });
 
+        // Parcerias com Corretoras
+        Route::get('parceiras', [\App\Http\Controllers\Api\Seguradora\ParceriaController::class, 'index']);
+        Route::get('parceiras/{id}/seguros', [\App\Http\Controllers\Api\Seguradora\ParceriaController::class, 'seguros']);
+        Route::post('parceiras/{id}/aprovar', [\App\Http\Controllers\Api\Seguradora\ParceriaController::class, 'aprovar']);
+        Route::post('parceiras/{id}/rejeitar', [\App\Http\Controllers\Api\Seguradora\ParceriaController::class, 'rejeitar']);
+        Route::post('parceiras/{id}/revogar', [\App\Http\Controllers\Api\Seguradora\ParceriaController::class, 'revogar']);
+
         // Visualização (Sempre permitido)
         Route::get('seguros', [SeguroController::class, 'index']);
         Route::get('seguros/{id}', [SeguroController::class, 'show']);
@@ -145,11 +152,17 @@ Route::middleware('auth:api')->group(function () {
         Route::get('sinistros/estatisticas', [SeguradoraSinistroController::class, 'estatisticas']);
     });
 
-    // ROTAS CORRETORA
+    //ROTAS CORRETORA
     Route::prefix('corretora')->group(function () {
         // Perfil e Verificação
         Route::get('perfil/verificacao', [\App\Http\Controllers\Api\Corretora\PerfilController::class, 'getVerificacaoStatus']);
         Route::post('perfil/verificacao', [\App\Http\Controllers\Api\Corretora\PerfilController::class, 'uploadDocumentos']);
+
+        // Parcerias com Seguradoras
+        Route::get('parceiras', [\App\Http\Controllers\Api\Corretora\ParceriaController::class, 'index']);
+        Route::get('seguradoras-disponiveis', [\App\Http\Controllers\Api\Corretora\ParceriaController::class, 'seguradoras']);
+        Route::post('seguradoras/{id}/solicitar', [\App\Http\Controllers\Api\Corretora\ParceriaController::class, 'solicitar']);
+        Route::delete('parceiras/{id}', [\App\Http\Controllers\Api\Corretora\ParceriaController::class, 'cancelar']);
 
         // Operações que requerem verificação
         Route::middleware(['entity_verified'])->group(function () {
@@ -162,6 +175,16 @@ Route::middleware('auth:api')->group(function () {
         Route::get('propostas/recentes', [PropostaController::class, 'recentNotifications']);
         Route::get('propostas', [PropostaController::class, 'index']);
         Route::get('propostas/{proposta}', [PropostaController::class, 'show']);
+    });
+
+    // ROTAS AGENTE
+    Route::prefix('agente')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\Api\Agente\DashboardController::class, 'index']);
+        Route::get('seguros', [\App\Http\Controllers\Api\Agente\SeguroController::class, 'index']);
+        Route::get('clientes', [\App\Http\Controllers\Api\Agente\ClienteController::class, 'index']);
+        Route::post('clientes', [\App\Http\Controllers\Api\Agente\ClienteController::class, 'store']);
+        Route::get('vendas', [\App\Http\Controllers\Api\Agente\PropostaController::class, 'index']);
+        Route::post('vendas', [\App\Http\Controllers\Api\Agente\PropostaController::class, 'store']);
     });
 
     // CONTRATAÇÃO

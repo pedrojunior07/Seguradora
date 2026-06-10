@@ -94,7 +94,7 @@ const RecentActivity = () => {
         border: '1px solid #f0f0f0',
         boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
       }}
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
     >
       <Collapse
         bordered={false}

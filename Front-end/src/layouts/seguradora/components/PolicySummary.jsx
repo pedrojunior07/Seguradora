@@ -111,7 +111,7 @@ Detalhes
 </div>
 }
 className="shadow-sm border border-gray-100 rounded-xl hover:shadow-md transition-shadow duration-300"
-bodyStyle={{ padding: '16px' }}
+styles={{ body: { padding: '16px' } }}
 >
 {/* Estatísticas rápidas */}
 <div className="mb-6 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">

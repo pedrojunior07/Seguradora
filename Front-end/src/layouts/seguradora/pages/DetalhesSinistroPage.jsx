@@ -76,7 +76,7 @@ const DetalhesSinistroPage = () => {
     };
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div className="page-container">
             <div style={{ marginBottom: '16px' }}>
                 <Breadcrumb items={[
                     { title: <Link to="/seguradora/dashboard">Dashboard</Link> },

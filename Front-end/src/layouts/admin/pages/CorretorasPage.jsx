@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Button, Space, Typography, Card, message, Tooltip, Modal, Form, Input, Radio, Divider } from 'antd';
+import { Table, Tag, Button, Space, Typography, Card, message, Tooltip, Modal, Form, Input, Radio, Divider, Row, Col } from 'antd';
 import { 
     ReloadOutlined, 
     StopOutlined, 
     CheckCircleOutlined, 
     AuditOutlined, 
     EyeOutlined, 
-    CloseCircleOutlined,
     IdcardOutlined,
     FileProtectOutlined,
     BankOutlined
@@ -14,7 +13,7 @@ import {
 import { STORAGE_BASE_URL } from '@services/api';
 import AdminService from '@services/admin.service';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const AdminCorretorasPage = () => {
     const [loading, setLoading] = useState(false);
@@ -57,14 +56,23 @@ const AdminCorretorasPage = () => {
     };
 
     const handleVerifySubmit = async (values) => {
+        if (!selectedCorretora?.id_corretora) {
+            message.error('Corretora não identificada. Feche e tente novamente.');
+            return;
+        }
         setVerifyLoading(true);
         try {
             await AdminService.verificarCorretora(selectedCorretora.id_corretora, values);
-            message.success('Status de verificação da corretora atualizado');
+            message.success(
+                values.status_verificacao === 'aprovado'
+                    ? 'Corretora aprovada com sucesso!'
+                    : 'Corretora rejeitada. A corretora foi notificada.'
+            );
             setIsVerifyModalVisible(false);
             fetchCorretoras(pagination.current);
         } catch (error) {
-            message.error('Erro ao atualizar verificação');
+            console.error('Erro verificação corretora:', error);
+            message.error(error?.message || error?.data?.message || 'Erro ao atualizar verificação. Tente novamente.');
         } finally {
             setVerifyLoading(false);
         }
@@ -100,7 +108,7 @@ const AdminCorretorasPage = () => {
             title: 'Email/Telefone',
             key: 'contact',
             render: (_, record) => (
-                <Space direction="vertical" size={0}>
+                <Space orientation="vertical" size={0}>
                     <Text size="small">{record.email}</Text>
                     <Text type="secondary" size="small">{record.telefone1}</Text>
                 </Space>
@@ -163,9 +171,9 @@ const AdminCorretorasPage = () => {
     ];
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div className="page-container">
             <Card variant="borderless" className="shadow-sm rounded-2xl">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div className="page-header-row">
                     <Title level={3} style={{ margin: 0 }}>Gestão de Corretoras</Title>
                     <Button 
                         icon={<ReloadOutlined />} 

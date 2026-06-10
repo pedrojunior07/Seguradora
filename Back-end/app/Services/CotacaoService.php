@@ -123,6 +123,10 @@ class CotacaoService
             $proposta->bem_id = $bemId;
             $proposta->bem_type = $bemType;
             
+            // Vínculos
+            $proposta->agente_id = $dados['agente_id'] ?? null;
+            $proposta->corretora_id = $dados['corretora_id'] ?? null;
+            
             // Valores
             $proposta->valor_bem = $cotacao['valor_bem'];
             $proposta->premio_calculado = $cotacao['premio_final'];

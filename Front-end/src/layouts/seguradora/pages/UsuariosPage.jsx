@@ -148,9 +148,9 @@ const UsuariosPage = () => {
     ];
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div className="page-container">
             <Card>
-                <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="page-header-row">
                     <div>
                         <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 600 }}>Minha Equipe</h2>
                         <p style={{ color: '#666', margin: 0 }}>Gerencie os operadores com acesso ao sistema</p>

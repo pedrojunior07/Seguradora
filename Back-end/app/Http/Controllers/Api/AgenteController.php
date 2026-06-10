@@ -68,45 +68,43 @@ class AgenteController extends Controller
         }
 
         $validated = $request->validate([
-            'nome' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|unique:agentes,email',
-            'telefone' => 'required|string|max:20',
-            'documento' => 'nullable|string|max:20',
-            'password' => 'nullable|string|min:6', // Opcional, gera default se vazio
-            'comissao_percentagem' => 'nullable|numeric|min:0|max:100',
-            'seguros_ids' => 'nullable|array', // IDs dos SeguradoraSeguro
-            'seguros_ids.*' => 'exists:seguradora_seguro,id',
+            'nome'       => 'required|string|max:255',
+            'email'      => 'required|email|unique:users,email|unique:agentes,email',
+            'telefone'   => 'required|string|max:20',
+            'documento'  => 'nullable|string|max:20',
+            'password'   => 'nullable|string|min:6',
+            'seguros'      => 'nullable|array',
+            'seguros.*.id' => [
+                'nullable', 'integer',
+                Rule::exists('seguradora_seguro', 'id')->where('id_seguradora', $seguradoraId),
+            ],
+            'seguros.*.percentagem_comissao_angariacao' => 'nullable|numeric|min:0|max:100',
+            'seguros.*.percentagem_comissao_cobranca'   => 'nullable|numeric|min:0|max:100',
         ]);
-        
-        // Preparar dados para o AuthService
+
         $dadosAgente = [
-            'nome' => $validated['nome'],
-            'email' => $validated['email'],
-            'telefone' => $validated['telefone'],
+            'nome'      => $validated['nome'],
+            'email'     => $validated['email'],
+            'telefone'  => $validated['telefone'],
             'documento' => $validated['documento'] ?? null,
-            'password' => $validated['password'] ?? 'agente123', // Senha padrão se não informada
-            'comissao_percentagem' => $validated['comissao_percentagem'] ?? 0,
+            'password'  => $validated['password'] ?? 'agente123',
         ];
 
         try {
             DB::beginTransaction();
 
-            // Usa AuthService para criar Agente, User e Vínculo com Seguradora
             $resultado = $this->authService->criarAgente($dadosAgente, 'seguradora', $seguradoraId);
             $agente = $resultado['agente'];
 
-            // Associar aos Seguros Específicos (SeguradoraSeguro)
-            if (!empty($validated['seguros_ids'])) {
-                foreach ($validated['seguros_ids'] as $seguroSeguradoraId) {
-                    // Verificar se o seguro pertence à seguradora (segurança)
-                    $pertence = SeguradoraSeguro::where('id', $seguroSeguradoraId)
-                        ->where('id_seguradora', $seguradoraId)
-                        ->exists();
-
-                    if ($pertence) {
-                         $agente->segurosSeguradoras()->attach($seguroSeguradoraId, ['status' => true]);
-                    }
+            foreach ($validated['seguros'] ?? [] as $seguro) {
+                if (empty($seguro['id'])) {
+                    continue;
                 }
+                $agente->segurosSeguradoras()->attach($seguro['id'], [
+                    'status'                          => true,
+                    'percentagem_comissao_angariacao' => $seguro['percentagem_comissao_angariacao'] ?? 0,
+                    'percentagem_comissao_cobranca'   => $seguro['percentagem_comissao_cobranca'] ?? 0,
+                ]);
             }
 
             DB::commit();
@@ -138,40 +136,51 @@ class AgenteController extends Controller
                 $q->where('agente_seguradora.id_seguradora', $user->perfil_id);
             })->firstOrFail();
 
+        $seguradoraId = $user->perfil_id;
+
         $validated = $request->validate([
-            'nome' => 'sometimes|string|max:255',
-            'email' => ['sometimes', 'email', Rule::unique('agentes')->ignore($agente->id_agente, 'id_agente')],
-            'telefone' => 'nullable|string|max:20',
-            'status' => 'boolean',
-            'seguros_ids' => 'sometimes|array',
-            'seguros_ids.*' => 'exists:seguradora_seguro,id',
+            'nome'      => 'sometimes|string|max:255',
+            'email'     => ['sometimes', 'email', Rule::unique('agentes')->ignore($agente->id_agente, 'id_agente')],
+            'telefone'  => 'nullable|string|max:20',
+            'status'    => 'boolean',
+            'seguros'      => 'sometimes|array',
+            'seguros.*.id' => [
+                'nullable', 'integer',
+                Rule::exists('seguradora_seguro', 'id')->where('id_seguradora', $seguradoraId),
+            ],
+            'seguros.*.percentagem_comissao_angariacao' => 'nullable|numeric|min:0|max:100',
+            'seguros.*.percentagem_comissao_cobranca'   => 'nullable|numeric|min:0|max:100',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $agente->update($validated);
+            $camposAgente = array_intersect_key($validated, array_flip(['nome', 'email', 'telefone', 'status']));
+            if (!empty($camposAgente)) {
+                $agente->update($camposAgente);
+            }
 
-            // Atualizar User associado se email/nome mudou
             $agenteUser = $agente->user;
             if ($agenteUser) {
-                if (isset($validated['nome'])) $agenteUser->name = $validated['nome'];
-                if (isset($validated['email'])) $agenteUser->email = $validated['email'];
+                if (isset($validated['nome']))   $agenteUser->name   = $validated['nome'];
+                if (isset($validated['email']))  $agenteUser->email  = $validated['email'];
                 if (isset($validated['status'])) $agenteUser->status = $validated['status'];
                 $agenteUser->save();
             }
 
-            // Atualizar Seguros Associados
-            if (isset($validated['seguros_ids'])) {
-                 // Sync garante que apenas os enviados fiquem ativos
-                 // Mas precisamos garantir que sejam da seguradora atual
-                 $validIds = SeguradoraSeguro::whereIn('id', $validated['seguros_ids'])
-                    ->where('id_seguradora', $user->perfil_id)
-                    ->pluck('id')
-                    ->toArray();
-                 
-                 // Usando sync com pivot status
-                 $agente->segurosSeguradoras()->syncWithPivotValues($validIds, ['status' => true]);
+            if (array_key_exists('seguros', $validated)) {
+                $syncData = [];
+                foreach ($validated['seguros'] as $seguro) {
+                    if (empty($seguro['id'])) {
+                        continue;
+                    }
+                    $syncData[$seguro['id']] = [
+                        'status'                          => true,
+                        'percentagem_comissao_angariacao' => $seguro['percentagem_comissao_angariacao'] ?? 0,
+                        'percentagem_comissao_cobranca'   => $seguro['percentagem_comissao_cobranca'] ?? 0,
+                    ];
+                }
+                $agente->segurosSeguradoras()->sync($syncData);
             }
 
             DB::commit();
@@ -182,7 +191,7 @@ class AgenteController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Erro ao atualizar agente.'], 500);
+            return response()->json(['message' => 'Erro ao atualizar agente: ' . $e->getMessage()], 500);
         }
     }
 

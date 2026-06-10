@@ -138,7 +138,7 @@ const SinistrosPage = () => {
     ];
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div className="page-container">
             <Card>
                 <div style={{ marginBottom: '24px' }}>
                     <Title level={2}>Gestão de Sinistros</Title>

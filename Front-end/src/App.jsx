@@ -16,6 +16,7 @@ import CorretoraDashboardPage from '@layouts/corretora/pages/DashboardPage';
 import CorretoraLayout from '@layouts/corretora/CorretoraLayout';
 import ListaSeguros from '@layouts/seguradora/pages/ListaSeguros';
 import CriarSeguro from '@layouts/seguradora/pages/CriarSeguro';
+import EditarSeguro from '@layouts/seguradora/pages/EditarSeguro';
 import DetalhesSeguro from '@layouts/seguradora/pages/DetalhesSeguro';
 import ListaCategorias from '@layouts/seguradora/pages/ListaCategorias';
 import UsuariosPage from '@layouts/seguradora/pages/UsuariosPage';
@@ -28,10 +29,20 @@ import DetalhesSinistroPage from '@layouts/seguradora/pages/DetalhesSinistroPage
 import AuditoriaPage from '@layouts/seguradora/pages/AuditoriaPage';
 import AgentesPage from '@layouts/seguradora/pages/AgentesPage';
 import VerificacaoConta from '@layouts/seguradora/pages/VerificacaoConta';
+import SeguradoraParceiriasPage from '@layouts/seguradora/pages/ParceiriasPage';
 import AdminRoute from '@components/AdminRoute';
 
 // Corretora
 import VerificacaoContaCorretora from '@layouts/corretora/pages/VerificacaoConta';
+import CorretoraParceiriasPage from '@layouts/corretora/pages/ParceiriasPage';
+
+// Agente
+import AgenteLayout from '@layouts/agente/AgenteLayout';
+import AgenteDashboard from '@layouts/agente/pages/Dashboard';
+import AgenteSeguros from '@layouts/agente/pages/MeusSeguros';
+import AgenteClientes from '@layouts/agente/pages/Clientes';
+import AgenteVendas from '@layouts/agente/pages/Vendas';
+import AgenteNovaVenda from '@layouts/agente/pages/NovaVenda';
 
 // Admin
 import AdminLayout from '@layouts/admin/AdminLayout';
@@ -147,6 +158,8 @@ const Home = () => {
       return <Navigate to="/seguradora/dashboard" replace />;
     case 'corretora':
       return <Navigate to="/corretora/dashboard" replace />;
+    case 'agente':
+      return <Navigate to="/agente/dashboard" replace />;
     case 'cliente':
       return <Navigate to="/cliente/dashboard" replace />;
     case 'admin':
@@ -217,6 +230,11 @@ function App() {
                   </AdminRoute>
                 } />
                 <Route path="seguros/:id" element={<DetalhesSeguro />} />
+                <Route path="seguros/:id/editar" element={
+                  <AdminRoute>
+                    <EditarSeguro />
+                  </AdminRoute>
+                } />
 
                 <Route path="categorias" element={<ListaCategorias />} />
                 <Route path="usuarios" element={
@@ -237,6 +255,7 @@ function App() {
                   </AdminRoute>
                 } />
                 <Route path="agentes" element={<AgentesPage />} />
+                <Route path="parcerias" element={<SeguradoraParceiriasPage />} />
                 <Route path="perfil/verificacao" element={
                   <AdminRoute>
                     <VerificacaoConta />
@@ -256,6 +275,25 @@ function App() {
                 <Route index element={<Navigate to="/corretora/dashboard" replace />} />
                 <Route path="dashboard" element={<CorretoraDashboardPage />} />
                 <Route path="perfil/verificacao" element={<VerificacaoContaCorretora />} />
+                <Route path="parcerias" element={<CorretoraParceiriasPage />} />
+                <Route path="notificacoes" element={<NotificacoesPage />} />
+              </Route>
+
+              {/* Agente Routes */}
+              <Route
+                path="/agente"
+                element={
+                  <ProtectedRoute allowedRoles={['agente']}>
+                    <AgenteLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/agente/dashboard" replace />} />
+                <Route path="dashboard" element={<AgenteDashboard />} />
+                <Route path="seguros" element={<AgenteSeguros />} />
+                <Route path="clientes" element={<AgenteClientes />} />
+                <Route path="vendas" element={<AgenteVendas />} />
+                <Route path="vendas/nova" element={<AgenteNovaVenda />} />
                 <Route path="notificacoes" element={<NotificacoesPage />} />
               </Route>
 

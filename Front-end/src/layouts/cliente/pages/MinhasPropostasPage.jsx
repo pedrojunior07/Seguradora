@@ -212,8 +212,8 @@ const MinhasPropostasPage = () => {
 
     return (
         <ClienteLayout>
-            <div style={{ padding: 24 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div className="page-container">
+                <div className="page-header-row">
                     <Title level={2}><FileTextOutlined /> Minhas Propostas</Title>
                     <Button type="primary" onClick={() => navigate('/cliente/contratar')}>Nova Simulação</Button>
                 </div>

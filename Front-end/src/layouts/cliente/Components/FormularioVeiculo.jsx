@@ -6,7 +6,7 @@ import api from '../../../services/api';
 const { Option } = Select;
 const { TextArea } = Input;
 
-const FormularioVeiculo = ({ veiculo, onSuccess, onCancel }) => {
+const FormularioVeiculo = ({ veiculo, onSuccess, onCancel, frotaId }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState({});
@@ -65,6 +65,10 @@ const FormularioVeiculo = ({ veiculo, onSuccess, onCancel }) => {
                 formData.append(key, values[key]);
             }
         });
+
+        if (frotaId) {
+            formData.append('frota_id', frotaId);
+        }
 
         // Campos de arquivo
         const photoFields = [

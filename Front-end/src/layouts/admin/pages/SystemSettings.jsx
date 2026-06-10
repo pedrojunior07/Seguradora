@@ -45,7 +45,7 @@ const SystemSettings = () => {
     const displaySettings = settings.length > 0 ? settings : demoSettings; // Use demo if empty for now
 
     return (
-        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <div className="page-container" style={{ maxWidth: 800, margin: '0 auto' }}>
             <Title level={2}>Configurações do Sistema</Title>
 
             <Card title="Geral" style={{ marginBottom: 24 }}>

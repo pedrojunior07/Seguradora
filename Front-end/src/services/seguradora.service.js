@@ -81,6 +81,33 @@ const seguradoraService = {
         return response.data;
     },
 
+    // Parcerias com Corretoras
+    getParceiras: async (status) => {
+        const params = status ? { status } : {};
+        const response = await api.get('/seguradora/parceiras', { params });
+        return response.data;
+    },
+
+    aprovarParceria: async (id, comissao_percentagem) => {
+        const response = await api.post(`/seguradora/parceiras/${id}/aprovar`, { comissao_percentagem });
+        return response.data;
+    },
+
+    rejeitarParceria: async (id, observacoes) => {
+        const response = await api.post(`/seguradora/parceiras/${id}/rejeitar`, { observacoes });
+        return response.data;
+    },
+
+    revogarParceria: async (id) => {
+        const response = await api.post(`/seguradora/parceiras/${id}/revogar`);
+        return response.data;
+    },
+
+    getParceiriaSeguros: async (id) => {
+        const response = await api.get(`/seguradora/parceiras/${id}/seguros`);
+        return response.data;
+    },
+
     // Perfil e Verificação
     getVerificacaoStatus: async () => {
         const response = await api.get('/seguradora/perfil/verificacao');

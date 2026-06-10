@@ -27,6 +27,27 @@ const corretoraService = {
         return response.data;
     },
 
+    // Parcerias com Seguradoras
+    getParceiras: async () => {
+        const response = await api.get('/corretora/parceiras');
+        return response.data;
+    },
+
+    getSeguradoresDisponiveis: async () => {
+        const response = await api.get('/corretora/seguradoras-disponiveis');
+        return response.data;
+    },
+
+    solicitarParceria: async (seguradoraId) => {
+        const response = await api.post(`/corretora/seguradoras/${seguradoraId}/solicitar`);
+        return response.data;
+    },
+
+    cancelarParceria: async (parceiraId) => {
+        const response = await api.delete(`/corretora/parceiras/${parceiraId}`);
+        return response.data;
+    },
+
     // Perfil e Verificação
     getVerificacaoStatus: async () => {
         const response = await api.get('/corretora/perfil/verificacao');

@@ -104,8 +104,8 @@ const UsersPage = () => {
     };
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div className="page-container">
+            <div className="page-header-row">
                 <Title level={2} style={{ margin: 0 }}>Gestão de Usuários (Governança)</Title>
                 <Button icon={<ReloadOutlined />} onClick={() => fetchUsers(pagination.current)}>
                     Atualizar

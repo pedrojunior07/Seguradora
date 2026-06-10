@@ -78,7 +78,7 @@ const SeguradoraDashboard = () => {
 
 
     return (
-        <div style={{ padding: '24px' }}>
+        <div className="page-container">
             <Container maxWidth="xl">
                     {verificationStatus?.status_verificacao !== 'aprovado' && (
                         <Alert
@@ -126,7 +126,7 @@ const SeguradoraDashboard = () => {
                     </Typography>
 
                     <Grid container spacing={3} mb={4}>
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <StatCard
                                 title="Apólices Pendentes"
                                 value={stats.pendingPolicies}
@@ -134,7 +134,7 @@ const SeguradoraDashboard = () => {
                                 bgColor="#F59E0B"
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <StatCard
                                 title="Apólices Ativas"
                                 value={stats.activePolicies}
@@ -142,7 +142,7 @@ const SeguradoraDashboard = () => {
                                 bgColor="#10B981"
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <StatCard
                                 title="Sinistros Pendentes"
                                 value={stats.pendingClaims}
@@ -150,7 +150,7 @@ const SeguradoraDashboard = () => {
                                 bgColor="#EF4444"
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <StatCard
                                 title="Receita (Mensal)"
                                 value={`${stats.totalRevenue.toLocaleString()} MT`}

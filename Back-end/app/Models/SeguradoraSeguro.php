@@ -101,7 +101,7 @@ class SeguradoraSeguro extends Model
     public function agentes()
     {
         return $this->belongsToMany(Agente::class, 'agente_seguroseguradora', 'id_seguro_seguradora', 'id_agente')
-                    ->withPivot('status')
+                    ->withPivot('status', 'percentagem_comissao_angariacao', 'percentagem_comissao_cobranca', 'data_inicio', 'data_fim')
                     ->withTimestamps();
     }
 

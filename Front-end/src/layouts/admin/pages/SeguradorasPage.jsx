@@ -174,8 +174,8 @@ const SeguradorasPage = () => {
     ];
 
     return (
-        <div style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div className="page-container">
+            <div className="page-header-row">
                 <Title level={2}>Gestão de Seguradoras</Title>
                 <Button
                     icon={<ReloadOutlined />}

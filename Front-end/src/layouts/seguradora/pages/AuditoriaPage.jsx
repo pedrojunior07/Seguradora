@@ -1,10 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Card, Typography, Tag, Space, Avatar, Modal, Descriptions, Empty } from 'antd';
-import { HistoryOutlined, UserOutlined, ClockCircleOutlined, LaptopOutlined, ArrowRightOutlined, DiffOutlined } from '@ant-design/icons';
+import {
+    HistoryOutlined,
+    UserOutlined,
+    ClockCircleOutlined,
+    LaptopOutlined,
+    ArrowRightOutlined,
+    DiffOutlined,
+} from '@ant-design/icons';
 import api from '../../../services/api';
 import moment from 'moment';
 
 const { Title, Text } = Typography;
+
+const ACTION_CONFIG = {
+    aprovar:   { color: 'green',   label: 'Aprovou' },
+    negar:     { color: 'red',     label: 'Negou' },
+    rejeitar:  { color: 'red',     label: 'Rejeitou' },
+    ativar:    { color: 'blue',    label: 'Ativou' },
+    desativar: { color: 'orange',  label: 'Desativou' },
+    analisar:  { color: 'gold',    label: 'Analisou' },
+    criar:     { color: 'cyan',    label: 'Criou' },
+    cancelar:  { color: 'volcano', label: 'Cancelou' },
+};
+
+const getModelName = (auditableType) => {
+    if (!auditableType) return '—';
+    const parts = auditableType.split('\\');
+    return parts[parts.length - 1];
+};
 
 const AuditoriaPage = () => {
     const [logs, setLogs] = useState([]);
@@ -13,62 +37,51 @@ const AuditoriaPage = () => {
     const [detailModal, setDetailModal] = useState({ visible: false, record: null });
 
     useEffect(() => {
-        fetchLogs();
+        fetchLogs(pagination.current);
     }, [pagination.current]);
 
-    const fetchLogs = async () => {
+    const fetchLogs = async (page) => {
         setLoading(true);
         try {
-            const response = await api.get(`/seguradora/auditoria?page=${pagination.current}`);
-            setLogs(response.data.data);
-            setPagination({
-                ...pagination,
-                total: response.data.total
-            });
+            const response = await api.get('/seguradora/auditoria', { params: { page } });
+            setLogs(response.data.data || []);
+            setPagination(prev => ({ ...prev, total: response.data.total || 0 }));
         } catch (error) {
             console.error('Erro ao buscar logs:', error);
+            setLogs([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const getActionTag = (action) => {
-        const actions = {
-            aprovar: { color: 'green', label: 'APROVOU' },
-            negar: { color: 'red', label: 'NEGOU' },
-            rejeitar: { color: 'red', label: 'REJEITOU' },
-            ativar: { color: 'blue', label: 'ATIVOU' },
-            desativar: { color: 'orange', label: 'DESATIVOU' },
-            analisar: { color: 'gold', label: 'ANALISOU' },
-            criar: { color: 'cyan', label: 'CRIOU' },
-            cancelar: { color: 'volcano', label: 'CANCELOU' },
-        };
-        const config = actions[action] || { color: 'default', label: action.toUpperCase() };
-        return <Tag color={config.color} style={{ fontWeight: 'bold' }}>{config.label}</Tag>;
-    };
-
     const renderChanges = (oldData, newData) => {
-        if (!oldData && !newData) return <Empty description="Sem detalhes de alteração" image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+        if (!oldData && !newData) {
+            return <Empty description="Sem detalhes de alteração" image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+        }
 
-        const keys = Array.from(new Set([...Object.keys(oldData || {}), ...Object.keys(newData || {})]));
+        const keys = Array.from(new Set([
+            ...Object.keys(oldData || {}),
+            ...Object.keys(newData || {}),
+        ]));
+
+        const SKIP = ['updated_at', 'created_at', 'data_modificacao'];
         const changes = keys.filter(key => {
-            const oldVal = oldData?.[key];
-            const newVal = newData?.[key];
-            // Ignorar campos de timestamp e outros irrelevantes se desejar
-            if (['updated_at', 'created_at', 'data_modificacao'].includes(key)) return false;
-            return JSON.stringify(oldVal) !== JSON.stringify(newVal);
+            if (SKIP.includes(key)) return false;
+            return JSON.stringify(oldData?.[key]) !== JSON.stringify(newData?.[key]);
         });
 
-        if (changes.length === 0) return <Text type="secondary">Nenhuma alteração de valor detectada nos campos principais.</Text>;
+        if (changes.length === 0) {
+            return <Text type="secondary">Nenhuma alteração nos campos principais.</Text>;
+        }
 
         return (
-            <Descriptions title="Diferenças Detectadas" bordered column={1} size="small">
+            <Descriptions title="Diferenças" bordered column={1} size="small">
                 {changes.map(key => (
-                    <Descriptions.Item label={<strong>{key.toUpperCase()}</strong>} key={key}>
+                    <Descriptions.Item label={<strong>{key}</strong>} key={key}>
                         <Space>
                             <Text delete type="secondary">{String(oldData?.[key] ?? 'nulo')}</Text>
                             <ArrowRightOutlined />
-                            <Text strong type="success">{String(newData?.[key] ?? 'nulo')}</Text>
+                            <Text strong style={{ color: '#059669' }}>{String(newData?.[key] ?? 'nulo')}</Text>
                         </Space>
                     </Descriptions.Item>
                 ))}
@@ -82,116 +95,138 @@ const AuditoriaPage = () => {
             dataIndex: 'user',
             key: 'user',
             render: (user) => (
-                <Space>
-                    <Avatar icon={<UserOutlined />} size="small" />
+                <Space size={8}>
+                    <Avatar icon={<UserOutlined />} size="small" style={{ background: '#2563EB' }} />
                     <div>
-                        <Text strong>{user?.name || 'Sistema'}</Text>
+                        <Text strong style={{ fontSize: 13 }}>{user?.name || 'Sistema'}</Text>
                         <br />
-                        <Text type="secondary" style={{ fontSize: '11px' }}>{user?.email}</Text>
+                        <Text type="secondary" style={{ fontSize: 11 }}>{user?.email || ''}</Text>
                     </div>
                 </Space>
-            )
+            ),
         },
         {
             title: 'Ação',
             dataIndex: 'action',
             key: 'action',
-            render: (action) => getActionTag(action)
+            render: (action) => {
+                if (!action) return <Text type="secondary">—</Text>;
+                const cfg = ACTION_CONFIG[action] || { color: 'default', label: action };
+                return <Tag color={cfg.color} style={{ fontWeight: 600, textTransform: 'capitalize' }}>{cfg.label}</Tag>;
+            },
         },
         {
             title: 'Objeto',
             key: 'object',
             render: (_, record) => {
-                const parts = record.auditable_type.split('\\');
-                const modelName = parts[parts.length - 1];
-                return <Tag color="blue">{modelName} #{record.auditable_id}</Tag>;
-            }
+                const name = getModelName(record.auditable_type);
+                return record.auditable_id
+                    ? <Tag color="blue">{name} #{record.auditable_id}</Tag>
+                    : <Text type="secondary">—</Text>;
+            },
         },
         {
             title: 'Descrição',
             dataIndex: 'description',
             key: 'description',
-            render: (text) => <Text style={{ fontSize: '13px' }}>{text || '-'}</Text>
+            render: (text) => <Text style={{ fontSize: 13 }}>{text || '—'}</Text>,
         },
         {
-            title: 'Histórico',
+            title: 'Alterações',
             key: 'history',
-            render: (_, record) => (record.old_values || record.new_values) ? (
-                <Tag
-                    icon={<DiffOutlined />}
-                    color="processing"
-                    className="cursor-pointer"
-                    onClick={() => setDetailModal({ visible: true, record })}
-                >
-                    Ver Mudanças
-                </Tag>
-            ) : <Text type="secondary">-</Text>
+            render: (_, record) =>
+                record.old_values || record.new_values ? (
+                    <Tag
+                        icon={<DiffOutlined />}
+                        color="processing"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => setDetailModal({ visible: true, record })}
+                    >
+                        Ver mudanças
+                    </Tag>
+                ) : (
+                    <Text type="secondary">—</Text>
+                ),
         },
         {
-            title: 'Data e Hora',
+            title: 'Data e hora',
             dataIndex: 'created_at',
             key: 'date',
             render: (date) => (
-                <Space>
-                    <ClockCircleOutlined style={{ color: '#bfbfbf' }} />
-                    <Text type="secondary">{moment(date).format('DD/MM/YYYY HH:mm:ss')}</Text>
+                <Space size={6}>
+                    <ClockCircleOutlined style={{ color: '#94a3b8', fontSize: 12 }} />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                        {date ? moment(date).format('DD/MM/YYYY HH:mm') : '—'}
+                    </Text>
                 </Space>
-            )
+            ),
         },
         {
-            title: 'Terminal',
+            title: 'IP',
             dataIndex: 'ip_address',
             key: 'ip',
             render: (ip) => (
-                <Space>
-                    <LaptopOutlined style={{ color: '#bfbfbf' }} />
-                    <Text type="secondary" style={{ fontSize: '11px' }}>{ip || 'N/A'}</Text>
+                <Space size={6}>
+                    <LaptopOutlined style={{ color: '#94a3b8', fontSize: 12 }} />
+                    <Text type="secondary" style={{ fontSize: 11 }}>{ip || '—'}</Text>
                 </Space>
-            )
-        }
+            ),
+        },
     ];
 
     return (
-        <div className="p-6">
-            <Card variant="borderless" className="shadow-sm">
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <Title level={2} style={{ margin: 0 }}>
-                            <HistoryOutlined /> Auditoria do Sistema
-                        </Title>
-                        <Text type="secondary">Rastreamento de operações e mudanças de estado nos registros</Text>
-                    </div>
-                </div>
+        <>
+        <div className="page-container">
+            <div style={{ marginBottom: 24 }}>
+                <Title level={4} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <HistoryOutlined /> Auditoria
+                </Title>
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                    Registo de operações e alterações de estado
+                </Text>
+            </div>
 
-                <Table
-                    columns={columns}
-                    dataSource={logs}
-                    rowKey="id"
-                    loading={loading}
-                    pagination={{
-                        ...pagination,
-                        onChange: (page) => setPagination({ ...pagination, current: page }),
-                        showSizeChanger: false
-                    }}
-                    size="small"
-                />
-            </Card>
+            <Table
+                columns={columns}
+                dataSource={logs}
+                rowKey="id"
+                loading={loading}
+                pagination={{
+                    current: pagination.current,
+                    pageSize: pagination.pageSize,
+                    total: pagination.total,
+                    onChange: (page) => setPagination(prev => ({ ...prev, current: page })),
+                    showSizeChanger: false,
+                    showTotal: (total) => `${total} registos`,
+                }}
+                size="small"
+                scroll={{ x: 900 }}
+            />
+        </div>
 
             <Modal
                 title={
                     <Space>
                         <HistoryOutlined />
-                        <span>Detalhes da Alteração - {detailModal.record?.action.toUpperCase()}</span>
+                        <span>
+                            Alteração —{' '}
+                            {detailModal.record?.action
+                                ? (ACTION_CONFIG[detailModal.record.action]?.label ?? detailModal.record.action)
+                                : ''}
+                        </span>
                     </Space>
                 }
                 open={detailModal.visible}
                 onCancel={() => setDetailModal({ visible: false, record: null })}
                 footer={null}
-                width={800}
+                width={700}
             >
-                {detailModal.record && renderChanges(detailModal.record.old_values, detailModal.record.new_values)}
+                {detailModal.record && renderChanges(
+                    detailModal.record.old_values,
+                    detailModal.record.new_values,
+                )}
             </Modal>
-        </div>
+        </>
     );
 };
 

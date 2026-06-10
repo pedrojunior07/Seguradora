@@ -27,9 +27,10 @@ class AuthService
                         'telefone2' => $dados['telefone2'] ?? null,
                         'email' => $dados['email'],
                         'endereco' => $dados['endereco'] ?? null,
-                        'licenca' => $dados['licenca'] ?? null,
                         'logo' => $dados['logo'] ?? null,
                         'status' => true,
+                        'verificado' => false,
+                        'status_verificacao' => 'nao_enviado',
                     ]);
                     break;
 
@@ -43,6 +44,8 @@ class AuthService
                         'email' => $dados['email'],
                         'endereco' => $dados['endereco'] ?? null,
                         'status' => true,
+                        'verificado' => false,
+                        'status_verificacao' => 'nao_enviado',
                     ]);
                     break;
 
@@ -138,10 +141,13 @@ class AuthService
 
         $token = auth('api')->login($user);
 
+        if (in_array($user->perfil, ['seguradora', 'corretora', 'cliente', 'agente'])) {
+            $user->load($user->perfil);
+        }
+
         return [
-            'user' => in_array($user->perfil, ['seguradora', 'corretora', 'cliente', 'agente']) 
-                ? $user->load($user->perfil) 
-                : $user,
+            'user' => $user,
+            'entidade' => $user->getPerfilEntidade(),
             'token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
@@ -162,24 +168,21 @@ class AuthService
             // Criar vínculo
             if ($vinculoTipo === 'seguradora') {
                 DB::table('agente_seguradora')->insert([
-                    'id_agente' => $agente->id_agente,
+                    'id_agente'    => $agente->id_agente,
                     'id_seguradora' => $vinculoId,
-                    'status' => true,
-                    'comissao_percentagem' => $dados['comissao_percentagem'] ?? 0,
-                    'data_inicio' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'status'       => true,
+                    'data_inicio'  => now(),
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
                 ]);
             } else {
                 DB::table('agente_corretora')->insert([
-                    'id_agente' => $agente->id_agente,
+                    'id_agente'   => $agente->id_agente,
                     'id_corretora' => $vinculoId,
                     'data_inicio' => now(),
-                    'comissao_angariacao' => $dados['comissao_angariacao'] ?? 0,
-                    'comissao_cobranca' => $dados['comissao_cobranca'] ?? 0,
-                    'status' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'status'      => true,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
                 ]);
             }
 

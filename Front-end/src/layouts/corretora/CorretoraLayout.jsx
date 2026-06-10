@@ -1,12 +1,12 @@
 // src/layouts/corretora/CorretoraLayout.jsx
 import { useState, useEffect } from 'react';
-import { Layout, Drawer, Modal, Typography, Button } from 'antd';
+import { Layout, Drawer, Modal, Typography } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import SideBar from './components/layout/SideBar';
 import { SafetyCertificateOutlined, ArrowRightOutlined } from '@ant-design/icons';
 
-const { Text, Title, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 const { Content } = Layout;
 
 const CorretoraLayout = () => {
@@ -84,9 +84,9 @@ const CorretoraLayout = () => {
                     onClose={() => setDrawerVisible(false)}
                     open={drawerVisible}
                     closable={false}
-                    width={280}
                     styles={{
-                        body: { padding: 0, background: '#FFFFFF' }
+                        body: { padding: 0, background: '#1e3a5f' },
+                        wrapper: { width: 280 },
                     }}
                 >
                     <SideBar collapsed={false} onMenuClick={() => setDrawerVisible(false)} />

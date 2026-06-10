@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Table, Typography, Space, Button, Tag, Spin, message } from 'antd';
-import { CarOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
+import { CarOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import api from '../../../services/api';
 import FormularioVeiculo from './FormularioVeiculo';
 
@@ -10,6 +10,7 @@ const VerVeiculosFrotaModal = ({ visible, onCancel, frota }) => {
     const [veiculos, setVeiculos] = useState([]);
     const [loading, setLoading] = useState(false);
     const [editingVeiculo, setEditingVeiculo] = useState(null);
+    const [addingVeiculo, setAddingVeiculo] = useState(false);
 
     const fetchVeiculos = async () => {
         if (!frota) return;
@@ -70,9 +71,12 @@ const VerVeiculosFrotaModal = ({ visible, onCancel, frota }) => {
         <>
             <Modal
                 title={`Veículos na Frota: ${frota?.nome_frota}`}
-                open={visible && !editingVeiculo}
+                open={visible && !editingVeiculo && !addingVeiculo}
                 onCancel={onCancel}
                 footer={[
+                    <Button key="add" type="primary" icon={<PlusOutlined />} onClick={() => setAddingVeiculo(true)}>
+                        Adicionar Veículo
+                    </Button>,
                     <Button key="close" onClick={onCancel}>Fechar</Button>
                 ]}
                 width={800}
@@ -100,6 +104,25 @@ const VerVeiculosFrotaModal = ({ visible, onCancel, frota }) => {
                     onCancel={() => setEditingVeiculo(null)}
                     onSuccess={() => {
                         setEditingVeiculo(null);
+                        fetchVeiculos();
+                    }}
+                />
+            </Modal>
+
+            <Modal
+                title={`Adicionar Veículo à Frota: ${frota?.nome_frota}`}
+                open={addingVeiculo}
+                onCancel={() => setAddingVeiculo(false)}
+                footer={null}
+                width={900}
+                style={{ top: 10 }}
+                styles={{ body: { maxHeight: 'calc(100vh - 150px)', overflowY: 'auto' } }}
+            >
+                <FormularioVeiculo
+                    frotaId={frota?.id}
+                    onCancel={() => setAddingVeiculo(false)}
+                    onSuccess={() => {
+                        setAddingVeiculo(false);
                         fetchVeiculos();
                     }}
                 />

@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Layout, Drawer } from 'antd';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/SideBar';
 import { Modal, Typography, Button } from 'antd';
 import { SafetyCertificateOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+
+// Rotas de detalhe onde a sidebar fica colapsada automaticamente
+const DETAIL_ROUTES = [
+    /^\/seguradora\/seguros\/\d+/,
+    /^\/seguradora\/propostas\/\d+/,
+    /^\/seguradora\/sinistros\/\d+/,
+    /^\/seguradora\/clientes\/\d+/,
+];
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -15,7 +23,9 @@ const SeguradoraLayout = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [drawerVisible, setDrawerVisible] = useState(false);
+    const [userToggled, setUserToggled] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     // Event listener for verification errors
     useEffect(() => {
@@ -52,25 +62,33 @@ const SeguradoraLayout = () => {
     // Detectar tamanho da tela
     useEffect(() => {
         const handleResize = () => {
-            const mobile = window.innerWidth < 992; // lg breakpoint
+            const mobile = window.innerWidth < 992;
             setIsMobile(mobile);
-
-            // Auto-collapse sidebar em telas menores
-            if (mobile) {
-                setCollapsed(true);
-            }
+            if (mobile) setCollapsed(true);
         };
-
-        handleResize(); // Check inicial
+        handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Auto-colapsar em páginas de detalhe; expandir ao voltar para listas
+    useEffect(() => {
+        if (isMobile) return;
+        const isDetail = DETAIL_ROUTES.some(r => r.test(location.pathname));
+        if (isDetail) {
+            setCollapsed(true);
+            setUserToggled(false);
+        } else if (!userToggled) {
+            setCollapsed(false);
+        }
+    }, [location.pathname, isMobile]);
 
     const toggleSidebar = () => {
         if (isMobile) {
             setDrawerVisible(!drawerVisible);
         } else {
-            setCollapsed(!collapsed);
+            setUserToggled(true);
+            setCollapsed(c => !c);
         }
     };
 

@@ -255,23 +255,122 @@ const VerificacaoConta = () => {
 
     if (status?.status_verificacao === 'aprovado') {
         return (
-            <div className="p-8">
-                <Result
-                    status="success"
-                    title={<span style={{ fontWeight: 800, fontSize: '28px' }}>Sua Conta está Totalmente Verificada!</span>}
-                    subTitle={<span style={{ fontSize: '16px' }}>Você já pode gerenciar seguros, apólices e atender seus clientes sem restrições.</span>}
-                    extra={[
-                        <Button type="primary" key="console" size="large" onClick={() => window.location.href = '/seguradora/dashboard'} style={{ borderRadius: '12px', height: '50px', padding: '0 40px', fontWeight: 700 }}>
-                            Ir para Dashboard
-                        </Button>
-                    ]}
-                />
+            <div style={{ padding: '40px', maxWidth: '860px', margin: '0 auto' }}>
+                <div style={{
+                    background: 'linear-gradient(135deg, #052e16 0%, #14532d 55%, #166534 100%)',
+                    borderRadius: '32px',
+                    padding: '64px 48px',
+                    textAlign: 'center',
+                    marginBottom: '28px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: '0 30px 60px rgba(5, 46, 22, 0.35)'
+                }}>
+                    <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                    <div style={{ position: 'absolute', bottom: '-70px', left: '-40px', width: '260px', height: '260px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+
+                    <div style={{
+                        border: '2px solid rgba(0, 128, 0, 0.2)',
+                        borderRadius: '8px',
+                        padding: '20px',
+                        backgroundColor: '#f0fdf4',
+                        textAlign: 'center',
+                        marginBottom: '20px'
+                    }}>
+                        <SafetyCertificateOutlined style={{ fontSize: '48px', color: '#22c55e' }} />
+                    </div>
+
+                    <div style={{ color: '#22c55e', fontWeight: 700, fontSize: '24px', textAlign: 'center', marginBottom: '12px' }}>
+                        Sua conta foi verificada com sucesso.
+                    </div>
+                    <div style={{
+                        color: '#374151',
+                        fontSize: '16px',
+                        textAlign: 'center',
+                        lineHeight: 1.6
+                    }}>
+                        Agora você tem acesso total ao sistema para gerenciar seguros, apólices e atender seus clientes.
+                    </div>
+
+                    <Button
+                        size="large"
+                        onClick={() => window.location.href = '/seguradora/dashboard'}
+                        style={{
+                            borderRadius: '8px',
+                            backgroundColor: '#22c55e',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            padding: '10px 20px',
+                            textTransform: 'uppercase',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'block',
+                            margin: '20px auto'
+                        }}
+                    >
+                        Acessar Dashboard
+                    </Button>
+
+                    <style>
+                        {`
+                            @keyframes pulse {
+                                0%, 100% {
+                                    transform: scale(1);
+                                    box-shadow: 0 0 0 12px rgba(74, 222, 128, 0.2);
+                                }
+                                50% {
+                                    transform: scale(1.05);
+                                    box-shadow: 0 0 0 16px rgba(74, 222, 128, 0.4);
+                                }
+                            }
+                        `}
+                    </style>
+                </div>
+
+                <Row gutter={16}>
+                    {[
+                        {
+                            icon: <FileProtectOutlined style={{ fontSize: '24px', color: '#2563eb' }} />,
+                            bg: '#eff6ff',
+                            title: 'Gestão de Seguros',
+                            desc: 'Crie e gerencie apólices livremente na plataforma.'
+                        },
+                        {
+                            icon: <IdcardOutlined style={{ fontSize: '24px', color: '#16a34a' }} />,
+                            bg: '#f0fdf4',
+                            title: 'Carteira de Clientes',
+                            desc: 'Acesso completo para atender e gerir clientes.'
+                        },
+                        {
+                            icon: <BankOutlined style={{ fontSize: '24px', color: '#7c3aed' }} />,
+                            bg: '#faf5ff',
+                            title: 'Recebíveis Bancários',
+                            desc: 'Prémios transferidos diretamente à sua conta validada.'
+                        }
+                    ].map((item, i) => (
+                        <Col key={i} xs={24} sm={8}>
+                            <Card style={{ borderRadius: '20px', textAlign: 'center', border: '1px solid #f1f5f9', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} styles={{ body: { padding: '28px 20px' } }}>
+                                <div style={{
+                                    width: '52px', height: '52px',
+                                    background: item.bg,
+                                    borderRadius: '14px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    margin: '0 auto 14px'
+                                }}>
+                                    {item.icon}
+                                </div>
+                                <Text strong style={{ display: 'block', marginBottom: '6px', fontSize: '14px' }}>{item.title}</Text>
+                                <Text type="secondary" style={{ fontSize: '12px', lineHeight: 1.5 }}>{item.desc}</Text>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
             </div>
         );
     }
 
     return (
-        <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto', fontFamily: '"Inter", sans-serif' }}>
+        <div className="page-container" style={{ maxWidth: '1200px', margin: '0 auto', fontFamily: '"Inter", sans-serif' }}>
             <div style={{ marginBottom: '40px', textAlign: 'center' }}>
                 <Title level={1} style={{ fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>Verificação de Identidade</Title>
                 <Paragraph style={{ fontSize: '16px', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>

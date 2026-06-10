@@ -13,26 +13,41 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('detalhes_bancarios', function (Blueprint $table) {
-            $table->unsignedBigInteger('bankable_id')->nullable()->after('id');
-            $table->string('bankable_type')->nullable()->after('bankable_id');
-            $table->string('codigo_banco')->nullable()->after('nome_banco');
-            $table->string('agencia')->nullable()->after('codigo_banco');
-            $table->string('tipo_conta')->default('corrente')->after('numero_conta');
-            $table->string('nuit_titular')->nullable()->after('titular');
-            $table->boolean('principal')->default(false)->after('nuit_titular');
+            if (!Schema::hasColumn('detalhes_bancarios', 'bankable_id')) {
+                $table->unsignedBigInteger('bankable_id')->nullable()->after('id');
+            }
+            if (!Schema::hasColumn('detalhes_bancarios', 'bankable_type')) {
+                $table->string('bankable_type')->nullable()->after('bankable_id');
+            }
+            if (!Schema::hasColumn('detalhes_bancarios', 'codigo_banco')) {
+                $table->string('codigo_banco')->nullable()->after('nome_banco');
+            }
+            if (!Schema::hasColumn('detalhes_bancarios', 'agencia')) {
+                $table->string('agencia')->nullable()->after('codigo_banco');
+            }
+            if (!Schema::hasColumn('detalhes_bancarios', 'tipo_conta')) {
+                $table->string('tipo_conta')->default('corrente')->after('numero_conta');
+            }
+            if (!Schema::hasColumn('detalhes_bancarios', 'nuit_titular')) {
+                $table->string('nuit_titular')->nullable()->after('titular');
+            }
+            if (!Schema::hasColumn('detalhes_bancarios', 'principal')) {
+                $table->boolean('principal')->default(false)->after('nuit_titular');
+            }
         });
 
         // Migrar dados existentes de seguradora_id para polymorphic
-        DB::table('detalhes_bancarios')->whereNotNull('seguradora_id')->update([
-            'bankable_id' => DB::raw('seguradora_id'),
-            'bankable_type' => 'App\Models\Seguradora',
-        ]);
+        if (Schema::hasColumn('detalhes_bancarios', 'seguradora_id')) {
+            DB::table('detalhes_bancarios')->whereNotNull('seguradora_id')->update([
+                'bankable_id' => DB::raw('seguradora_id'),
+                'bankable_type' => 'App\Models\Seguradora',
+            ]);
 
-        Schema::table('detalhes_bancarios', function (Blueprint $table) {
-            // Remover a foreign key e a coluna original após a migração
-            $table->dropForeign(['seguradora_id']);
-            $table->dropColumn('seguradora_id');
-        });
+            Schema::table('detalhes_bancarios', function (Blueprint $table) {
+                // Remover a coluna original após a migração
+                $table->dropColumn('seguradora_id');
+            });
+        }
     }
 
     /**
